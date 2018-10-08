@@ -1,0 +1,198 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<#import "/system/dicdata/dataMacro.html" as dic />
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+$(function(){
+	jQuery("#btn_lingyong").bind("click",function(){ 
+		opendialog("资产领用","${ctx}/zichan/lingyong/pre?zcid=${(returnDatas.data.id)!''}");  
+	});
+	jQuery("#btn_guihuan").bind("click",function(){ 
+		opendialog("资产归还","${ctx}/zichan/guihuan/pre?zcid=${(returnDatas.data.id)!''}");  
+	});
+	jQuery("#btn_baosun").bind("click",function(){ 
+		opendialog("资产报损","${ctx}/zichan/baosun/pre?zcid=${(returnDatas.data.id)!''}");  
+	});
+	jQuery("#btn_chushou").bind("click",function(){ 
+		opendialog("资产出售","${ctx}/zichan/chushou/pre?zcid=${(returnDatas.data.id)!''}");  
+	});
+})
+var _openWindow;
+function opendialog(_title,url){
+	//页面层
+	_openWindow = layer.open({
+	  type: 2,
+	  skin: 'layui-layer-rim', //加上边框
+	  area: ['800px', '500px'], //宽高
+	  content: [url, 'yes'],
+	  title:_title,
+	  closeBtn:1
+	});
+}
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+											        <button type="button" id="btn_lingyong" class="layui-btn " style="margin:8px 0;">领用</button>
+											        <button type="button" id="btn_guihuan"  class="layui-btn " style="margin:8px 0;">归还</button>
+											        <button type="button" id="btn_baosun" class="layui-btn layui-btn-danger" style="margin:8px 0;">报损</button>
+											        <button type="button" id="btn_chushou"  class="layui-btn layui-btn-danger" style="margin:8px 0;">出售</button>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form"  method="post" action="${ctx}/zichan/update">
+														<table class="layui-table" lay-even>
+															<thead>
+																<tr>
+																	<th colspan="4">资产信息</th>
+																</tr>
+															</thead>
+															<tbody>
+																<tr>
+																	<td>资产编号</td>
+																	<td>${(returnDatas.data.zccode)!''}</td>
+																	<td>资产名称</td>
+																	<td>${(returnDatas.data.zcname)!''}</td>
+																</tr>
+																<tr>
+																	<td>资产类型</td>
+																	<td>${(returnDatas.data.zctypeName)!''}</td>
+																	<td>规格类别</td>
+																	<td>${(returnDatas.data.zcleibieName)!''}</td>
+																</tr>
+																<tr>
+																	<td>规格型号</td>
+																	<td>${(returnDatas.data.guige)!''}</td>
+																	<td>单位</td>
+																	<td>${(returnDatas.data.danwei)!''}</td>
+																</tr>
+																<tr>
+																	<td>存放地点</td>
+																	<td>${(returnDatas.data.zccfd)!''}</td>
+																	<td>购买日期</td>
+																	<td>${((returnDatas.data.goumaidate)?string('yyyy-MM-dd'))!'' }</td>
+																</tr>
+																<tr>
+																	<td>资产数量</td>
+																	<td>${(returnDatas.data.zcnumber)!''}</td>
+																	<td>库存量</td>
+																	<td>${(returnDatas.data.kucun)!''}</td>
+																</tr>
+																<tr>
+																	<td>资产单价</td>
+																	<td>${(returnDatas.data.zcprice)!''}</td>
+																	<td>资产金额</td>
+																	<td>${(returnDatas.data.zcmoney)!''}</td>
+																</tr>
+																<tr>
+																	<td>使用年限</td>
+																	<td>${(returnDatas.data.nianxian)!''}</td>
+																	<td>质保到期日</td>
+																	<td>${((returnDatas.data.zhibaodate)?string('yyyy-MM-dd'))!'' }</td>
+																</tr>
+																<tr>
+																	<td>经销商</td>
+																	<td>${(returnDatas.data.jingxiaoshang)!''}</td>
+																	<td>经销商联系方式</td>
+																	<td>${(returnDatas.data.jingxiaoshangtel)!''}</td>
+																</tr>
+																<tr>
+																	<td>资产配置情况</td>
+																	<td>${(returnDatas.data.zcconfig)!''}</td>
+																	<td>经手人</td>
+																	<td>${(returnDatas.data.jsuser)!''}</td>
+																</tr>
+																<tr>
+																	<td>入库日期</td>
+																	<td>${((returnDatas.data.rukudate)?string('yyyy-MM-dd'))!'' }</td>
+																	<td>备注</td>
+																	<td>${(returnDatas.data.remark)!''}</td>
+																</tr>
+															</tbody>
+														</table>
+													</form>
+													<table class="layui-table" style="width: 30%">	
+											    		<tr>
+														<th colspan="3">资产现使用情况</th>	
+														</tr>
+														
+														<tr style="font-weight: bold">
+														<td>领用人</td>
+														<td>领用人部门</td>
+														<td>现领用数量</td>
+														</tr>
+														
+														<#if listling??>
+														     <#list listling as ling>
+														     <tr>
+														         <td>${(ling.linguser)!''}</td>
+														         <td>${(ling.lingunit)!''}</td>
+														         <td>${(ling.lingnum)!''}</td>
+														         </tr>
+														     </#list>
+														</#if>
+													</table>
+													<table class="layui-table" style="width: 90%">	
+													    	<tr>
+															<th colspan="8">资产变动记录</th>	
+															</tr>
+															<tr style="font-weight: bold">
+															<td>变动日期</td>
+															<td>变动类型</td>
+															<td>变动人</td>
+															<td>变动人部门</td>
+															<td>变动数量</td>
+															<td>审核人</td>
+															<td>其它</td>
+															<td>备注</td>
+															</tr>
+															
+															<#if listrecord??>
+															     <#list listrecord as re>
+															        <tr>
+															         <td> ${((re.redate)?string('yyyy-MM-dd'))!'' }</td>
+															         <td>${(re.retype)!''}</td>
+															         <td>${(re.reuser)!''}</td>
+															         <td>${(re.reunit)!''}</td>
+															         <td>${(re.renum)!''}</td>
+															         <td>${(re.bak1)!''}</td>
+															         <#if re?? && re.retype=='出售'>
+															           <td>出售金额：${(re.remoney)!''}</td>
+															         <#else>
+															            <td></td>  
+															         </#if>
+															         <td>${(re.remark)!''}</td>
+															        </tr> 
+															     </#list>
+															</#if>
+													</table>	
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	 jQuery(function(){
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(null,function(_json){
+			 if(_json.status == 'success'){
+				 layer.alert("保存成功",function(){
+				 window.location.href=springrain.appendToken("${ctx}/salaryinfo/list?springraintoken="+springraintoken)
+				 })
+			 }else{
+				 layer.alert(_json.message,{icon: 5});
+			 }
+		 });
+	 });
+	 jQuery(document).ready(function(){
+			$("#user").select2({width:'320px',height:'26px'});
+			$("#salaryTypeId").select2({width:'320px',height:'26px'});
+			
+			//选择角色给其他信息自动填充；
+			$('#user').change(function(){
+				var userId = $('#user option:selected') .val();//选中的值
+				var inDateStr = $("#inDateStr").val();
+				$.ajax({
+					url:"${ctx}/salaryinfo/update/more",
+					type:"post",
+					dataType:"json",
+					data: {userId:userId,inDate:inDateStr} , 
+					async: false,
+					success:function(_json){
+						if(_json.status=='success'){
+							if(_json.data!=null){
+									$("#userId").val(_json.data.id);
+									$("#rigongzi").val(_json.data.payDay);
+									$("#userAccount").val(_json.data.account);
+									$("#userName").val(_json.data.name);
+							}
+						}else{
+							$("#user option[value='']").prop("selected",true);
+							$("#user").select2({width:'320px',height:'26px'});
+							$("#rigongzi").val("");
+							layer.alert(_json.message,{icon: 5});
+						}
+					}
+				});
+				})
+		//类型改变		
+		$('#salaryTypeId').change(function(){
+					
+					var salaryType = $("#salaryTypeId  option:selected").text();
+					var salaryTypeId = $('#salaryTypeId option:selected') .val();//选中的值
+					$("#salaryType").val(salaryType);
+					if(salaryTypeId=="N000014"||salaryTypeId=="N000013"){
+						$("#numberDay").val("");
+						$("#divNumberDay").show();
+						$('#amount').attr("readonly","readonly")//将input元素设置为readonly 　　 
+					}else{
+						$("#divNumberDay").hide();
+						$('#amount').removeAttr("readonly");//去除input元素的readonly属性 　
+					}
+					$("#amount").val("");
+				})
+			});
+	 //赋值
+	 function change() {
+		 var userId = $('#user option:selected').val();//选中的值
+		 if(userId == ""){
+			 layer.alert("请选择用户");
+			 return;
+		 }
+		 var numberDay = $("#numberDay").val();
+		 if(numberDay==""){
+			 layer.alert("请填写天数");
+			 return;
+		 }
+		 if(!isNaN(numberDay)){
+		 	var rigongzi = $("#rigongzi").val();
+			 var amount =parseFloat(numberDay)*parseFloat(rigongzi);
+			 $("#amount").val(amount);
+		 }
+	 }
+	 //校验输入天数
+	 function clearNoNum(obj){
+			obj.value = obj.value.replace(/[^\d.]/g,""); //清除"数字"和"."以外的字符
+			obj.value = obj.value.replace(/^\./g,""); //验证第一个字符是数字而不是
+			obj.value = obj.value.replace(/\.{2,}/g,"."); //只保留第一个. 清除多余的
+			obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+			obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); //只能输入两个小数
+			}
+	 </script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+<!-- 													<span>添加工资子表</span> -->
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/salaryinfo/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>
+																<input type="hidden" id="userId" name="userId" value=""/>
+																<input type="hidden" id="salaryType" name="salaryType" value=""/>
+																<input type="hidden" id="userAccount" name="userAccount" value=""/>
+																<input type="hidden" id="userName" name="userName" value=""/>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">归属月份*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="inDateStr" id="inDateStr" datatype="*" nullmsg="不能为空" errormsg="不能为空！" onfocus="WdatePicker({dateFmt:'yyyy-MM'})" class="layui-input" value="${(returnDatas.data.month)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"><span style="color: red;">注：选择用户前请选择归属月份</span></div>
+																	</div>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">用户</label>
+																		<div class="layui-inline col-lg-5"> 
+																		<select id="user" name="user" class="nolayer"  datatype="*" nullmsg="角不能为空"   data-placeholder="请选择用户">
+																						<option  selected="selected" value="">-请选择用户-</option>
+																						<#if userList ??>
+																							<#list userList as user>
+																								<option value="${(user.id)!''}">${(user.name)!''}&nbsp;(${(user.account)!''})</option>
+																							</#list>
+																						</#if>
+																			</select> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																		<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">日工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="rigongzi" id="rigongzi"  readonly="readonly"  autocomplete="off" class="layui-input" value="${(returnDatas.data.amount)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">增减项类型*</label>
+																		<div class="layui-inline col-lg-5">  
+																				<select name="salaryTypeId"   class="nolayer" id="salaryTypeId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" data-placeholder="请选择增减项类型">
+																						<option  value="">-增减项类型-</option>
+																						<#if salaydicList??>
+																							<#list salaydicList as tc>
+																								<option value="${(tc.id)!''}">${(tc.name)!''}</option>
+																							</#list>
+																						</#if>
+																					</select>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6" id="divNumberDay" style="display: none;">
+																		<label class="layui-form-label" >天数</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="numberDay" id="numberDay" onkeyup="clearNoNum(this)" autocomplete="off" class="layui-input" value="${(returnDatas.data.amount)!''}" oninput="change()">
+<!-- 																			<span style="color: red;">注：如果增减项类型需要填写天数，请点击计算按钮，否则该项不用填写</span> -->
+																		</div>
+																		<div class="layui-inline valid-info">
+																		</div>
+																	</div>
+																		<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">金额*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="amount" id="amount" datatype="*" autocomplete="off" class="layui-input" value="${(returnDatas.data.amount)!''}">
+																		</div>
+																		<div class="layui-inline valid-info">
+<!-- 																				<button type="button" class="layui-btn" style="background-color: #ff5722" onclick="jisuan()" >计算</button> -->
+																		</div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">备注*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="remarker" id="remarker"  autocomplete="off" class="layui-input" value="${(returnDatas.data.remarker)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+															</div>
+														</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

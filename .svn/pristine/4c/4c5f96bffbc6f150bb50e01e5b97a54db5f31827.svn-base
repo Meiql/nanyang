@@ -1,0 +1,110 @@
+package org.springrain.erp.tc.service.impl;
+
+import java.io.File;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.tc.entity.TongchouShow;
+import org.springrain.erp.tc.service.ITongchouShowService;
+import org.springrain.frame.entity.IBaseEntity;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.Page;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.service.BaseSpringrainServiceImpl;
+
+
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:42:41
+ * @see org.springrain.erp.tc.service.impl.TongchouShow
+ */
+@Service("tongchouShowService")
+public class TongchouShowServiceImpl extends BaseSpringrainServiceImpl implements ITongchouShowService {
+
+   
+    @Override
+	public String  save(Object entity ) throws Exception{
+	      TongchouShow tongchouShow=(TongchouShow) entity;
+	       return super.save(tongchouShow).toString();
+	}
+
+    @Override
+	public String  saveorupdate(Object entity ) throws Exception{
+	      TongchouShow tongchouShow=(TongchouShow) entity;
+		 return super.saveorupdate(tongchouShow).toString();
+	}
+	
+	@Override
+    public Integer update(IBaseEntity entity ) throws Exception{
+	 TongchouShow tongchouShow=(TongchouShow) entity;
+	return super.update(tongchouShow);
+    }
+    @Override
+	public TongchouShow findTongchouShowById(Object id) throws Exception{
+	 return super.findById(id,TongchouShow.class);
+	}
+	
+/**
+ * 列表查询,每个service都会重载,要把sql语句封装到service中,Finder只是最后的方案
+ * @param finder
+ * @param page
+ * @param clazz
+ * @param o
+ * @return
+ * @throws Exception
+ */
+        @Override
+    public <T> List<T> findListDataByFinder(Finder finder, Page page, Class<T> clazz,
+			Object o) throws Exception{
+			 return super.findListDataByFinder(finder,page,clazz,o);
+			}
+	/**
+	 * 根据查询列表的宏,导出Excel
+	 * @param finder 为空则只查询 clazz表
+	 * @param ftlurl 类表的模版宏
+	 * @param page 分页对象
+	 * @param clazz 要查询的对象
+	 * @param o  querybean
+	 * @return
+	 * @throws Exception
+	 */
+		@Override
+	public <T> File findDataExportExcel(Finder finder,String ftlurl, Page page,
+			Class<T> clazz, Object o)
+			throws Exception {
+			 return super.findDataExportExcel(finder,ftlurl,page,clazz,o);
+		}
+
+	@Override
+	public List<TongchouShow> findListTongchou(Page page,
+			TongchouShow tongchouShow) throws Exception {
+		Finder finder = new Finder();
+		finder.append("select tc.* ,t.`name` dicdataName from "+Finder.getTableName(TongchouShow.class)+" tc ,"+Finder.getTableName(DicData.class)+" t ");
+		finder.append("  where tc.dicttypeId = t.id ");
+		if(StringUtils.isNotBlank(tongchouShow.getDeskShowName())){
+			finder.append(" and tc.deskShowName like:deskShowName");
+			finder.setParam("deskShowName", "%" + tongchouShow.getDeskShowName() + "%");
+		}
+		finder.append(" order by tc.sortno desc");
+		return super.queryForList(finder, TongchouShow.class, page);
+	}
+
+	@Override
+	public List<TongchouShow> findListByTypekey(String typekey)
+			throws Exception {
+		if(StringUtils.isEmpty(typekey)){
+			return null;
+		}
+		Finder finder = new Finder();
+		finder.append("select tc.* ,t.`name` dicdataName from "+Finder.getTableName(TongchouShow.class)+" tc ,"+Finder.getTableName(DicData.class)+" t ");
+		finder.append("  where tc.dicttypeId = t.id ");
+			finder.append(" and t.typekey =:typekey and tc.showOrhidden=:showOrhidden");
+			finder.setParam("typekey", typekey).setParam("showOrhidden", "0");
+		finder.append(" order by tc.sortno asc");
+		return super.queryForList(finder, TongchouShow.class);
+	}
+
+}

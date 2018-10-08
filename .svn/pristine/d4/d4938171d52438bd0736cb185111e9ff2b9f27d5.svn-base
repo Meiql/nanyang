@@ -1,0 +1,42 @@
+package org.springrain.erp.hr.service;
+
+import java.util.List;
+
+import org.springrain.erp.hr.entity.UserInfo;
+import org.springrain.frame.util.Page;
+import org.springrain.frame.util.ReturnDatas;
+import org.springrain.system.service.IBaseSpringrainService;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:47:25
+ * @see org.springrain.erp.hr.service.UserInfo
+ */
+public interface IUserInfoService extends IBaseSpringrainService {
+	
+	/**
+	 * 根据ID查找
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	UserInfo findUserInfoById(Object id) throws Exception;
+	/**
+	 * 查找用户信息
+	 * @return
+	 * @throws Exception
+	 */
+	UserInfo finderUserInfo(UserInfo userInfo)throws Exception;
+	
+	List<UserInfo> findUserInfoByQuery(UserInfo query,Page page) throws Exception;
+	/**
+	 * 根据用户id查找用户详情
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	UserInfo findUserInfoByUserId(String userId) throws Exception;
+	
+	ReturnDatas saveOrUpdate(UserInfo userInfo) throws Exception;
+}

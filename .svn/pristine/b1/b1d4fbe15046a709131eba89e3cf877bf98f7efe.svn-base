@@ -1,0 +1,177 @@
+<!-- 员工基本信息 -->
+<#macro userbaseInfo>
+
+													<table  width="100%" class="Table4">
+																<tr><td colspan="3">&nbsp;</td></tr>
+																<tr>
+																	<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="red">*</font>姓名：
+																	<select id="user" name="user" class="nolayer"   datatype="*" nullmsg="角不能为空"   data-placeholder="请选择用户" >
+																	<#if userList ??>
+																		<option value="">--请选择--</option>
+																		<#list userList as user>
+																			<option value="${(user.id)!''}" >${(user.name)!''}&nbsp;(${(user.account)!''})</option>	
+																		</#list>
+																	</#if>	
+																	</select>
+																	</td>
+																	<td>
+																	<label class="layui-form-label">工号：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="workno" id="workno" readonly="readonly" value="${(returnDatas.data.jobNumber)!''}" class="layui-input"/>
+																		</div>
+																	</td>
+																</tr>
+																<tr><td colspan="2">&nbsp;</td></tr>
+																<tr>
+																	<td>
+																		<label class="layui-form-label">岗位：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="gangwei" id="gangwei" readonly="readonly" value="${(returnDatas.data.dutyTypeName)!''}"  class="layui-input"/>
+																		</div>
+																	</td>
+																	<td>
+																	<label class="layui-form-label">身份证号：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="cardId" id="cardId"  readonly="readonly" value="" class="layui-input"/>
+																		</div>
+																	</td>	
+																</tr>
+																<tr><td colspan="2">&nbsp;</td></tr>
+																<tr>
+																	<td>
+																	<label class="layui-form-label">基本工资：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="jibenpay" id="jibenpay"  readonly="readonly"  value="" class="layui-input"/>
+																		</div>
+																	</td>
+																	<td>
+																		<label class="layui-form-label">考核工资：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="kaohepay" id="kaohepay"   readonly="readonly" value="" class="layui-input"/>
+																		</div>
+																	</td>	
+																</tr>
+																<tr><td colspan="2">&nbsp;</td></tr>
+																<tr>
+																	<td>
+																		<label class="layui-form-label">岗位工资：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="gangweipay" id="gangweipay"   readonly="readonly" value="" class="layui-input"/>
+																		</div>
+																	</td>			
+																	<td>
+																		<label class="layui-form-label">日工资：*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="payDay" id="payDay"   readonly="readonly" value="" class="layui-input"/>
+																		</div>
+																	</td>
+																</tr>
+																<tr><td colspan="2">&nbsp;</td></tr>
+																	<tr>
+																	<td>
+																		<label class="layui-form-label">公司名称：*</label>
+																		<div class="layui-inline col-lg-5"> 
+																		<input type="text" name="company" id="company"  readonly="readonly"  value="" class="layui-input"/> 
+																		</div>
+																</td></tr>
+																<thead>
+															</table>
+		<hr/>
+</#macro>
+<!-- 员工统筹信息--上月 -->
+<#macro userlasttcInfo>
+<hr/>
+统筹标准信息
+															<table class="layui-table" lay-even>
+															<thead>
+																<tr>
+																	<th></th>
+																		<#if tcList??>
+																			<#list tcList as showTitle>
+																				<th>${showTitle.name}</th>
+																			</#list>
+																		</#if>
+																</tr> 
+															</thead>
+															<tbody id="personrecordList">
+															</tbody>
+															<tbody id="companyList">
+															</tbody>
+															</table>
+															<hr/>
+															统筹增减项
+															<table class="layui-table" lay-even>
+															<thead>
+																<tr>
+																	<th>月份</th>
+																	<th>统筹类型</th>
+																	<th>费用类型</th>
+																	<th>公司缴纳部分</th>
+																	<th>个人缴纳部分</th>
+																</tr> 
+															</thead>
+															<tbody id="tczengjian">
+																
+															</tbody>
+															</table>
+															</div>
+</#macro>
+<!-- 员工统筹信息--本月 -->
+<#macro usernowtcInfo>
+<hr/>
+统筹标准信息&nbsp;&nbsp;&nbsp;&nbsp;<button type="button"  class="layui-btn" style="background-color: #ff5722" onclick="productTc();">生成本月统筹</button>
+<!-- <button type="button"  class="layui-btn" style="background-color: #ff5722" onclick="productTc();">生成本月统筹</button> -->
+														
+															<table class="layui-table" lay-even>
+															<thead>
+																<tr>
+																	<th></th>
+																		<#if tcList??>
+																			<#list tcList as showTitle>
+																				<th>${showTitle.name}</th>
+																			</#list>
+																		</#if>
+																</tr> 
+															</thead>
+															<tbody id="personrecordList">
+															</tbody>
+															<tbody id="companyList">
+															</tbody>
+															</table>
+															<hr/>
+															统筹增减项
+															<table class="layui-table" lay-even>
+															<thead>
+																<tr>
+																	<th>月份</th>
+																	<th>统筹类型</th>
+																	<th>费用类型</th>
+																	<th>公司缴纳部分</th>
+																	<th>个人缴纳部分</th>
+																</tr> 
+															</thead>
+															<tbody id="tczengjian">
+																
+															</tbody>
+															</table>
+															</div>
+</#macro>
+
+<#macro usersalaryInfo>
+<hr/>
+												工资增减项
+															<table class="layui-table"  id="zengjianxiang">
+															<thead>
+																<tr>
+																	<th>月份</th>
+																	<th>类型</th>
+																	<th>金额</th>
+																	<th>天数</th>
+																	<th>备注</th>			
+																</tr> 
+															</thead>
+															<tbody id="salary">
+																
+															</tbody>
+															</table>
+					</#macro>

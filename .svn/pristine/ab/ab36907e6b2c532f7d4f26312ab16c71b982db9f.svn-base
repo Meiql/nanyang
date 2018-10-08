@@ -1,0 +1,370 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<style>
+th table{table-layout:fixed;}
+td table{table-layout:fixed;}
+th table tr th{width: 10px;}
+td table tr td{width: 10px;word-wrap:break-word;word-break:break-all;}
+</style>
+<script>
+	var _state;
+	jQuery(function(){ 
+		_state="${(returnDatas.queryBean.active)!''}";
+		jQuery("#active").val(_state);
+		 $("#searchGangwei").find("option[value='${(returnDatas.queryBean.gangwei)!''}']").prop("selected","true");
+		 $("#searchUserActive").find("option[value='${(returnDatas.queryBean.userActive)!''}']").prop("selected","true");
+		//initData();
+		
+	});
+	function initData(){
+		 $("#searchCompany").find("option[value='${(returnDatas.queryBean.company)!''}']").prop("selected","true");
+		 $("#searchTongchou").find("option[value='${(returnDatas.queryBean.tongchou)!''}']").prop("selected","true");
+		 $("#searchEntryCity").find("option[value='${(returnDatas.queryBean.entryCity)!''}']").prop("selected","true");
+		 $("#searchGrade").find("option[value='${(returnDatas.queryBean.grade)!''}']").prop("selected","true");
+	 }
+	
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+		             		
+		             </li>
+					 <li style="float:right;">
+		             	<@shiro.hasPermission name="/userbaseinfo/list/export" >
+				        	<button type="button"   class="layui-btn layui-btn-small" onclick="myexport('searchForm','${ctx}/userbaseinfo/list/export')"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/userbaseinfo/list" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">员工综合信息搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">名称</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="userName" value="${(returnDatas.queryBean.userName)!''}" placeholder="请输入名称 " class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">工号</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="workno" value="${(returnDatas.queryBean.workno)!''}" placeholder="请输入工号" class="layui-input">
+									                    </div>
+							                		</div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">岗位</label>
+									                    <div class="layui-input-inline">
+									                        <select name="gangwei" id="searchGangwei" class="layui-input">
+									                          <@dic.dataList typekey="gangwei"/>
+															</select>   
+									                    </div>
+									                </div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">在职状态</label>
+									                    <div class="layui-input-inline">
+									                        <select name="userActive" id="searchUserActive" class="layui-input">
+									                          <option value="1">在职</option>
+									                          <option value="0">离职</option>
+															</select>   
+									                    </div>
+									                </div>
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even id="resultTable">
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												  <!--first_start_no_export-->
+												<tr>
+													<th id="recordTh" colspan="68">员工综合信息列表<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												  <!--first_end_no_export-->
+												<tr id="titleTr">
+												  <!--first_start_no_export-->
+												  <!--first_end_no_export-->
+														<th id="th_userId" rowspan="2">员工姓名</th>
+														<th rowspan="2">中心</th>
+														<th rowspan="2">部门</th>
+														<th rowspan="2">劳动关系</th>
+														<th id="th_workno" rowspan="2">工号</th>
+														<th rowspan="2">职位</th>
+														<th rowspan="2">入职时间</th>
+														<th rowspan="2">转正时间</th>
+														<th rowspan="2">司龄</th>
+														<th rowspan="2">首次参加工作时间</th>
+														<th rowspan="2">工龄</th>
+														<th colspan="13">基本信息</th>
+														<th colspan="2">联系方式</th>
+														<th >教育背景</th>
+														<th >职称与资格证书</th>
+														<th >劳动关系</th>
+														<th >五险一金</th>
+														<th >履历信息</th>
+														<th rowspan="2">兴趣爱好</th>
+												</tr>
+												<tr>
+													<th>性别</th>
+													<th>出生日期</th>
+													<th>年龄</th>
+													<th>籍贯</th>
+													<th>民族</th>
+													<th>婚姻状况</th>
+													<th>政治面貌</th>
+													<th>身份证号码</th>
+													<th>户籍地址</th>
+													<th>现居住详细地址</th>
+													<th>紧急联系人</th>
+													<th>紧急联系电话</th>
+													<th>与本人关系</th>
+													<th>电子信箱</th>
+													<th>电话</th>
+													<th>
+														<table>
+															<tr>
+																<th>起始时间</th>				
+																<th>毕业时间</th>				
+																<th>毕业学校</th>				
+																<th>招生方式</th>				
+																<th>学历性质</th>				
+																<th>专业</th>				
+																<th>学位</th>	
+															</tr>
+														</table>
+													</th>
+													<th>
+														<table>
+															<tr>
+																<th>证书编号</th>
+																<th>证书名称</th>
+																<th>颁证机构</th>
+																<th>通过日期</th>
+																<th>有效期</th>
+															</tr>
+														</table>
+													</th>
+													<th>
+														<table>
+															<tr>
+																<th>合同状态</th>
+																<th>用工起始时间</th>
+																<th>有效的合同协议编号</th>
+																<th>签订次数</th>
+																<th>合同期限</th>
+																<th>到期时间</th>
+															</tr>
+														</table>
+													</th>
+													<th>
+														<table>
+															<tr>
+																<th>名称</th>
+																<th>办理时间</th>
+																<th>终止时间</th>
+															</tr>
+														</table>
+													</th>
+													<th>
+														<table>
+															<tr>
+																<th>转岗时间</th>
+																<th>原部门</th>
+																<th>新部门</th>
+																<th>原级别</th>
+																<th>新级别</th>
+																<th>原岗位</th>
+																<th>新岗位</th>
+																<th>原基本工资</th>
+																<th>新基本工资</th>
+																<th>原考核工资</th>
+																<th>新考核工资</th>
+																<th>原岗位工资</th>
+																<th>新岗位工资</th>
+															</tr>
+														</table>
+													</th>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+													<tr class="">
+														<td>${(_data.name)!''}</td>
+														<td>${(_data.centerName)!''}</td>
+														<td>${(_data.orgName)!''}</td>
+														<td>${(_data.laodongguanxi)!''}</td>
+														<td>${(_data.workno)!''}&#160;</td>
+														<td>${(_data.gangweiName)!''}</td>
+														<td>${((_data.entryDate)?string('yyyy-MM-dd'))!''}</td>
+														<td>${((_data.startDate)?string('yyyy-MM-dd'))!''}</td>
+														<td>${(_data.ourAge)!''}</td>
+														<td>${((_data.firstDate)?string('yyyy-MM-dd'))!''}</td>
+														<td>${(_data.workingYears)!''}</td>
+														<td>${(_data.sex)!''}</td>
+														<td>${((_data.birthDay)?string('yyyy-MM-dd'))!''}</td>
+														<td>${(_data.age)!''}</td>
+														<td>${(_data.jiguan)!''}</td>
+														<td>${(_data.minzuName)!''}</td>
+														<td>${(_data.marryState)!''}</td>
+														<td>${(_data.politicsStatus)!''}</td>
+														<td>${(_data.idCardNo)!''}&#160;</td>
+														<td>${(_data.hujidizhi)!''}</td>
+														<td>${(_data.address)!''}</td>
+														<td>${(_data.fireName)!''}</td>
+														<td>${(_data.firePhone)!''}&#160;</td>
+														<td>${(_data.guanxi)!''}</td>
+														<td>${(_data.email)!''}</td>
+														<td>${(_data.phone)!''}&#160;</td>
+														<td>
+															<#if (_data.educationals)?? &&(_data.educationals)?size gt 0 >
+																<table>
+																	<#list _data.educationals as educationals>
+																		<tr>
+																			<td>${((educationals.startDate)?string('yyyy-MM-dd'))!''}</td>
+																			<td>${((educationals.endDate)?string('yyyy-MM-dd'))!''}</td>
+																			<td>${(educationals.xuexiao)!''}</td>
+																			<td>${(educationals.zhaoshengfangshiName)!''}</td>
+																			<td>${(educationals.xueliName)!''}</td>
+																			<td>${(educationals.zhuanye)!''}</td>
+																			<td>${(educationals.xueweiName)!''}</td>
+																		</tr>
+																	</#list>
+																</table>
+															</#if>
+														</td>
+														<td>
+															<#if (_data.certificates)?? &&(_data.certificates)?size gt 0 >
+																<table>
+																	<#list _data.certificates as certificates>
+																		<tr>
+																			<td>${(certificates.bianhao)!''}</td>
+																			<td>${(certificates.name)!''}</td>
+																			<td>${(certificates.banzhengjigou)!''}</td>
+																			<td>${((certificates.passDate)?string('yyyy-MM-dd'))!''}</td>
+																			<td>${((certificates.youxiaoqi)?string('yyyy-MM-dd'))!''}</td>
+																		</tr>
+																	</#list>
+																</table>
+															</#if>
+														</td>
+														<td>
+															<#if (_data.workContracts)?? &&(_data.workContracts)?size gt 0 >
+																<table>
+																	<#list _data.workContracts as workContracts>
+																		<tr>
+																			<td>
+																				<#if (workContracts.state)?? && (workContracts.state == '1')>
+																				有效
+																				<#else>
+																				失效
+																				</#if>
+																			</td>
+																			<td>${((workContracts.startDate)?string('yyyy-MM-dd'))!''}</td>
+																			<td>${(workContracts.contractNo)!''}</td>
+																			<td>${(workContracts.times)!''}</td>
+																			<td>${(workContracts.term)!''}</td>
+																			<td>${((workContracts.endDate)?string('yyyy-MM-dd'))!''}</td>
+																		</tr>
+																	</#list>
+																</table>
+															</#if>
+														</td>
+														<td>
+															<#if (_data.tongchouInfos)?? &&(_data.tongchouInfos)?size gt 0 >
+																<table>
+																	<#list _data.tongchouInfos as tongchouInfos>
+																		<tr>
+																			<td>${(tongchouInfos.insuranceTypeName)!''}</td>
+																			<td>${((tongchouInfos.insurancePaymentDate)?string('yyyy-MM-dd'))!''}</td>
+																			<td>${((tongchouInfos.stopProtectMonth)?string('yyyy-MM-dd'))!''}</td>
+																		</tr>
+																	</#list>
+																</table>
+															</#if>
+														</td>
+														<td>
+															<#if (_data.resumes)?? &&(_data.resumes)?size gt 0 >
+																<table>
+																	<#list _data.resumes as resumes>
+																		<tr>
+																			<td>${((resumes.createDate)?string('yyyy-MM-dd'))!''}</td>
+																			<td>${(resumes.oldOrgName)!''}</td>
+																			<td>${(resumes.newOrgName)!''}</td>
+																			<td>${(resumes.oldGradeName)!''}</td>
+																			<td>${(resumes.newGradeName)!''}</td>
+																			<td>${(resumes.oldGangweiName)!''}</td>
+																			<td>${(resumes.newGangweiName)!''}</td>
+																			<td>${(resumes.oldJibenpay)!''}&#160;</td>
+																			<td>${(resumes.newJibenpay)!''}&#160;</td>
+																			<td>${(resumes.oldKaohepay)!''}&#160;</td>
+																			<td>${(resumes.newKaohepay)!''}&#160;</td>
+																			<td>${(resumes.oldGangweipay)!''}&#160;</td>
+																			<td>${(resumes.newGangweipay)!''}&#160;</td>
+																		</tr>
+																	</#list>
+																</table>
+															</#if>
+														</td>
+														<!--end_no_export-->
+														
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+										<!--end_export-->
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

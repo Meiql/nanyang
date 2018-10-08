@@ -1,0 +1,257 @@
+package org.springrain.erp.gz.entity;
+
+import java.util.Date;
+
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springrain.frame.annotation.WhereSQL;
+import org.springrain.frame.entity.BaseEntity;
+
+/**
+ * 工资子表
+ * 
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version 2017-07-03 17:28:49
+ * @see org.springrain.erp.gz.entity.Salaryinfo
+ */
+@Table(name = "z_salaryinfo")
+public class Salaryinfo extends BaseEntity {
+
+	private static final long serialVersionUID = 1L;
+
+	// alias
+	/*
+	 * public static final String TABLE_ALIAS = "工资子表"; public static final
+	 * String ALIAS_ID = "id"; public static final String ALIAS_SALARYID =
+	 * "主表ID"; public static final String ALIAS_BUSINESSID = "业务ID"; public
+	 * static final String ALIAS_SALARYTYPE = "工资类型(包括社保、公积金和自定义的工资类型)"; public
+	 * static final String ALIAS_AMOUNT = "金额"; public static final String
+	 * ALIAS_REMARKER = "备注";
+	 */
+	// date formats
+
+	// columns START
+	/**
+	 * id
+	 */
+	private java.lang.String id;
+	/**
+	 * 主表ID
+	 */
+	private java.lang.String salaryId;
+	/**
+	 * 字典工资类型
+	 */
+	private java.lang.String salaryTypeId;
+	/**
+	 * 工资类型(包括社保、公积金和自定义的工资类型)
+	 */
+	private java.lang.String salaryType;
+	/**
+	 * 金额
+	 */
+	private java.math.BigDecimal amount;
+	/**
+	 * 备注
+	 */
+	private java.lang.String remarker;
+	/**
+	 * 用户ID
+	 */
+	private String userId;
+	/**
+	 * 账号
+	 */
+	private String userAccount;
+	/**
+	 * 用户名称
+	 */
+	private String userName;
+	/**
+	 * 归属日期
+	 */
+	private Date inDate;
+
+	// columns END 数据库字段结束
+	private String monthStr;
+	// concstructor
+
+	public Salaryinfo() {
+	}
+
+	public Salaryinfo(java.lang.String id) {
+		this.id = id;
+	}
+
+	// get and set
+	/**
+	 * id
+	 */
+	public void setId(java.lang.String value) {
+		if (StringUtils.isNotBlank(value)) {
+			value = value.trim();
+		}
+		this.id = value;
+	}
+	@Transient
+	public String getMonthStr() {
+		return monthStr;
+	}
+
+	public void setMonthStr(String monthStr) {
+		this.monthStr = monthStr;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getUserAccount() {
+		return userAccount;
+	}
+
+	public void setUserAccount(String userAccount) {
+		this.userAccount = userAccount;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public Date getInDate() {
+		return inDate;
+	}
+
+	public void setInDate(Date inDate) {
+		this.inDate = inDate;
+	}
+
+	/**
+	 * id
+	 */
+	@Id
+	@WhereSQL(sql = "id=:Salaryinfo_id")
+	public java.lang.String getId() {
+		return this.id;
+	}
+
+	/**
+	 * 主表ID
+	 */
+	public void setSalaryId(java.lang.String value) {
+		if (StringUtils.isNotBlank(value)) {
+			value = value.trim();
+		}
+		this.salaryId = value;
+	}
+
+	/**
+	 * 主表ID
+	 */
+	@WhereSQL(sql = "salaryId=:Salaryinfo_salaryId")
+	public java.lang.String getSalaryId() {
+		return this.salaryId;
+	}
+
+	public java.lang.String getSalaryTypeId() {
+		return salaryTypeId;
+	}
+
+	public void setSalaryTypeId(java.lang.String salaryTypeId) {
+		this.salaryTypeId = salaryTypeId;
+	}
+
+	/**
+	 * 工资类型(包括社保、公积金和自定义的工资类型)
+	 */
+	public void setSalaryType(java.lang.String value) {
+		if (StringUtils.isNotBlank(value)) {
+			value = value.trim();
+		}
+		this.salaryType = value;
+	}
+
+	/**
+	 * 工资类型(包括社保、公积金和自定义的工资类型)
+	 */
+	@WhereSQL(sql = "salaryType=:Salaryinfo_salaryType")
+	public java.lang.String getSalaryType() {
+		return this.salaryType;
+	}
+
+	/**
+	 * 金额
+	 */
+	public void setAmount(java.math.BigDecimal value) {
+		this.amount = value;
+	}
+
+	/**
+	 * 金额
+	 */
+	@WhereSQL(sql = "amount=:Salaryinfo_amount")
+	public java.math.BigDecimal getAmount() {
+		return this.amount;
+	}
+
+	/**
+	 * 备注
+	 */
+	public void setRemarker(java.lang.String value) {
+		if (StringUtils.isNotBlank(value)) {
+			value = value.trim();
+		}
+		this.remarker = value;
+	}
+
+	/**
+	 * 备注
+	 */
+	@WhereSQL(sql = "remarker=:Salaryinfo_remarker")
+	public java.lang.String getRemarker() {
+		return this.remarker;
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder().append("id[").append(getId()).append("],")
+				.append("主表ID[").append(getSalaryId()).append("],")
+				.append("业务ID[").append(getSalaryTypeId()).append("],")
+				.append("工资类型(包括社保、公积金和自定义的工资类型)[").append(getSalaryType())
+				.append("],").append("金额[").append(getAmount()).append("],")
+				.append("备注[").append(getRemarker()).append("],").toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getId()).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Salaryinfo == false) {
+			return false;
+		}
+
+		if (this == obj) {
+			return true;
+		}
+
+		Salaryinfo other = (Salaryinfo) obj;
+		return new EqualsBuilder().append(getId(), other.getId()).isEquals();
+	}
+}

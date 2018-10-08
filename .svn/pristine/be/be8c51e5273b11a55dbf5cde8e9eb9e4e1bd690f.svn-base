@@ -1,0 +1,364 @@
+<#ftl output_format="HTML" auto_esc=true>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<link rel="stylesheet" href="${ctx}/css/weui/weui.min.css">
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/tc/add.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<style>
+
+
+</style>
+<script>
+	 jQuery(function(){
+		 $("#userId").find("option[value='${(returnDatas.data.id)!''}']").prop("selected","true");
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(
+			null,
+		 	function(_json){
+				 if(_json.status == 'success'){
+					 layer.alert("修改成功",function(){
+						 window.location.href="${ctx}/userinfo/list?springraintoken="+springraintoken
+					 })
+				 }else{
+					 layer.alert(_json.message,{icon: 5});
+				 }
+			 }
+		 );
+	 });
+	 jQuery(document).ready(function(){
+		 
+		 var nowsalarystate = '${(returnDatas.data.nowsalarystate)!''}'
+		 var state = '${(returnDatas.data.state)!''}';
+		 if(state =="0"){
+			 $("#lcimg01").hide();
+			 $("#lcimg02").show();
+			 $("#lcimg03").hide();
+			 $("#lcimg04").hide();
+			 $("#tongchou").show();
+			 $("#bllz").hide();
+		 }
+		 if(state =="1"){
+			 $("#lcimg01").hide();
+			 $("#lcimg02").hide();
+			 $("#lcimg03").show();
+			 $("#lcimg04").hide();
+			 $("#tongchou").show();
+			 $("#bllz").hide();
+			 $("#tcjscz").hide();
+			 $("#tingbao").show();
+		 }
+		 if(state =="2"){
+			 $("#lcimg01").hide();
+			 $("#lcimg02").hide();
+			 $("#lcimg03").hide();
+			 $("#lcimg04").show();
+			 $("#tongchou").show();
+			 $("#tcjscz").hide();
+			 $("#bllz").hide();
+			 $("#tingbao").show();
+			 $("#stoptc").hide();
+		 }
+	 });
+	 //办理离职
+	 function lizhi() {
+		 var userId = $('#userId option:selected').val();//选中的值
+		 var endDate = $("#endDate").val();
+		 var lizhiremark = $("#lizhiremark").val();
+		 $.ajax({
+				url :"${ctx}/userleave/lizhi", 
+			    type :"post",
+			    data: {"userId":userId,"endDate":endDate,"lizhiremark":lizhiremark},
+				dataType : "json",
+				success:function(ret){
+					if(ret.status=="success"){
+						layer.alert(ret.message, {icon: 1},function(){
+							layer.closeAll();
+							window.location.href="${ctx}/userleave/update/pre?userId="+userId+"&springraintoken="+springraintoken});
+						
+					}else{
+						layer.alert(ret.message,{icon: 5});
+					}
+				},
+				error:function(){
+					layer.closeAll('loading')
+					layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+				}
+			});
+	};
+	//离职结算跳转
+	function lizhitiaozhuan(key) {
+		var userId = $("#userId").val();//选中的值
+		if(key=='1'){
+			window.location.href="${ctx}/nowdimission/list?userId="+userId+"&springraintoken="+springraintoken			
+		}else if(key=='2'){
+			window.location.href="${ctx}/lastdimission/list?userId="+userId+"&springraintoken="+springraintoken
+		}
+	}
+	//下一步
+	function nextStep(state) {
+		var userIdStr = $('#userId').val();//选中的值
+		if(userIdStr==null||userIdStr==""){
+			layer.alert("请选择员工");
+			return;
+		}
+		 $.ajax({
+				url :"${ctx}/userleave/lizhi/pre", 
+			    type :"post",
+			    data: {"id":userIdStr,"state":state},
+				dataType : "json",
+				success:function(ret){
+					if(ret.status=="success"){
+						$("#tcjscz").hide();
+						$("#tingbao").show();
+						 $("#lcimg01").hide();
+						 $("#lcimg02").hide();
+						 $("#lcimg03").show();
+						 $("#lcimg04").hide();
+					}else{
+						layer.alert(ret.message,{icon: 5});
+					}
+				},
+				error:function(){
+					layer.closeAll('loading')
+					layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+				}
+			});
+	};
+	//停保
+	function stopTc() {
+		var userIdStr = $('#userId').val();//选中的值
+		var stopProtectMonth = $("#stopProtectMonth").val();
+		if(userIdStr==null||userIdStr==""){
+			layer.alert("请选择员工");
+			return;
+		}
+		if(stopProtectMonth==null||stopProtectMonth==""){
+			layer.alert("请选择停保月份");
+			return;
+		}
+		 $.ajax({
+				url :"${ctx}/userleave/lizhi/json", 
+			    type :"post",
+			    data: {"userId":userIdStr,"stopProtectMonth":stopProtectMonth},
+				dataType : "json",
+				success:function(ret){
+					if(ret.status=="success"){
+						 $("#lcimg01").hide();
+						 $("#lcimg02").hide();
+						 $("#lcimg03").hide();
+						 $("#lcimg04").show();
+						 layer.alert("停保流程结束，该员工已经离职", {icon: 1},function(){
+							layer.closeAll();
+							window.location.href="${ctx}/userleave/list?springraintoken="+springraintoken}); 
+						
+						
+					}else{
+						layer.alert(ret.message,{icon: 5});
+					}
+				},
+				error:function(){
+					layer.closeAll('loading')
+					layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+				}
+			});
+	}
+	
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            		
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<img id="lcimg01" style="margin-top: 8px" src="${ctx}/img/lcimg01.png"><img id="lcimg02" style="margin-top: 8px" src="${ctx}/img/lcimg02.png">
+													<img id="lcimg03" style="margin-top: 8px" src="${ctx}/img/lcimg03.png"><img id="lcimg04" style="margin-top: 8px;margin-left: 8px" src="${ctx}/img/lcimg04.png">
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/userinfo/update">
+													<input type="hidden" id="userId" name="userId" value="${(returnDatas.data.id)!''}"/>
+														<table   class="layui-table" style="border:1px solid #e2e2e2">
+															<tr>
+																<td colspan="2" style="border:0px solid #e2e2e2">
+																	<span>员工信息:</span>
+																</td>
+														   </tr>
+															<tr>
+																<td style="border:0px solid #e2e2e2">
+																<label class="layui-form-label">姓名：*</label>
+																<#if (returnDatas.data??)&&returnDatas.data.id??>
+																	<div class="layui-inline col-lg-5">  
+																		<input type="text" name="userIdStr" id="userIdStr"  readonly value="${(returnDatas.data.userName)!''}" class="layui-input"/>
+																	</div>
+																</#if>	
+																</td>
+																<td style="border:0px solid #e2e2e2">
+																<label class="layui-form-label">用户状态：</label>
+																	<div class="layui-inline col-lg-5">  
+																		<input type="text" name="userActiveStr" id="userActiveStr"  readonly value="${(returnDatas.data.userActiveStr)!''}" class="layui-input"/>
+																	</div>
+																</td>
+															</tr>
+															<tr>
+																	<td style="border:0px solid #e2e2e2">
+																			<label class="layui-form-label">公司名称：</label>
+																			<div class="layui-inline col-lg-5"> 
+																				<input type="text" name="companyName" id="companyName"  readonly value="${(returnDatas.data.companyName)!''}" class="layui-input"/> 
+																			</div>
+																	</td>
+																	<td style="border:0px solid #e2e2e2">
+																			<label class="layui-form-label">部门：</label>
+																			<div class="layui-inline col-lg-5">  
+																				<input type="text" name="orgName" id="orgName"  readonly value="${(returnDatas.data.orgName)!''}" class="layui-input"/>
+																			</div>
+																   </td>
+															</tr>
+														</table>
+														<table   class="layui-table" style="border:1px solid #e2e2e2">
+															<tr>
+																<td colspan="2" style="border:0px solid #e2e2e2">
+																	<span>离职信息:</span>
+																</td>
+														   </tr>
+															<tr>
+																	<td style="border:0px solid #e2e2e2">
+																			<label class="layui-form-label">离职时间：*</label>
+																			<div class="layui-inline col-lg-4"> 
+																				<input type="text" name="endDate" id="endDate" value="${(returnDatas.data.endDate)!''}" autocomplete="off" class="layui-input" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/> 
+																			</div>
+																	</td>
+															</tr>
+																<tr>
+																	<td style="border:0px solid #e2e2e2">
+																			<label class="layui-form-label">离职原因：*</label>
+																			<div class="layui-inline col-lg-5">  
+																				<input type="text" name="lizhiremark" id="lizhiremark"   value="${(returnDatas.data.lizhiremark)!''}" class="layui-input"/>
+																			</div>
+																			<#if (returnDatas.data.endDate??)>
+																				<div class="layui-inline valid-info">
+																					<span><i class="weui-icon-success"></i>员工离职已办理</span>
+																				</div>
+																			</#if>
+																   </td>
+															</tr>
+															<tr id="bllz">
+																<td colspan="2" >
+																	<div class="layui-form-item change-submit"  style="margin-left: 800px" >
+																			<label class="layui-form-label"></label>
+																			<div class="layui-inline">
+																		<#if (returnDatas.data.state)!='0'>
+																				<button type="button" class="layui-btn"  onclick="lizhi()">办理离职</button>
+																		</div>
+																		</#if>		
+																	</div>
+																</td>
+															</tr>
+													</table>
+													<table   class="layui-table"  id="tongchou" style="border:1px solid #e2e2e2;display: none;" >
+														<tr>
+																<td colspan="2" style="border:0px solid #e2e2e2">
+																	<span>工资生成:</span>
+																</td>
+														   </tr>
+														<tr>
+														<#if (returnDatas.data.lastsalarystate)=='y'>
+															<td style="border:0px solid #e2e2e2">
+																	<span style="margin-left: 100px;"><i class="weui-icon-success"></i>上月工资已生成</span>
+															</td>
+														 </#if>	
+														<#if (returnDatas.data.nowsalarystate) =='y'>
+															<td style="border:0px solid #e2e2e2">
+																			<span><i class="weui-icon-success"></i>本月工资已生成</span>
+															</td>
+														</#if>	
+														</tr>
+														<tr>
+															<#if (returnDatas.data.nowsalarystate) =='y'&& (returnDatas.data.lastsalarystate)=='y'>
+															<td style="border:0px solid #e2e2e2"  colspan="2">
+																			<span style="margin-left: 100px;"><i class="weui-icon-info-circle"></i>工资已经生成,请通知财务人员进行工资发放。</span>
+															</td>
+														</#if>														
+														</tr>
+														<tr id="tcjscz">
+															<td colspan="2">
+																<div class="layui-form-item change-submit" style="margin-left: 800px">
+																	<label class="layui-form-label"></label>
+																	<div class="layui-inline">
+																	<#if (returnDatas.data.nowsalarystate)=='n'>
+																		<button type="button" class="layui-btn"  onclick="lizhitiaozhuan('1')">结算本月</button>
+																	</#if>	
+																	<#if (returnDatas.data.lastsalarystate)=='n'>
+																		<button type="button" class="layui-btn" onclick="lizhitiaozhuan('2')">结算上月</button>
+																	</#if>
+																		<button type="button" class="layui-btn layui-btn-primary"    onclick="nextStep('1')">下一步</button>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+													<table   class="layui-table" id="tingbao" style="display: none ;border:1px solid #e2e2e2">
+															<tr>
+																<td colspan="2">
+																	<span>确认是否停保:</span>
+																</td>
+														   </tr>
+															<tr>
+																	<td style="border:0px solid #e2e2e2">
+																			<label class="layui-form-label">停保时间：*</label>
+																			<div class="layui-inline col-lg-5"> 
+																				<input type="text" name="stopProtectMonth" id="stopProtectMonth"  value="${(returnDatas.data.stopProtectMonth)!''}" autocomplete="off" class="layui-input" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/> 
+																			</div>
+																			<#if (returnDatas.data.stopProtectMonth??)>
+																				<div class="layui-inline valid-info">
+																					<span ><i class="weui-icon-success"></i>用户已经停保</span>
+																				</div>
+																			</#if>
+																			
+																	</td>
+															</tr>	
+														<tr id="stoptc">
+															<td colspan="2">
+																<div class="layui-form-item change-submit" style="margin-left: 800px">
+																	<label class="layui-form-label"></label>
+																	<div class="layui-inline">
+																		<button type="button" class="layui-btn"  onclick="stopTc()">确认停保</button>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>		
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

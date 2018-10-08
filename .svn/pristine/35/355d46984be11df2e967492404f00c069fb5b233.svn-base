@@ -1,0 +1,1249 @@
+package org.springrain.erp.hr.entity;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springrain.frame.annotation.WhereSQL;
+import org.springrain.frame.entity.BaseEntity;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:47:25
+ * @see org.springrain.erp.hr.entity.UserInfo
+ */
+@Table(name="t_user_info")
+public class UserInfo  extends BaseEntity {
+	
+	private static final long serialVersionUID = 1L;
+
+	//alias
+	/*
+	public static final String TABLE_ALIAS = "UserInfo";
+	public static final String ALIAS_ID = "id";
+	public static final String ALIAS_USERID = "userId";
+	public static final String ALIAS_USERCODE = "员工代码";
+	public static final String ALIAS_BIRTHDAY = "出生日期";
+	public static final String ALIAS_WORKNO = "工号";
+	public static final String ALIAS_IDCARD = "身份证号";
+	public static final String ALIAS_COMPANY = "公司";
+	public static final String ALIAS_TONGCHOU = "统筹缴纳地";
+	public static final String ALIAS_GANGWEI = "岗位";
+	public static final String ALIAS_ENTRYDATE = "入职日期";
+	public static final String ALIAS_STARTDATE = "转正日期";
+	public static final String ALIAS_ENDDATE = "离职日期";
+	public static final String ALIAS_MOBILE1 = "移动电话1";
+	public static final String ALIAS_MOBILE2 = "移动电话2";
+	public static final String ALIAS_TELEPHONE = "固定电话";
+	public static final String ALIAS_EMAIL = "电子邮箱";
+	public static final String ALIAS_MARRYSTATE = "婚否";
+	public static final String ALIAS_HEALTH = "健康状态";
+	public static final String ALIAS_ENTRYCITY = "入职城市";
+	public static final String ALIAS_ENTRYTYPE = "入职方式";
+	public static final String ALIAS_INTRODUCER = "介绍人";
+	public static final String ALIAS_MINZU = "民族";
+	public static final String ALIAS_POLITICSSTATUS = "政治面貌";
+	public static final String ALIAS_ZUIGAOXUELI = "最高学历";
+	public static final String ALIAS_JIAOYUJINGLI = "教育经历";
+	public static final String ALIAS_FIRENAME = "紧急联系人";
+	public static final String ALIAS_FIREPHONE = "紧急联系电话";
+	public static final String ALIAS_BAK = "备注";
+	public static final String ALIAS_BANKNAME = "银行名称";
+	public static final String ALIAS_BANKACCOUNTNAME = "银行帐号";
+	public static final String ALIAS_BANKID = "银行卡号";
+	public static final String ALIAS_BANKSTATE = "卡号状态";
+	public static final String ALIAS_JIBENPAY = "基本工资";
+	public static final String ALIAS_KAOHEPAY = "考核工资";
+	public static final String ALIAS_GANGWEIPAY = "岗位工资";
+	public static final String ALIAS_STOPPAY = "是否停发工资";
+    */
+	//date formats
+	//public static final String FORMAT_BIRTHDAY = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_ENTRYDATE = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_STARTDATE = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_ENDDATE = DateUtils.DATETIME_FORMAT;
+	
+	//columns START
+	/**
+	 * id
+	 */
+	private java.lang.String id;
+	/**
+	 * userId
+	 */
+	private java.lang.String userId;
+	/**
+	 * 员工代码
+	 */
+	private java.lang.String userCode;
+	/**
+	 * 出生日期
+	 */
+	private java.util.Date birthday;
+	/**
+	 * 工号
+	 */
+	private java.lang.String workno;
+	/**
+	 * 身份证号
+	 */
+	private java.lang.String idCard;
+	/**
+	 * 公司
+	 */
+	private java.lang.String company;
+	/**
+	 * 统筹缴纳地
+	 */
+	private java.lang.String tongchou;
+	/**
+	 * 岗位
+	 */
+	private java.lang.String gangwei;
+	/**
+	 * 入职日期
+	 */
+	private java.util.Date entryDate;
+	/**
+	 * 转正日期
+	 */
+	private java.util.Date startDate;
+	/**
+	 * 离职日期
+	 */
+	private java.util.Date endDate;
+	/**
+	 * 移动电话1
+	 */
+	private java.lang.String mobile1;
+	/**
+	 * 移动电话2
+	 */
+	private java.lang.String mobile2;
+	/**
+	 * 固定电话
+	 */
+	private java.lang.String telephone;
+	/**
+	 * 电子邮箱
+	 */
+	private java.lang.String email;
+	/**
+	 * 婚否
+	 */
+	private java.lang.String marryState;
+	/**
+	 * 健康状态
+	 */
+	private java.lang.String health;
+	/**
+	 * 入职城市
+	 */
+	private java.lang.String entryCity;
+	/**
+	 * 入职方式
+	 */
+	private java.lang.String entryType;
+	/**
+	 * 介绍人
+	 */
+	private java.lang.String introducer;
+	/**
+	 * 民族
+	 */
+	private java.lang.String minzu;
+	/**
+	 * 政治面貌
+	 */
+	private java.lang.String politicsStatus;
+	/**
+	 * 最高学历
+	 */
+	private java.lang.String zuigaoxueli;
+	/**
+	 * 教育经历
+	 */
+	private java.lang.String jiaoyujingli;
+	/**
+	 * 紧急联系人
+	 */
+	private java.lang.String fireName;
+	/**
+	 * 紧急联系电话
+	 */
+	private java.lang.String firePhone;
+	/**
+	 * 备注
+	 */
+	private java.lang.String bak;
+	/**
+	 * 银行名称
+	 */
+	private java.lang.String bankName;
+	/**
+	 * 银行帐号
+	 */
+	private java.lang.String bankAccountName;
+	/**
+	 * 银行卡号
+	 */
+	private java.lang.String bankId;
+	/**
+	 * 卡号状态
+	 */
+	private java.lang.String bankState;
+	/**
+	 * 基本工资
+	 */
+	private java.math.BigDecimal jibenpay;
+	/**
+	 * 考核工资
+	 */
+	private java.math.BigDecimal kaohepay;
+	/**
+	 * 岗位工资
+	 */
+	private java.math.BigDecimal gangweipay;
+	/**
+	 * 是否停发工资
+	 */
+	private java.lang.String stoppay;
+	/**
+	 * 修改人
+	 */
+	private String editPerson;
+	/**
+	 * 修改时间
+	 */
+	private java.util.Date editDate;
+	/**
+	 * 离职原因
+	 */
+	private String lizhiremark;
+	/**
+	 * 首次参加工作时间
+	 */
+	private java.util.Date firstTime;
+	/**
+	 * 级别
+	 */
+	private String grade;
+	/**
+	 * 电话费补助
+	 */
+	private BigDecimal mobilePay;
+	
+	private String sex;
+	
+	private String mobile;
+	
+	//columns END 数据库字段结束
+	private String userName;//用户名称
+	private String uid;//
+	private String account;//用户账号
+	private String active;//用户账号
+	private String companyName;
+	private String tongchouName;
+	private String gangweiName;
+	private String entryCityName;
+	private String bankNameStr;
+	private String gradeName;
+	private Integer age;//年龄
+	private Integer workingYears;//工龄
+	private Integer ourAge;//司龄
+	private List<UserEducational> educational;
+	private List<UserCertificate> certificate;
+	private String flag;//不为空由基本信息页面跳转 
+	//concstructor
+
+	public UserInfo(){
+	}
+
+	public UserInfo(
+		java.lang.String id
+	){
+		this.id = id;
+	}
+
+	//get and set
+		/**
+		 * id
+		 */
+	public void setId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.id = value;
+	}
+	
+	
+	
+	/**
+	 * id
+	 */
+	@Id
+     @WhereSQL(sql="id=:UserInfo_id")
+	public java.lang.String getId() {
+		return this.id;
+	}
+		/**
+		 * userId
+		 */
+	public void setUserId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.userId = value;
+	}
+	
+	@Transient
+	public String getActive() {
+			return active;
+		}
+
+		public void setActive(String active) {
+			this.active = active;
+		}
+
+	public String getLizhiremark() {
+			return lizhiremark;
+		}
+
+		public void setLizhiremark(String lizhiremark) {
+			this.lizhiremark = lizhiremark;
+		}
+
+	public BigDecimal getMobilePay() {
+			return mobilePay;
+		}
+
+		public void setMobilePay(BigDecimal mobilePay) {
+			this.mobilePay = mobilePay;
+		}
+
+	@Transient
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
+	@Transient
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	@Transient
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	
+	@Transient
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	@Transient
+	public String getTongchouName() {
+		return tongchouName;
+	}
+
+	public void setTongchouName(String tongchouName) {
+		this.tongchouName = tongchouName;
+	}
+
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	@Transient
+	public String getGangweiName() {
+		return gangweiName;
+	}
+
+	public void setGangweiName(String gangweiName) {
+		this.gangweiName = gangweiName;
+	}
+
+	@Transient
+	public String getEntryCityName() {
+		return entryCityName;
+	}
+
+	public void setEntryCityName(String entryCityName) {
+		this.entryCityName = entryCityName;
+	}
+
+	@Transient
+	public String getBankNameStr() {
+		return bankNameStr;
+	}
+
+	public void setBankNameStr(String bankNameStr) {
+		this.bankNameStr = bankNameStr;
+	}
+
+	/**
+	 * userId
+	 */
+     @WhereSQL(sql="userId=:UserInfo_userId")
+	public java.lang.String getUserId() {
+		return this.userId;
+	}
+		/**
+		 * 员工代码
+		 */
+	public void setUserCode(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.userCode = value;
+	}
+	
+	
+	
+	/**
+	 * 员工代码
+	 */
+     @WhereSQL(sql="userCode=:UserInfo_userCode")
+	public java.lang.String getUserCode() {
+		return this.userCode;
+	}
+		/*
+	public String getbirthdayString() {
+		return DateUtils.convertDate2String(FORMAT_BIRTHDAY, getbirthday());
+	}
+	public void setbirthdayString(String value) throws ParseException{
+		setbirthday(DateUtils.convertString2Date(FORMAT_BIRTHDAY,value));
+	}*/
+	
+		/**
+		 * 出生日期
+		 */
+	public void setBirthday(java.util.Date value) {
+		this.birthday = value;
+	}
+	
+	
+	
+	/**
+	 * 出生日期
+	 */
+     @WhereSQL(sql="birthday=:UserInfo_birthday")
+	public java.util.Date getBirthday() {
+		return this.birthday;
+	}
+		/**
+		 * 工号
+		 */
+	public void setWorkno(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.workno = value;
+	}
+	
+	
+	
+	/**
+	 * 工号
+	 */
+     @WhereSQL(sql="workno=:UserInfo_workno")
+	public java.lang.String getWorkno() {
+		return this.workno;
+	}
+		/**
+		 * 身份证号
+		 */
+	public void setIdCard(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.idCard = value;
+	}
+	
+	
+	
+	/**
+	 * 身份证号
+	 */
+     @WhereSQL(sql="idCard=:UserInfo_idCard")
+	public java.lang.String getIdCard() {
+		return this.idCard;
+	}
+		/**
+		 * 公司
+		 */
+	public void setCompany(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.company = value;
+	}
+	
+	
+	
+	/**
+	 * 公司
+	 */
+     @WhereSQL(sql="company=:UserInfo_company")
+	public java.lang.String getCompany() {
+		return this.company;
+	}
+		/**
+		 * 统筹缴纳地
+		 */
+	public void setTongchou(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.tongchou = value;
+	}
+	
+	
+	
+	/**
+	 * 统筹缴纳地
+	 */
+     @WhereSQL(sql="tongchou=:UserInfo_tongchou")
+	public java.lang.String getTongchou() {
+		return this.tongchou;
+	}
+		/**
+		 * 岗位
+		 */
+	public void setGangwei(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.gangwei = value;
+	}
+	
+	
+	
+	/**
+	 * 岗位
+	 */
+     @WhereSQL(sql="gangwei=:UserInfo_gangwei")
+	public java.lang.String getGangwei() {
+		return this.gangwei;
+	}
+		/*
+	public String getentryDateString() {
+		return DateUtils.convertDate2String(FORMAT_ENTRYDATE, getentryDate());
+	}
+	public void setentryDateString(String value) throws ParseException{
+		setentryDate(DateUtils.convertString2Date(FORMAT_ENTRYDATE,value));
+	}*/
+	
+		/**
+		 * 入职日期
+		 */
+	public void setEntryDate(java.util.Date value) {
+		this.entryDate = value;
+	}
+	
+	
+	
+	/**
+	 * 入职日期
+	 */
+     @WhereSQL(sql="entryDate=:UserInfo_entryDate")
+	public java.util.Date getEntryDate() {
+		return this.entryDate;
+	}
+		/*
+	public String getstartDateString() {
+		return DateUtils.convertDate2String(FORMAT_STARTDATE, getstartDate());
+	}
+	public void setstartDateString(String value) throws ParseException{
+		setstartDate(DateUtils.convertString2Date(FORMAT_STARTDATE,value));
+	}*/
+	
+		/**
+		 * 转正日期
+		 */
+	public void setStartDate(java.util.Date value) {
+		this.startDate = value;
+	}
+	
+	
+	
+	/**
+	 * 转正日期
+	 */
+     @WhereSQL(sql="startDate=:UserInfo_startDate")
+	public java.util.Date getStartDate() {
+		return this.startDate;
+	}
+		/*
+	public String getendDateString() {
+		return DateUtils.convertDate2String(FORMAT_ENDDATE, getendDate());
+	}
+	public void setendDateString(String value) throws ParseException{
+		setendDate(DateUtils.convertString2Date(FORMAT_ENDDATE,value));
+	}*/
+	
+		/**
+		 * 离职日期
+		 */
+	public void setEndDate(java.util.Date value) {
+		this.endDate = value;
+	}
+	
+	
+	
+	/**
+	 * 离职日期
+	 */
+     @WhereSQL(sql="endDate=:UserInfo_endDate")
+	public java.util.Date getEndDate() {
+		return this.endDate;
+	}
+		/**
+		 * 移动电话1
+		 */
+	public void setMobile1(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.mobile1 = value;
+	}
+	
+	
+	
+	/**
+	 * 移动电话1
+	 */
+     @WhereSQL(sql="mobile1=:UserInfo_mobile1")
+	public java.lang.String getMobile1() {
+		return this.mobile1;
+	}
+		/**
+		 * 移动电话2
+		 */
+	public void setMobile2(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.mobile2 = value;
+	}
+	
+	
+	
+	/**
+	 * 移动电话2
+	 */
+     @WhereSQL(sql="mobile2=:UserInfo_mobile2")
+	public java.lang.String getMobile2() {
+		return this.mobile2;
+	}
+		/**
+		 * 固定电话
+		 */
+	public void setTelephone(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.telephone = value;
+	}
+	
+	
+	
+	/**
+	 * 固定电话
+	 */
+     @WhereSQL(sql="telephone=:UserInfo_telephone")
+	public java.lang.String getTelephone() {
+		return this.telephone;
+	}
+		/**
+		 * 电子邮箱
+		 */
+	public void setEmail(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.email = value;
+	}
+	
+	
+	
+	/**
+	 * 电子邮箱
+	 */
+     @WhereSQL(sql="email=:UserInfo_email")
+	public java.lang.String getEmail() {
+		return this.email;
+	}
+		/**
+		 * 婚否
+		 */
+	public void setMarryState(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.marryState = value;
+	}
+	
+	
+	
+	/**
+	 * 婚否
+	 */
+     @WhereSQL(sql="marryState=:UserInfo_marryState")
+	public java.lang.String getMarryState() {
+		return this.marryState;
+	}
+		/**
+		 * 健康状态
+		 */
+	public void setHealth(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.health = value;
+	}
+	
+	
+	
+	/**
+	 * 健康状态
+	 */
+     @WhereSQL(sql="health=:UserInfo_health")
+	public java.lang.String getHealth() {
+		return this.health;
+	}
+		/**
+		 * 入职城市
+		 */
+	public void setEntryCity(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.entryCity = value;
+	}
+	
+	
+	
+	/**
+	 * 入职城市
+	 */
+     @WhereSQL(sql="entryCity=:UserInfo_entryCity")
+	public java.lang.String getEntryCity() {
+		return this.entryCity;
+	}
+		/**
+		 * 入职方式
+		 */
+	public void setEntryType(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.entryType = value;
+	}
+	
+	
+	
+	/**
+	 * 入职方式
+	 */
+     @WhereSQL(sql="entryType=:UserInfo_entryType")
+	public java.lang.String getEntryType() {
+		return this.entryType;
+	}
+		/**
+		 * 介绍人
+		 */
+	public void setIntroducer(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.introducer = value;
+	}
+	
+	
+	
+	/**
+	 * 介绍人
+	 */
+     @WhereSQL(sql="introducer=:UserInfo_introducer")
+	public java.lang.String getIntroducer() {
+		return this.introducer;
+	}
+		/**
+		 * 民族
+		 */
+	public void setMinzu(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.minzu = value;
+	}
+	
+	
+	
+	/**
+	 * 民族
+	 */
+     @WhereSQL(sql="minzu=:UserInfo_minzu")
+	public java.lang.String getMinzu() {
+		return this.minzu;
+	}
+		/**
+		 * 政治面貌
+		 */
+	public void setPoliticsStatus(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.politicsStatus = value;
+	}
+	
+	
+	
+	/**
+	 * 政治面貌
+	 */
+     @WhereSQL(sql="politicsStatus=:UserInfo_politicsStatus")
+	public java.lang.String getPoliticsStatus() {
+		return this.politicsStatus;
+	}
+		/**
+		 * 最高学历
+		 */
+	public void setZuigaoxueli(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.zuigaoxueli = value;
+	}
+	
+	
+	
+	/**
+	 * 最高学历
+	 */
+     @WhereSQL(sql="zuigaoxueli=:UserInfo_zuigaoxueli")
+	public java.lang.String getZuigaoxueli() {
+		return this.zuigaoxueli;
+	}
+		/**
+		 * 教育经历
+		 */
+	public void setJiaoyujingli(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.jiaoyujingli = value;
+	}
+	
+	
+	
+	/**
+	 * 教育经历
+	 */
+     @WhereSQL(sql="jiaoyujingli=:UserInfo_jiaoyujingli")
+	public java.lang.String getJiaoyujingli() {
+		return this.jiaoyujingli;
+	}
+		/**
+		 * 紧急联系人
+		 */
+	public void setFireName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.fireName = value;
+	}
+	
+	
+	
+	/**
+	 * 紧急联系人
+	 */
+     @WhereSQL(sql="fireName=:UserInfo_fireName")
+	public java.lang.String getFireName() {
+		return this.fireName;
+	}
+		/**
+		 * 紧急联系电话
+		 */
+	public void setFirePhone(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.firePhone = value;
+	}
+	
+	
+	
+	/**
+	 * 紧急联系电话
+	 */
+     @WhereSQL(sql="firePhone=:UserInfo_firePhone")
+	public java.lang.String getFirePhone() {
+		return this.firePhone;
+	}
+		/**
+		 * 备注
+		 */
+	public void setBak(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.bak = value;
+	}
+	
+	
+	
+	/**
+	 * 备注
+	 */
+     @WhereSQL(sql="bak=:UserInfo_bak")
+	public java.lang.String getBak() {
+		return this.bak;
+	}
+		/**
+		 * 银行名称
+		 */
+	public void setBankName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.bankName = value;
+	}
+	
+	
+	
+	/**
+	 * 银行名称
+	 */
+     @WhereSQL(sql="bankName=:UserInfo_bankName")
+	public java.lang.String getBankName() {
+		return this.bankName;
+	}
+		/**
+		 * 银行帐号
+		 */
+	public void setBankAccountName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.bankAccountName = value;
+	}
+	
+	
+	
+	/**
+	 * 银行帐号
+	 */
+     @WhereSQL(sql="bankAccountName=:UserInfo_bankAccountName")
+	public java.lang.String getBankAccountName() {
+		return this.bankAccountName;
+	}
+		/**
+		 * 银行卡号
+		 */
+	public void setBankId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.bankId = value;
+	}
+	
+	
+	
+	/**
+	 * 银行卡号
+	 */
+     @WhereSQL(sql="bankId=:UserInfo_bankId")
+	public java.lang.String getBankId() {
+		return this.bankId;
+	}
+		/**
+		 * 卡号状态
+		 */
+	public void setBankState(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.bankState = value;
+	}
+	
+	
+	
+	/**
+	 * 卡号状态
+	 */
+     @WhereSQL(sql="bankState=:UserInfo_bankState")
+	public java.lang.String getBankState() {
+		return this.bankState;
+	}
+		/**
+		 * 基本工资
+		 */
+	public void setJibenpay(java.math.BigDecimal value) {
+		this.jibenpay = value;
+	}
+	
+	
+	
+	/**
+	 * 基本工资
+	 */
+     @WhereSQL(sql="jibenpay=:UserInfo_jibenpay")
+	public java.math.BigDecimal getJibenpay() {
+		return this.jibenpay;
+	}
+		/**
+		 * 考核工资
+		 */
+	public void setKaohepay(java.math.BigDecimal value) {
+		this.kaohepay = value;
+	}
+	
+	
+	
+	/**
+	 * 考核工资
+	 */
+     @WhereSQL(sql="kaohepay=:UserInfo_kaohepay")
+	public java.math.BigDecimal getKaohepay() {
+		return this.kaohepay;
+	}
+		/**
+		 * 岗位工资
+		 */
+	public void setGangweipay(java.math.BigDecimal value) {
+		this.gangweipay = value;
+	}
+	
+	
+	
+	/**
+	 * 岗位工资
+	 */
+     @WhereSQL(sql="gangweipay=:UserInfo_gangweipay")
+	public java.math.BigDecimal getGangweipay() {
+		return this.gangweipay;
+	}
+		/**
+		 * 是否停发工资
+		 */
+	public void setStoppay(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.stoppay = value;
+	}
+	
+	
+	
+	/**
+	 * 是否停发工资
+	 */
+     @WhereSQL(sql="stoppay=:UserInfo_stoppay")
+	public java.lang.String getStoppay() {
+		return this.stoppay;
+	}
+     
+     /**
+      * 修改人
+      * @return
+      */
+	public String getEditPerson() {
+		return editPerson;
+	}
+	  /**
+     * 修改人
+     * @return
+     */
+	public void setEditPerson(String editPerson) {
+		this.editPerson = editPerson;
+	}
+	/**
+     * 修改时间
+     * @return
+     */
+	public java.util.Date getEditDate() {
+		return editDate;
+	}
+	/**
+     * 修改时间
+     * @return
+     */
+	public void setEditDate(java.util.Date editDate) {
+		this.editDate = editDate;
+	}
+
+	public java.util.Date getFirstTime() {
+		return firstTime;
+	}
+
+	public void setFirstTime(java.util.Date firstTime) {
+		this.firstTime = firstTime;
+	}
+
+	public String getGrade() {
+		return grade;
+	}
+
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
+	@Transient
+	public String getGradeName() {
+		return gradeName;
+	}
+
+	public void setGradeName(String gradeName) {
+		this.gradeName = gradeName;
+	}
+	@Transient
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+	@Transient
+	public Integer getWorkingYears() {
+		return workingYears;
+	}
+
+	public void setWorkingYears(Integer workingYears) {
+		this.workingYears = workingYears;
+	}
+	@Transient
+	public Integer getOurAge() {
+		return ourAge;
+	}
+
+	public void setOurAge(Integer ourAge) {
+		this.ourAge = ourAge;
+	}
+	@Transient
+	public List<UserEducational> getEducational() {
+		return educational;
+	}
+
+	public void setEducational(List<UserEducational> educational) {
+		this.educational = educational;
+	}
+	@Transient
+	public String getFlag() {
+		return flag;
+	}
+
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+	@Transient
+	public List<UserCertificate> getCertificate() {
+		return certificate;
+	}
+
+	public void setCertificate(List<UserCertificate> certificate) {
+		this.certificate = certificate;
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder()
+			.append("id[").append(getId()).append("],")
+			.append("userId[").append(getUserId()).append("],")
+			.append("员工代码[").append(getUserCode()).append("],")
+			.append("出生日期[").append(getBirthday()).append("],")
+			.append("工号[").append(getWorkno()).append("],")
+			.append("身份证号[").append(getIdCard()).append("],")
+			.append("公司[").append(getCompany()).append("],")
+			.append("统筹缴纳地[").append(getTongchou()).append("],")
+			.append("岗位[").append(getGangwei()).append("],")
+			.append("入职日期[").append(getEntryDate()).append("],")
+			.append("转正日期[").append(getStartDate()).append("],")
+			.append("离职日期[").append(getEndDate()).append("],")
+			.append("移动电话1[").append(getMobile1()).append("],")
+			.append("移动电话2[").append(getMobile2()).append("],")
+			.append("固定电话[").append(getTelephone()).append("],")
+			.append("电子邮箱[").append(getEmail()).append("],")
+			.append("婚否[").append(getMarryState()).append("],")
+			.append("健康状态[").append(getHealth()).append("],")
+			.append("入职城市[").append(getEntryCity()).append("],")
+			.append("入职方式[").append(getEntryType()).append("],")
+			.append("介绍人[").append(getIntroducer()).append("],")
+			.append("民族[").append(getMinzu()).append("],")
+			.append("政治面貌[").append(getPoliticsStatus()).append("],")
+			.append("最高学历[").append(getZuigaoxueli()).append("],")
+			.append("教育经历[").append(getJiaoyujingli()).append("],")
+			.append("紧急联系人[").append(getFireName()).append("],")
+			.append("紧急联系电话[").append(getFirePhone()).append("],")
+			.append("备注[").append(getBak()).append("],")
+			.append("银行名称[").append(getBankName()).append("],")
+			.append("银行帐号[").append(getBankAccountName()).append("],")
+			.append("银行卡号[").append(getBankId()).append("],")
+			.append("卡号状态[").append(getBankState()).append("],")
+			.append("基本工资[").append(getJibenpay()).append("],")
+			.append("考核工资[").append(getKaohepay()).append("],")
+			.append("岗位工资[").append(getGangweipay()).append("],")
+			.append("是否停发工资[").append(getStoppay()).append("],")
+			.toString();
+	}
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(getId())
+			.toHashCode();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof UserInfo == false){
+			return false;
+		}
+			
+		if(this == obj){
+			return true;
+		}
+		
+		UserInfo other = (UserInfo)obj;
+		return new EqualsBuilder()
+			.append(getId(),other.getId())
+			.isEquals();
+	}
+}
+
+	

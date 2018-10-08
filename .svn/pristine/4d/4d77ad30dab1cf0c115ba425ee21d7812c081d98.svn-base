@@ -1,0 +1,193 @@
+<#ftl output_format="HTML" auto_esc=true>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<script src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<script src="${ctx}/js/ueditor/ueditor.config.js"></script>
+<script src="${ctx}/js/ueditor/ueditor.all.js"></script>
+<script src="${ctx}/js/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script>
+	 jQuery(function(){
+		
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(function(){
+			 var _obj = bankno.verify($("#bankId").val());
+			 if(_obj.code == 1){
+				 layer.alert(_obj.msg,{icon: 5});
+				 return false;
+			 }
+		 },function(_json){
+			 if(_json.status == 'success'){
+				 layer.alert("修改成功",function(){
+					 window.location.href="${ctx}/userinfo/userbank/list?springraintoken="+springraintoken
+				 })
+			 }else{
+				 layer.alert(_json.message,{icon: 5});
+			 }
+		 });
+		 initData();
+	 });
+	 function initData(){
+		 $("#bankName").find("option[value='${(returnDatas.data.bankName)!''}']").prop("selected","true");
+		
+		 $("input[value='${(returnDatas.data.bankState)!''}']").prop("checked","true");
+	 }
+	 ;!function(){
+		    var _bankno,_code,_msg,_verify_code,_base_code;
+		    var _msg_code = ['\u65e0\u6548\u7684\u5361\u53f7','\u5408\u6cd5'];
+		    function _verify_length(){
+		        if(_bankno.length !=16 && _bankno.length != 19){
+		            return false;
+		        }
+		        return true;
+		    }
+		    function _get_verify_code(){
+		        try{
+		            _verify_code = _bankno.substring(_bankno.length-1);
+		            _base_code = _bankno.substring(0,_bankno.length-1);
+		            _base_code = _base_code.split("").reverse().join("");
+		            _sum = 0;
+		            for(var i=0;i<_base_code.length;i++){
+		                var _k = +_base_code[i];
+		                if(i%2==0){
+		                    _k = _k*2;
+		                    _sum += _k%10+parseInt(_k/10);
+		                }else{
+		                    _sum += _k;
+		                }
+		            }
+		            _sum += +_verify_code;
+		            if(_sum%10==0){
+		                return true;
+		            }
+		            return false;
+		        }catch(e){
+		            return false;
+		        }
+		    }
+		    function _return(){
+		        return {
+		            code:_code,
+		            msg:_msg,
+		            bankno:_bankno
+		        }
+		    }
+		    function _verify(){
+		        _msg = _msg_code[0];
+		        _code = 1;
+		        if(!_verify_length()) return _return();
+		        if(!_get_verify_code()) return _return();
+		        _msg = _msg_code[1];
+		        _code = 0;
+		        return _return();
+		    }
+		    function bankno(){};
+		    bankno.prototype = {
+		        verify:function(bankno){
+		            _bankno = bankno;
+		            return _verify();
+		        }
+		    }
+		    window.bankno = new bankno();
+		}(window);
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            		
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>修改用户银行信息 <b style="color:red;">请添加用户基本信息后添加用户银行信息</b></span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/userinfo/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">员工姓名</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="userName" id="userName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.userName)!''}" readonly="readonly">
+																			<input type="hidden" name="userId" id="userId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.uid)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">工号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="workno" id="workno" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.workno)!''}" readonly="readonly">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">银行名称*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="bankName" id="bankName" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="bank"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="tongchou" id="tongchou" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.tongchou)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">银行帐号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="bankAccountName" id="bankAccountName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.bankAccountName)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">银行卡号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="bankId" id="bankId"  class="layui-input" value="${(returnDatas.data.bankId)!''}" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">卡号状态*</label>
+																		<div class="layui-inline col-lg-5">
+																			<input class="bankState" type="radio" name="bankState" value="1" title="可用" checked="">
+																	     	<input class="bankState" type="radio" name="bankState" value="0" title="停用">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+															</div>
+														</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

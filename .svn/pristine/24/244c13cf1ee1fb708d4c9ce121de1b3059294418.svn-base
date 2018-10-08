@@ -1,0 +1,106 @@
+<#ftl output_format="HTML" auto_esc=true> 
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<script>
+jQuery(function(){
+	
+	jQuery("#subBtn").click(function(){
+		var sendDate = $("#sendDate").val();
+		 var g=/^\d+$/;
+		 if(!g.test(sendDate)){
+			 layer.alert("日期只能填写整数",{icon: 5});
+				return false;
+		 }
+		jQuery.ajax( {
+			type : "post",
+			dataType : "json",
+			data : $("#validForm").serialize(),
+			url : "${ctx}/workcontract/configure/update",  
+			success : function(_json) {
+				if(_json.status =="success"){
+					layer.alert("设置成功！",function(){location.reload();});
+				}else{
+					layer.alert(_json.message,{icon: 5});
+				}
+			},
+			error: function (){
+				layer.alert("系统发生错误！",{icon: 5});
+			}
+		});
+	});
+	jQuery("#rstbtn").click(function(){
+		$("#receiveEmail").html("");
+		$("#sendDate").val("");
+	});
+});
+</script>
+</head>	
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /> <@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+					<li class="layui-this">
+		             		
+		             </li>
+	       		</ul>
+	       		<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+				          				<header class="larry-personal-tit">
+											<span>员工查询工资时间配置</span>
+										</header>
+										<div class="larry-personal-body clearfix changepwd">
+											<form id="validForm" class="layui-form"  method="post" action="${ctx}/workcontract/configure/update">
+											<div class="layui-form-item change-submit  col-lg-6">
+												 	<div class="layui-form-item col-lg-6">
+														<label class="layui-form-label">发送邮件天数*</label>
+														<div class="layui-inline col-lg-5">  
+														  	<input type="text" name="sendDate" id="sendDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.map['sendDate'].code)!''}">
+														</div>
+														<div class="layui-inline valid-info"></div>
+													</div>
+												 	<div class="layui-form-item col-lg-6" style="padding-left: 30px;">
+												 		<div style="color:red;">
+												 			说明：设置合同到期前发送邮件天数
+												 			<br/>
+												 			例如：合同还有45天到期，则设置此值为45
+												 		</div>
+													</div>
+												 	<div class="layui-form-item col-lg-6">
+														<label class="layui-form-label">接收邮箱*</label>
+														<div class="layui-inline col-lg-5"> 
+														  	<textarea  datatype="*" nullmsg="不能为空" errormsg="不能为空！" name="receiveEmail" id="receiveEmail"class="layui-textarea">${(returnDatas.map['receiveEmail'].remark)!''}</textarea>
+														</div>
+														<div class="layui-inline valid-info"></div>
+													</div>
+												 	<div class="layui-form-item col-lg-6" style="padding-left: 30px;">
+												 		<div style="color:red;">
+												 			说明：设置邮箱发送的地址，用“ , ”隔开
+												 			<br/>
+												 			例如：123@123.com,456@456.com
+												 		</div>
+													</div>
+													<div class="layui-inline">
+														<button type="button" class="layui-btn" id="subBtn">保存</button>
+														<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+													</div>
+												</div>
+											</form>
+										</div>
+									</div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

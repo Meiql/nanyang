@@ -1,0 +1,152 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>添加员工履历表</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/userresume/update">
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">员工Id*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.userId)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">类别*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.type)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">创建人*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.createPerson)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">创建时间*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${((returnDatas.data.createDate)?string('yyyy-MM-dd'))!'' }
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">原部门*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.oldOrg)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">新部门*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.newOrg)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">原级别*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.oldGrade)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">新级别*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.newGrade)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">原岗位*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.oldGangwei)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">新岗位*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.newGangwei)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">原基本工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.oldJibenpay)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">新基本工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.newJibenpay)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">原考核工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.oldKaohepay)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">新考核工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.newKaohepay)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">原岗位工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.oldGangweipay)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">新岗位工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.newGangweipay)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

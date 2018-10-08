@@ -1,0 +1,214 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+
+<script>
+	 var _zctype,_zcleibie;
+	 jQuery(function(){
+		 _zctype = "${(returnDatas.data.zctype)!''}";
+		 $("#zctype").val(_zctype);
+		 _zcleibie="${(returnDatas.data.zcleibie)!''}";
+		jQuery("#zcleibie").val(_zcleibie);
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(null,function(){window.location.href="${ctx}/zichan/list?springraintoken="+springraintoken});
+	 });
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>添加资产表</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/zichan/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>	
+																<input type="hidden" id="kucun" name="kucun" value="${(returnDatas.data.kucun)!'0'}"/>	
+																<input type="hidden" id="active" name="active" value="${(returnDatas.data.active)!'0'}"/>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产编号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zccode" id="zccode" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zccode)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产名称*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zcname" id="zcname" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zcname)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产类型*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="zctype" id="zctype" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input">
+																			<@dic.dataList typekey="zichan"/>
+																			</select>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产类别*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="zcleibie" id="zcleibie" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input">
+																			<@dic.dataList typekey="zcleibie"/>
+																			</select>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">规格型号</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="guige" id="guige" autocomplete="off" class="layui-input" value="${(returnDatas.data.guige)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label"></label>
+																		<div class="layui-inline col-lg-5 " style="color:red;">  
+																		例如：cpu:i3,硬盘:500G,xx:xx,
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">单位*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="danwei" id="danwei" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.danwei)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">存放地点</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zccfd" id="zccfd" autocomplete="off" class="layui-input" value="${(returnDatas.data.zccfd)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">购买日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="goumaidate" id="goumaidate"  datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${((returnDatas.data.goumaidate)?string('yyyy-MM-dd'))!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入库日期*</label>
+																		<div class="layui-inline col-lg-5">
+																			<input type="datetime" name="rukudate" id="rukudate"  datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${((returnDatas.data.rukudate)?string('yyyy-MM-dd'))!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产数量*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zcnumber" id="zcnumber" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zcnumber)!''}" readonly="readonly">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产单价*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zcprice" id="zcprice" datatype="money" nullmsg="不能为空" errormsg="请输入正确金额！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zcprice)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产金额*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zcmoney" id="zcmoney" datatype="money" nullmsg="不能为空" errormsg="请输入正确金额！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zcmoney)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">使用年限*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="nianxian" id="nianxian" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.nianxian)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">质保到期日*</label>
+																		<div class="layui-inline col-lg-5">
+																			<input type="datetime" name="zhibaodate" id="zhibaodate"  datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" value="${((returnDatas.data.zhibaodate)?string('yyyy-MM-dd'))!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">经销商</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="jingxiaoshang" id="jingxiaoshang"  autocomplete="off" class="layui-input" value="${(returnDatas.data.jingxiaoshang)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">经销商联系方式</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="jingxiaoshangtel" id="jingxiaoshangtel"  autocomplete="off" class="layui-input" value="${(returnDatas.data.jingxiaoshangtel)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">资产配置情况</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="zcconfig" id="zcconfig"  autocomplete="off" class="layui-input" value="${(returnDatas.data.zcconfig)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">经手人</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="jsuser" id="jsuser"  autocomplete="off" class="layui-input" value="${(returnDatas.data.jsuser)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">备注</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="remark" id="remark"  autocomplete="off" class="layui-input" value="${(returnDatas.data.remark)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+															</div>
+														</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

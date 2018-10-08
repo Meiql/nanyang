@@ -1,0 +1,60 @@
+package org.springrain.erp.gz.service;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springrain.erp.gz.entity.Salaryinfo;
+import org.springrain.system.service.IBaseSpringrainService;
+/**
+ * 工资增减项
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:28:49
+ * @see org.springrain.erp.gz.service.Salaryinfo
+ */
+public interface ISalaryinfoService extends IBaseSpringrainService {
+	
+	/**
+	 * 根据ID查找
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	Salaryinfo findSalaryinfoById(Object id) throws Exception;
+	
+	/**
+	 * 根据工资id查询小项
+	 * @param salaryId
+	 * @return
+	 * @throws Exception
+	 */
+	List<Salaryinfo> findListSalaryinfo(String salaryId)throws Exception;
+	/**
+	 * 根据userId,inDate查询工资小项
+	 * @param userId
+	 * @param inDate
+	 * @return
+	 * @throws Exception
+	 */
+	List<Salaryinfo> findListSalaryinfo(String userId,Date inDate)throws Exception;
+	
+	/**
+	 * 根据userId,inDate查询工资信息
+	 * @param userId
+	 * @param inDate
+	 * @return
+	 * @throws Exception
+	 */
+	List<Salaryinfo> findSalaryinfoForList(String userId,Date inDate)throws Exception;
+	
+	/**
+	 * 离职增加工资增减项
+	 * @param list
+	 * @param userId
+	 * @param month
+	 * @return
+	 * @throws Exception
+	 */
+	List<Salaryinfo> saveSalryForList(List<Salaryinfo> list ,String userId,Date month)throws Exception;
+	
+}

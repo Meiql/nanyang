@@ -1,0 +1,354 @@
+package  org.springrain.erp.hr.web;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.constants.ErpStateEnum.tcstateEnum;
+import org.springrain.erp.constants.ErpStateEnum.userActiveEnum;
+import org.springrain.erp.constants.ErpStateEnum.userStateEnum;
+import org.springrain.erp.gz.entity.Salary;
+import org.springrain.erp.gz.service.ISalaryService;
+import org.springrain.erp.gz.util.GlobalStaticVar.SalaryStateEnum;
+import org.springrain.erp.hr.entity.UserInfo;
+import org.springrain.erp.hr.service.IUserInfoService;
+import org.springrain.erp.tc.entity.TongchouInfo;
+import org.springrain.erp.tc.service.ITongchouInfoService;
+import org.springrain.frame.controller.BaseController;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.GlobalStatic;
+import org.springrain.frame.util.Page;
+import org.springrain.frame.util.ReturnDatas;
+import org.springrain.frame.util.property.MessageUtils;
+import org.springrain.system.entity.User;
+import org.springrain.system.service.IDicDataService;
+import org.springrain.system.service.IUserOrgService;
+import org.springrain.system.service.IUserService;
+
+
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:47:25
+ * @see org.springrain.erp.hr.web.UserInfo
+ */
+@Controller
+@RequestMapping(value="/userleave")
+public class UserLeaveProcessController  extends BaseController {
+	@Resource
+	private IUserInfoService userInfoService;
+	@Resource
+	private IDicDataService dicDataService;
+	@Resource
+	private IUserOrgService userOrgService;
+	@Resource
+	private IUserService userService;
+	@Resource
+	private ISalaryService salaryService;
+	@Resource
+	private ITongchouInfoService tongchouInfoService;
+	private String listurl="/erp/hr/userleave/userleaveList";
+	
+	
+	   
+	/**
+	 * 列表数据,调用listjson方法,保证和app端数据统一
+	 * 
+	 * @param request
+	 * @param model
+	 * @param userInfo
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/list")
+	public String list(HttpServletRequest request, Model model,UserInfo userInfo) 
+			throws Exception {
+		ReturnDatas returnObject = listjson(request, model, userInfo);
+		model.addAttribute(GlobalStatic.returnDatas, returnObject);
+		return listurl;
+	}
+	
+	/**
+	 * json数据,为APP提供数据
+	 * 
+	 * @param request
+	 * @param model
+	 * @param userInfo
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/list/json")
+	@ResponseBody   
+	public  ReturnDatas listjson(HttpServletRequest request, Model model,UserInfo userInfo) throws Exception{
+		ReturnDatas returnObject = ReturnDatas.getSuccessReturnDatas();
+		// ==构造分页请求
+		Page page = newPage(request);
+		// ==执行分页查询
+		userInfo.setUserActive(userActiveEnum.离职.getValue());
+		List<UserInfo> datas=userInfoService.findUserInfoByQuery(userInfo, page);
+		
+		returnObject.setQueryBean(userInfo);
+		returnObject.setPage(page);
+		returnObject.setData(datas);
+		return returnObject;
+	}
+	
+	@RequestMapping("/list/export")
+	public void listexport(HttpServletRequest request,HttpServletResponse response, Model model,UserInfo userInfo) throws Exception{
+		// ==构造分页请求
+		Page page = newPage(request);
+	
+		File file = userInfoService.findDataExportExcel(null,listurl, page,UserInfo.class,userInfo);
+		String fileName="userInfo"+GlobalStatic.excelext;
+		downFile(response, file, fileName,true);
+		return;
+	}
+	
+		/**
+	 * 查看操作,调用APP端lookjson方法
+	 */
+	@RequestMapping(value = "/look")
+	public String look(Model model,HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		ReturnDatas returnObject = lookjson(model, request, response);
+		model.addAttribute(GlobalStatic.returnDatas, returnObject);
+		return "/erp/hr/userinfo/userinfoLook";
+	}
+
+	
+	/**
+	 * 查看的Json格式数据,为APP端提供数据
+	 */
+	@RequestMapping(value = "/look/json")
+	@ResponseBody      
+	public ReturnDatas lookjson(Model model,HttpServletRequest request,HttpServletResponse response) throws Exception {
+		ReturnDatas returnObject = ReturnDatas.getSuccessReturnDatas();
+		String userId = request.getParameter("userId");
+		if(StringUtils.isEmpty(userId)){
+			returnObject.setStatus(ReturnDatas.ERROR);
+			returnObject.setMessage("请选择离职员工");
+			return returnObject;
+		}
+		UserInfo userInfo = userInfoService.findUserInfoByUserId(userId);
+		if(userInfo==null){
+			returnObject.setStatus(ReturnDatas.ERROR);
+			returnObject.setMessage("系统不存在该员工信息，请联系管理员");
+			return returnObject;
+		}
+		if(userInfo.getJibenpay()==null&&userInfo.getKaohepay()==null&&userInfo.getGangweipay()==null){
+			returnObject.setStatus(ReturnDatas.ERROR);
+			returnObject.setMessage("请完善用户工资信息");
+			return returnObject;
+		}
+		//是否停保
+		Finder f = Finder.getSelectFinder(TongchouInfo.class);
+		f.append(" where userId=:userId and state=:state").setParam("userId", userId).setParam("state", tcstateEnum.否.getValue());
+		List<TongchouInfo> listTc = tongchouInfoService.queryForList(f, TongchouInfo.class);
+		Date stopMonth = null;
+		if(CollectionUtils.isNotEmpty(listTc)){
+			 stopMonth = listTc.get(0).getStopProtectMonth();
+		}
+		userInfo.setStopProtectMonth(stopMonth);
+		Date thismonthfirstday = DateUtils.getMonthFirstDay(new Date());
+		//得到上个月第一天
+		Calendar calendar = Calendar.getInstance();
+		Date lastdate = DateUtils.getBoferBeginDate(calendar);
+		Salary salary = salaryService.finderSalaryInfo(userId, thismonthfirstday);
+		Salary lastsalary = salaryService.finderSalaryInfo(userId, lastdate);
+		//判断工资是否生成
+		String nowstate = "n";
+		String laststate = "n";
+		if(salary!=null){
+			if(SalaryStateEnum.已生成.getValue()==salary.getState()){
+				nowstate="y";
+			}
+		}
+		if(lastsalary!=null){
+			if(SalaryStateEnum.已生成.getValue()==lastsalary.getState()){
+				laststate="y";
+			}
+		}
+		userInfo.setNowsalarystate(nowstate);
+		userInfo.setLastsalarystate(laststate);
+		returnObject.setData(userInfo);
+		return returnObject;
+	
+	}
+	
+	
+	/**
+	 * 新增/修改 操作吗,返回json格式数据
+	 * 
+	 */
+	@RequestMapping("/update")
+	@ResponseBody      
+	public ReturnDatas saveorupdate(Model model,HttpServletRequest request,HttpServletResponse response) throws Exception{
+		ReturnDatas returnObject = ReturnDatas.getSuccessReturnDatas();
+		return returnObject;
+	
+	}
+	
+	/**
+	 * 进入修改页面,APP端可以调用 lookjson 获取json格式数据
+	 */
+	@RequestMapping(value = "/update/pre")
+	public String updatepre(Model model,HttpServletRequest request,HttpServletResponse response)  throws Exception{
+		ReturnDatas returnObject = lookjson(model, request, response);
+		model.addAttribute(GlobalStatic.returnDatas, returnObject);
+		return "/erp/hr/userleave/userleaveedit";
+	}
+	/**
+	 * 进入新增页面,APP端可以调用 lookjson 获取json格式数据
+	 */
+	@RequestMapping(value = "/update/json")
+	public String xinzeng(Model model,HttpServletRequest request,HttpServletResponse response)  throws Exception{
+		ReturnDatas returnObject = lookjson(model, request, response);
+		User user = new User();
+		user.setUserType(ErpStateEnum.userTypeEnum.员工.getValue());
+		user.setActive(userActiveEnum.在职.getValue());
+		List<User> userList = userService.finderUserForList(user,null);
+		model.addAttribute("userList", userList);
+		model.addAttribute(GlobalStatic.returnDatas, returnObject);
+		return "/erp/hr/userleave/userleaveCru";
+	}
+	/**
+	 * 删除操作
+	 */
+	@RequestMapping(value="/delete")
+	@ResponseBody      
+	public  ReturnDatas delete(HttpServletRequest request) throws Exception {
+
+			// 执行删除
+		try {
+		java.lang.String id=request.getParameter("id");
+		if(StringUtils.isNotBlank(id)){
+				userInfoService.deleteById(id,UserInfo.class);
+				return new ReturnDatas(ReturnDatas.SUCCESS,MessageUtils.DELETE_SUCCESS);
+			} else {
+				return new ReturnDatas(ReturnDatas.WARNING,MessageUtils.DELETE_WARNING);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ReturnDatas(ReturnDatas.WARNING, MessageUtils.DELETE_WARNING);
+	}
+	
+	/**
+	 * 删除多条记录
+	 * 
+	 */
+	@RequestMapping("/delete/more")
+	@ResponseBody      
+	public ReturnDatas deleteMore(HttpServletRequest request, Model model) {
+		String records = request.getParameter("records");
+		if(StringUtils.isBlank(records)){
+			 return new ReturnDatas(ReturnDatas.ERROR,MessageUtils.DELETE_ALL_FAIL);
+		}
+		String[] rs = records.split(",");
+		if (rs == null || rs.length < 1) {
+			return new ReturnDatas(ReturnDatas.ERROR,MessageUtils.DELETE_NULL_FAIL);
+		}
+		try {
+			List<String> ids = Arrays.asList(rs);
+			userInfoService.deleteByIds(ids,UserInfo.class);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return new ReturnDatas(ReturnDatas.ERROR,MessageUtils.DELETE_ALL_FAIL);
+		}
+		return new ReturnDatas(ReturnDatas.SUCCESS,MessageUtils.DELETE_ALL_SUCCESS);
+		
+	}
+
+	
+	/**
+	 * 离职保存
+	 * @param model
+	 * @param request
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/lizhi")
+	public @ResponseBody ReturnDatas staffLizhi(Model model,HttpServletRequest request,User user)throws Exception{
+		ReturnDatas returnDatas = ReturnDatas.getSuccessReturnDatas();
+		String id = request.getParameter("userId");
+		user.setId(id);
+		UserInfo userInfo = userInfoService.findUserInfoByUserId(id);
+		try {
+			if(userInfo==null){
+				returnDatas.setStatus(ReturnDatas.ERROR);
+				returnDatas.setMessage("用户信息不存在");
+				return returnDatas;
+			}
+			userService.saveUserLizhi(user);
+		} catch (Exception e) {
+			returnDatas.setStatus(ReturnDatas.ERROR);
+			returnDatas.setMessage("办理失败");
+			return returnDatas;
+		}
+		returnDatas.setMessage("办理成功");
+		return returnDatas;
+	}
+	/**
+	 * 离职状态
+	 * @param model
+	 * @param request
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/lizhi/pre")
+	public @ResponseBody ReturnDatas staffLizhiState(Model model,HttpServletRequest request,User user)throws Exception{
+		ReturnDatas returnDatas = ReturnDatas.getSuccessReturnDatas();
+		String id = user.getId();
+		String state = user.getState();
+		try {
+			 user = userService.findById(id, User.class);
+			 user.setState(state);
+			 userService.update(user);
+		} catch (Exception e) {
+			returnDatas.setStatus(ReturnDatas.ERROR);
+			returnDatas.setMessage("办理失败");
+			return returnDatas;
+		}
+		returnDatas.setMessage("办理成功");
+		return returnDatas;
+	}
+	@RequestMapping("/lizhi/json")
+	public @ResponseBody   ReturnDatas stopTc(Model model,TongchouInfo tongchouInfo,HttpServletRequest request,HttpServletResponse response) throws Exception{
+		ReturnDatas returnObject = ReturnDatas.getSuccessReturnDatas();
+		returnObject.setMessage(MessageUtils.UPDATE_SUCCESS);
+		try {
+			String userId = request.getParameter("userId");
+			if(StringUtils.isEmpty(userId)){
+				returnObject.setStatus(ReturnDatas.ERROR);
+				returnObject.setMessage(MessageUtils.UPDATE_ERROR);	
+				return returnObject;
+			}
+			User user = userService.findById(userId, User.class);
+			user.setState(userStateEnum.人力确认停保.getValue());
+			userService.update(user);
+			tongchouInfoService.saveOrUpdateTcTingbao(tongchouInfo,ErpStateEnum.tcstateEnum.否.getValue());
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			returnObject.setStatus(ReturnDatas.ERROR);
+			returnObject.setMessage(MessageUtils.UPDATE_ERROR);
+		}
+		return returnObject;
+	
+	}
+}

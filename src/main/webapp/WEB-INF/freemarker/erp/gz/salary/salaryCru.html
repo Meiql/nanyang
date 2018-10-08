@@ -1,0 +1,166 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<script>
+	 jQuery(function(){
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(null,function(){window.location.href="${ctx}/salary/list?springraintoken="+springraintoken});
+	 });
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            		<i class="layui-icon">&#xe630;</i>
+		             		<span class="layui-breadcrumb" style="visibility: visible;">
+							   <a href="${ctx}">首页<span class="layui-box">&gt;</span></a>
+							   <a><cite>工资主表管理</cite></a>
+							</span>
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>添加工资主表</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/salary/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">用户Id*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="userId" id="userId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.userId)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">部门Id*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="unitId" id="unitId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.unitId)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">归属月份*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="inDate" id="inDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.inDate)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">开始时间*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="startDate" id="startDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.startDate)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">结束时间*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="endDate" id="endDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.endDate)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">基本工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="jibenpay" id="jibenpay" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.jibenpay)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">考核工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="kaohepay" id="kaohepay" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.kaohepay)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">岗位工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="gangweipay" id="gangweipay" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.gangweipay)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">日工资*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="ripay" id="ripay" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.ripay)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">状态 1是未生成 2生成 3已发放*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="state" id="state" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.state)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">发放日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="sendDate" id="sendDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.sendDate)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">发放时间,系统时间*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="sendTime" id="sendTime" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.sendTime)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">发放人*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="sendPerson" id="sendPerson" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.sendPerson)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">说明*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="remarker" id="remarker" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.remarker)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+															</div>
+														</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

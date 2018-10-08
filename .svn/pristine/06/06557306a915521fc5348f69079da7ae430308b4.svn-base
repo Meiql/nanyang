@@ -1,0 +1,319 @@
+package org.springrain.erp.zc.service.impl;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.DicdataTypeEnum;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.gz.util.MathUtils;
+import org.springrain.erp.zc.entity.Zichan;
+import org.springrain.erp.zc.entity.ZichanLingDetail;
+import org.springrain.erp.zc.entity.ZichanRecord;
+import org.springrain.erp.zc.service.IZichanPropertiesService;
+import org.springrain.erp.zc.service.IZichanService;
+import org.springrain.frame.common.SessionUser;
+import org.springrain.frame.entity.IBaseEntity;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.Page;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.service.BaseSpringrainServiceImpl;
+import org.springrain.system.service.IDicDataService;
+
+/**
+ * TODO 在此加入类描述
+ * 
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version 2017-08-14 09:44:45
+ * @see org.springrain.erp.zc.service.impl.Zichan
+ */
+@Service("zichanService")
+public class ZichanServiceImpl extends BaseSpringrainServiceImpl implements
+		IZichanService {
+	@Resource
+	private IZichanPropertiesService zichanPropertiesService;
+	@Resource
+	private IDicDataService dicDataService;
+
+	@Override
+	public String save(Object entity) throws Exception {
+		Zichan zichan = (Zichan) entity;
+		String id = super.save(zichan).toString();
+		zichanPropertiesService.saveZichanProperties(zichan.getId(), zichan.getGuige());
+		return id;
+	}
+
+	@Override
+	public String saveorupdate(Object entity) throws Exception {
+		Zichan zichan = (Zichan) entity;
+		if(StringUtils.isNotBlank(zichan.getId())){
+			return String.valueOf(this.update(zichan));
+		}else{
+			return this.save(zichan).toString();
+		}
+	}
+
+	@Override
+	public Integer update(IBaseEntity entity) throws Exception {
+		Zichan zichan = (Zichan) entity;
+		 int num = super.update(zichan);
+		 zichanPropertiesService.saveZichanProperties(zichan.getId(), zichan.getGuige());
+		 return num;
+	}
+
+	@Override
+	public Zichan findZichanById(Object id) throws Exception {
+		return super.findById(id, Zichan.class);
+	}
+
+	/**
+	 * 列表查询,每个service都会重载,要把sql语句封装到service中,Finder只是最后的方案
+	 * 
+	 * @param finder
+	 * @param page
+	 * @param clazz
+	 * @param o
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<T> findListDataByFinder(Finder finder, Page page,
+			Class<T> clazz, Object o) throws Exception {
+		return (List<T>) findZichanByQuery((Zichan) o, page);
+	}
+
+	/**
+	 * 根据查询列表的宏,导出Excel
+	 * 
+	 * @param finder
+	 *            为空则只查询 clazz表
+	 * @param ftlurl
+	 *            类表的模版宏
+	 * @param page
+	 *            分页对象
+	 * @param clazz
+	 *            要查询的对象
+	 * @param o
+	 *            querybean
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public <T> File findDataExportExcel(Finder finder, String ftlurl,
+			Page page, Class<T> clazz, Object o) throws Exception {
+		return super.findDataExportExcel(finder, ftlurl, page, clazz, o);
+	}
+
+	@Override
+	public void saveBaosun(Zichan zc, ZichanRecord re) throws Exception {
+		// 记录
+		re.setZcid(zc.getId());
+		re.setActive(0);
+		re.setCreatetime(new Date());
+		re.setCreateuser(SessionUser.getUserId());
+		re.setRetype(ErpStateEnum.ZichanOperEnum.报损.getValue());
+		super.save(re);
+		// 更新资产库存
+		zc.setKucun(Integer.parseInt(MathUtils.sub(
+				String.valueOf(zc.getKucun()), String.valueOf(re.getRenum()))));
+		super.update(zc);
+	}
+
+	@Override
+	public void saveChushou(Zichan zc, ZichanRecord re) throws Exception {
+		// 记录
+		re.setZcid(zc.getId());
+		re.setActive(0);
+		re.setCreatetime(new Date());
+		re.setCreateuser(SessionUser.getUserId());
+		re.setRetype(ErpStateEnum.ZichanOperEnum.出售.getValue());
+		super.save(re);
+		// 更新资产库存
+		zc.setKucun(Integer.parseInt(MathUtils.sub(
+				String.valueOf(zc.getKucun()), String.valueOf(re.getRenum()))));
+		super.update(zc);
+
+	}
+
+	@Override
+	public void saveLingyong(Zichan zc, ZichanRecord re) throws Exception {
+		// 判断领用人是否已经领用该资产,如果是则直接取到它的现领用Id
+		ZichanLingDetail dbling = findLingId(re.getZcid(), re.getReuser());
+		String lingid = null;
+		ZichanLingDetail ling = new ZichanLingDetail();
+		ling.setZcId(zc.getId());
+		ling.setLinguser(re.getReuser());
+		ling.setLinguserid(re.getReuserid());
+		ling.setLingunit(re.getReunit());
+		ling.setLingunitid(re.getReunitid());
+		ling.setLingnum(re.getRenum());
+		ling.setActive(0);
+		if (dbling == null) {
+			lingid = super.save(ling).toString();
+		} else {
+			// 更新领用数量
+			lingid = dbling.getId();
+			dbling.setLingnum(Integer.parseInt(MathUtils.add(
+					String.valueOf(dbling.getLingnum()),
+					String.valueOf(ling.getLingnum()))));
+			super.update(dbling);
+		}
+
+		// 领用记录
+		re.setLingid(lingid);
+		re.setZcid(zc.getId());
+		re.setActive(0);
+		re.setCreatetime(new Date());
+		re.setCreateuser(SessionUser.getUserId());
+		re.setRetype(ErpStateEnum.ZichanOperEnum.领用.getValue());
+		super.save(re);
+
+		// 更新资产
+		zc.setKucun(Integer.parseInt(MathUtils.sub(
+				String.valueOf(zc.getKucun()), String.valueOf(re.getRenum()))));
+		;
+		super.update(zc);
+	}
+
+	@Override
+	public void saveGuihuan(Zichan zc, ZichanRecord re) throws Exception {
+		// 更新现领用
+		ZichanLingDetail ling = findLingId(re.getZcid(), re.getReuser());
+		Integer lingnum = Integer.parseInt(MathUtils.sub(
+				String.valueOf(ling.getLingnum()),
+				String.valueOf(re.getRenum())));
+		ling.setLingnum(lingnum);
+		super.update(ling);
+		// 添加归还记录
+		re.setZcid(zc.getId());
+		re.setActive(0);
+		re.setCreatetime(new Date());
+		re.setCreateuser(SessionUser.getUserId());
+		re.setRetype(ErpStateEnum.ZichanOperEnum.归还.getValue());
+		super.save(re);
+		// 更新资产库存
+		zc.setKucun(Integer.parseInt(MathUtils.add(
+				String.valueOf(zc.getKucun()), String.valueOf(re.getRenum()))));
+		super.update(zc);
+	}
+
+	/**
+	 * 查询领用人是否已领用此资产
+	 * 
+	 * @param zcid
+	 * @param linguser
+	 * @return
+	 * @throws Exception
+	 */
+	ZichanLingDetail findLingId(String zcid, String linguser) throws Exception {
+		if (StringUtils.isBlank(zcid) || StringUtils.isBlank(linguser)) {
+			return null;
+		}
+		Finder finder = Finder.getSelectFinder(ZichanLingDetail.class);
+		finder.append(" where 1 = 1 ");
+		finder.append(" and active=0 and zcid=:zcid and linguser=:linguser and lingnum>0");
+		finder.setParam("zcid", zcid).setParam("linguser", linguser);
+		return super.queryForObject(finder, ZichanLingDetail.class);
+	}
+
+	@Override
+	public boolean findZcCodeLegal(String zcCode, String zcId) throws Exception {
+		if (StringUtils.isBlank(zcCode)) {
+			return false;
+		}
+		Finder finder = Finder.getSelectFinder(Zichan.class, "id");
+		finder.append(" where 1 = 1 and active=0 and zccode=:zccode");
+		if(StringUtils.isNotBlank(zcId)){
+			finder.append(" and id!=:zcId ");
+		}
+		finder.setParam("zccode", zcCode).setParam("zcId", zcId);
+		List<String> list = super.queryForList(finder,String.class);
+		if (CollectionUtils.isNotEmpty(list)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	public void saveZichanList(List<Zichan> zichanList) throws Exception {
+		if(CollectionUtils.isEmpty(zichanList)){
+			return ;
+		}
+		Date now = new Date();
+		try {
+			for(Zichan z : zichanList){
+				z.setId(null);
+				z.setCreateuser(SessionUser.getUserId());
+				z.setCreatetime(now);
+				z.setActive(0);
+				String id = (String) super.save(z);
+				zichanPropertiesService.saveZichanProperties(id, z.getGuige());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public List<Zichan> findZichanByQuery(Zichan query, Page page)
+			throws Exception {
+		Finder finder = Finder.getSelectFinder(Zichan.class);
+		finder.append(" where 1 = 1 ");
+		if(StringUtils.isNotBlank(query.getZccode())){
+			finder.append(" and zccode like :zccode ").setParam("zccode", "%"+query.getZccode()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getZcname())){
+			finder.append(" and zcname like :zcname ").setParam("zcname", "%"+query.getZcname()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getZctype())){
+			finder.append(" and zctype = :zctype ").setParam("zctype", query.getZctype());
+		}
+		if(StringUtils.isNotBlank(query.getZcleibie())){
+			finder.append(" and zcleibie = :zcleibie ").setParam("zcleibie", query.getZcleibie());
+		}
+		if(StringUtils.isNotBlank(query.getSdate())){
+			finder.append(" and createtime >= :sdate ").setParam("sdate", query.getSdate());
+		}
+		if(StringUtils.isNotBlank(query.getEdate())){
+			finder.append(" and createtime <= :edate ").setParam("edate", query.getEdate());
+		}
+		if(StringUtils.isNotBlank(query.getSrukudate())){
+			finder.append(" and rukudate >= :srukudate ").setParam("srukudate", query.getSrukudate());
+		}
+		if(StringUtils.isNotBlank(query.getErukudate())){
+			finder.append(" and rukudate <= :erukudate ").setParam("erukudate", query.getErukudate());
+		}
+		
+		List<Zichan> datas = super.queryForList(finder, Zichan.class,page);
+		Map<String,DicData> leixingmap = dicDataService.getAlldicData(DicdataTypeEnum.资产类型.getValue());
+		Map<String,DicData> leibiemap = dicDataService.getAlldicData(DicdataTypeEnum.资产类别.getValue());
+		if(CollectionUtils.isNotEmpty(datas)){
+			for(Zichan z : datas){
+				if(leixingmap != null && leixingmap.size() > 0){
+					DicData data = leixingmap.get(z.getZctype());
+					if(data != null){
+						z.setZctypeName(data.getName());
+					}
+				}
+				if(leibiemap != null && leibiemap.size() > 0){
+					DicData data = leibiemap.get(z.getZcleibie());
+					if(data != null){
+						z.setZcleibieName(data.getName());
+					}
+				}
+			}
+		}
+		return datas;
+	}
+
+	
+}

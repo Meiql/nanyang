@@ -1,0 +1,329 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<script>
+var panelElement = 0;
+	 jQuery(function(){
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(null,function(){window.location.href="${ctx}/tongchouzengjian/list?springraintoken="+springraintoken});
+	 });
+	 
+	 jQuery(document).ready(function(){
+		 
+		 $("#userId").select2({width:'320px',height:'26px'});
+		 
+		 $("#userId").change(function name() {
+			
+			cleanMessage();
+			var userId = $('#userId option:selected').val();//选中的值
+			
+		});
+		 
+		 //添加面板
+		jQuery("#addPanel").click(function(){
+// 			var num = panelElement;
+			panelElement++;
+			// 面板副本ID
+			var panelId = "infoPanel_" + panelElement;
+			// 副本
+			var panelObject = jQuery("#infoPanel_0").clone();
+			jQuery(panelObject).attr("id",panelId);
+			jQuery(panelObject).find("#0_monthdate").attr("id",panelElement+"_monthdate");
+			jQuery(panelObject).find("#0_insuranceTypeid").attr("id",panelElement+"_insuranceTypeid");
+			jQuery(panelObject).find("#0_feiyongtypeid").attr("id",panelElement+"_feiyongtypeid");
+			jQuery(panelObject).find("#0_companySum").attr("id",panelElement+"_companySum");
+			jQuery(panelObject).find("#0_personSum").attr("id",panelElement+"_personSum");
+			// 清空
+			resetText(panelObject);
+			
+			// 副本中CHECKBOX存放当前面板ID
+			var checkBoxObject = jQuery(panelObject).find(".panelBox");
+			jQuery(checkBoxObject).attr("panelId",panelId);
+			// 复制模板到顶级的后边
+			jQuery("#infoPanel_0").after(panelObject);
+		});
+		
+	// 删除所有选中的模板
+	jQuery("#deletePanel").click(function(){
+		var selectedArray = jQuery(".panelBox:checked");
+			if(selectedArray.length > 0){
+				if(window.confirm("你确定要删除所选中的面板信息？")){
+						var panelId;
+						jQuery.each(selectedArray,function(i,o){
+							panelId = jQuery(o).attr("panelId");
+							if(panelId != null && panelId != "" && panelId != "#"){
+									jQuery("#"+panelId).remove();
+							}else{
+									alert("首面板无法删除！");
+									var checkBoxObject = jQuery("#infoPanel_0").find(".panelBox");
+									jQuery(checkBoxObject).attr("checked",false);		
+								}
+						});	
+					}
+				}else{
+					alert("没有选中任何信息面板！");			
+				}
+		});
+	
+	// 添加面板和重置动作清空数据
+	function resetText(panelObject){
+			if(panelObject != null){
+				// panelBox
+				var panelBoxObject = jQuery(panelObject).find("#panelBox");
+				jQuery(panelBoxObject).attr("checked",false);
+				// 月份
+				var monthObject = jQuery(panelObject).find("#"+panelElement+"_monthdate");
+				jQuery(monthObject).val("");
+				// 统筹类型
+				var tcObject = jQuery(panelObject).find("#"+panelElement+"_insuranceTypeid");
+				jQuery(tcObject).val("");
+				// 费用类型
+				var fyObject = jQuery(panelObject).find("#"+panelElement+"_feiyongtypeid");
+				jQuery(fyObject).val("");
+				// 公司部分
+				var companyObject = jQuery(panelObject).find("#"+panelElement+"_companySum");
+				jQuery(companyObject).val("");
+				// 个人部分
+				var personObject = jQuery(panelObject).find("#"+panelElement+"_personSum");
+				jQuery(personObject).val("");
+			}else{
+				// 清空
+				jQuery("#0_userId").val("");
+				jQuery("#0_monthdate").val("");
+				jQuery("#0_insuranceTypeid").val("");
+				jQuery("#0_feiyongtypeid").val("");
+				jQuery("#0_companySum").val("");
+				jQuery("#0_personSum").val("");
+			}
+		}
+	 })
+	 
+	  //清空信息
+	 function cleanMessage(){
+		 jQuery.each(jQuery(":checkbox"), function(i,n){
+	 			if(i!=0){
+	 			jQuery("#infoPanel_"+i+"").remove();
+	 			}
+	 			panelElement=0;
+			}); 
+			jQuery("#0_monthdate").val("");
+			jQuery("#0_insuranceTypeid").val("");
+			jQuery("#0_feiyongtypeid").val("");
+			jQuery("#0_companySum").val("");
+			jQuery("#0_personSum").val("");
+		}
+	
+	 	//提交
+	 	function saveForm() {
+	 		var isvalited = true;
+	 		if($("#userId").val()==""){
+	 			layer.alert("请选择用户");
+	 			return;
+	 		} 
+	 		var panelId = "infoPanel_";
+			var jsObject;// 面板对象
+					for(var i=0;i<=panelElement;i++){
+						var pId = panelId + i;
+						jsObject = jQuery("#"+pId);
+						if(jsObject.length > 0){
+							var number = i;
+							//交费月份非空验证
+				 	 		if(jQuery("#"+number+"_monthdate").val()==""){
+				 	 			layer.alert("请选择月份！");
+				 	 			jQuery("#"+number+"_monthdate").focus();
+				 	 			isvalited = false;
+				 	 			return false;
+				 	 		}
+				 	 		//统筹类型非空验证
+				 	 		if(jQuery("#"+number+"_insuranceTypeid").val()==""){
+				 	 			layer.alert("请选择统筹类型！");
+				 	 			jQuery("#"+number+"_insuranceTypeid").focus();
+				 	 			isvalited = false;
+				 	 			return false;
+				 	 		}
+				 	 		//费用类型非空验证
+				 	 		if(jQuery("#"+number+"_feiyongtypeid").val()==""){
+				 	 			layer.alert("请选择费用类型！");
+				 	 			jQuery("#"+number+"_feiyongtypeid").focus();
+				 	 			isvalited = false;
+				 	 			return false;
+				 	 		}
+				 	 		//公司缴纳部分
+				 	 		if(jQuery("#"+number+"_companySum").val()==""){
+				 	 			layer.alert("请选择公司缴纳部分");
+				 	 			jQuery("#"+number+"_companySum").focus();
+				 	 			isvalited = false;
+				 	 			return false;
+				 	 		}
+				 	 		//公司缴纳部分
+				 	 		if(jQuery("#"+number+"_personSum").val()==""){
+				 	 			layer.alert("请填写个人缴纳部分");
+				 	 			jQuery("#"+number+"_personSum").focus();
+				 	 			isvalited = false;
+				 	 			return false;
+				 	 		}
+						}
+					}
+	 		if(isvalited == false){
+	 			return;
+	 		}
+			 $.ajax({
+				url :"${ctx}/tongchouzengjian/update", 
+			    type :"post",
+			    data:jQuery("#validForm").serialize(),
+				dataType : "json",
+				success:function(ret){
+					if(ret.status=="success"){
+						layer.alert(ret.message, {icon: 1},function(){
+								layer.closeAll();
+								window.location.href="${ctx}/tongchouzengjian/list?springraintoken="+springraintoken});
+						
+					}else{
+						layer.alert(ret.message,{icon: 5});
+					}
+				},
+				error:function(){
+					layer.closeAll('loading')
+					layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+				}
+			});  
+	} 
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="nolayer"  method="post" action="${ctx}/tongchouzengjian/update">
+																
+																<br/>
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>
+																<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table" style="font-size: 15px;">	
+																	<tr>
+																			<td>
+																				<label class="layui-form-label">用户姓名*</label>
+																		<div class="layui-inline col-lg-5">  
+																				<select id="userId" name="userId" class="nolayer"  datatype="*" nullmsg="角不能为空"   data-placeholder="请选择用户">
+																						<option  value="">-请选择用户-</option>
+																						<#if userList ??>
+																							<#list userList as user>
+																								<option value="${(user.id)!''}">${(user.name)!''}&nbsp;(${(user.account)!''})</option>
+																							</#list>
+																						</#if>
+																			</select>
+																		</div>
+																		</td>
+																		</tr>
+																	</table>
+																	<div>
+																		<input class="linkButton" type="button" id="addPanel" value="添加新项" />
+																		<input class="linkButton" type="button" id="deletePanel" value="删除选项" />
+																	</div>
+																	<div id="infoPanel_0">
+																	<hr/>
+																	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+																		<tr>
+																			<td align="left">
+																				<input type="checkbox" class="panelBox" title="是否选中面板" panelId="" />
+																			</td>
+																			<td></td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<label class="layui-form-label">月份*</label>
+																				<div class="layui-inline col-lg-5">  
+																					<input type="text" name="monthdate" id="0_monthdate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" onfocus="WdatePicker({dateFmt:'yyyy-MM'})" class="layui-input" value="${(returnDatas.data.month)!''}">
+		<!-- 																			<input type="text" class="monthDate"  id="month" name="month" class="layui-input" onfocus="WdatePicker({dateFmt:'yyyy-MM'})" /> -->
+																				</div>
+																			</td>		
+																		</tr>
+																		<tr><td colspan="2">&nbsp;</td></tr>
+																		<tr>
+																			<td>			
+																				<label class="layui-form-label">统筹类型*</label>
+																				<div class="layui-inline col-lg-5">  
+		<!-- 																			<input type="text" name="insuranceType" id="insuranceType" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.insuranceType)!''}"> -->
+																					<select style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  name="insuranceTypeid" id="0_insuranceTypeid" >
+																						<option selected="selected" value="">-请选择统筹类型-</option>
+																						<#if tcList??>
+																							<#list tcList as tc>
+																								<option value="${(tc.id)!''}">${(tc.name)!''}</option>
+																							</#list>
+																						</#if>
+																					</select>
+																				</div>
+																			</td>
+																			<td>		
+																				<label class="layui-form-label">费用类型*</label>
+																				<div class="layui-inline col-lg-5">  
+		<!-- 																			<input type="text" name="feiyongtype" id="feiyongtype" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.feiyongtype)!''}"> -->
+																					<select style="width:320px; height: 40px;border: 1px solid #e6e6e6;" class="fyTypeId" name="feiyongtypeid" id="0_feiyongtypeid" >
+																						<option selected="selected" value="">-请选择费用类型-</option>
+																						<#if fyList??>
+																							<#list fyList as fy>
+																								<option value="${(fy.id)!''}">${(fy.name)!''}</option>
+																							</#list>
+																						</#if>
+																					</select>
+																				</div>
+																			</td>
+																		</tr>
+																		<tr><td colspan="2">&nbsp;</td></tr>
+																		 <tr>	
+																			 <td>
+																					<label class="layui-form-label">公司缴纳部分*</label>
+																					<div class="layui-inline col-lg-5">  
+																						<input type="text" class="layui-input" id ="0_companySum" class="companySum" name="companySum" value=""/>
+																					</div>
+																			</td>
+																			<td>
+																				<label class="layui-form-label">个人缴纳部分*</label>
+																					<div class="layui-inline col-lg-5">  
+																						<input type="text" name="personSum" id="0_personSum"  class="layui-input" value="">
+																					</div>
+																			</td>
+																					
+																		</tr>
+																	</table>
+																	</div>
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" onclick="saveForm();">保存</button>
+<!-- 																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button> -->
+															</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

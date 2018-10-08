@@ -1,0 +1,325 @@
+<!-- 正常员工添加的表头信息 -->
+<#macro addtitle>
+<table  width="100%" class="Table4" style="font-size: 15px;">
+	
+	<tr><td colspan="3">&nbsp;</td></tr>
+	<tr>
+		<td>
+		<label class="layui-form-label">姓名：*</label>
+		<select id="userId" name="userId" class="nolayer"  datatype="*" nullmsg="角不能为空"   data-placeholder="请选择用户">
+		<#if userList ??>
+			<option value="">--请选择--</option>
+			<#list userList as user>
+				<option value="${(user.id)!''}" >${(user.name)!''}&nbsp;(${(user.account)!''})</option>	
+			</#list>
+		</#if>	
+		</select>
+		</td>
+		<td>
+		<label class="layui-form-label">工号：*</label>
+			<div class="layui-inline col-lg-5">  
+				<input type="text" name="workno" id="workno"  readonly value="${(returnDatas.data.jobNumber)!''}" class="layui-input"/>
+			</div>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td>
+			<label class="layui-form-label">岗位：*</label>
+			<div class="layui-inline col-lg-5">  
+				<input type="text" name="gangwei" id="gangwei" value="${(returnDatas.data.dutyTypeName)!''}"  class="layui-input"/>
+			</div>
+		</td>
+		<td>
+		<label class="layui-form-label">身份证号：*</label>
+			<div class="layui-inline col-lg-5">  
+				<input type="text" name="cardId" id="cardId"  readonly value="${(returnDatas.data.cardId)!''}" class="layui-input"/>
+			</div>
+		</td>	
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td>
+		<label class="layui-form-label">公积金账号：*</label>
+			<div class="layui-inline col-lg-5">  
+				<input type="text" name="gongjijinaccount" id="gongjijinaccount"   value="${(returnDatas.data.gongjijinaccount)!''}" class="layui-input"/>
+			</div>
+		</td>
+		<td>
+			<label class="layui-form-label">社保账号：*</label>
+			<div class="layui-inline col-lg-5">  
+				<input type="text" name="baoxianaccount" id="baoxianaccount"   value="${(returnDatas.data.baoxianaccount)!''}" class="layui-input"/>
+			</div>
+		</td>	
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>			
+		<td>
+			<label class="layui-form-label">统筹缴纳地：*</label>
+			<div class="layui-inline col-lg-5">  
+			<select id="tcjiaonadi" name="tcjiaonadi"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+					<option value="">请选择</option>
+					<#if addressList ??>
+						<#list addressList as address>
+							<option value="${(address.id)!''}" >${(address.name)!''}</option>	
+						</#list>
+					</#if>	
+			</select>
+			</div>
+	</td>
+		<td>
+			<label class="layui-form-label">公司名称：*</label>
+			<div class="layui-inline col-lg-5">  
+			<select id="company" name="company"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+					<option value="">请选择</option>
+					<#if gsList ??>
+						<#list gsList as unit>
+							<option value="${(unit.id)!''}" >${(unit.name)!''}</option>	
+						</#list>
+					</#if>	
+			</select>
+			</div>
+	</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+</#macro>
+
+<!-- 添加与删除统筹信息按钮 -->
+<#macro addstatChipInfo>
+<table  border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4">
+	<tr>
+		<td>
+			<input type="button" name="add_statChip" id="add_statChip" class="linkButton" value="添加新项" />&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="button" name="delete_statChip" id="delete_statChip" class="linkButton" value="删除选项" />
+		</td>
+	</tr>
+</table>
+</#macro>
+<!-- 单项添加统筹信息 -->
+<#macro statChipInfoadd idBefore>
+<hr/>
+<div id="${idBefore!''}allDiv" class="addDiv">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+		<tr>
+			<td>
+				<input   type="checkbox" id="${(idBefore)!''}checkbox" value="${(idBefore)!''}" /><font color="red">*</font>
+			</td>
+			<td>
+				<label class="layui-form-label">统筹类型：*</label>
+					<div class="layui-inline col-lg-5">  
+							<select id="${(idBefore)!''}statType" name="statType" onchange="changeValidate(this)"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;">
+								<option value=""></option>
+								<#if tcList??>
+									<#list tcList as stapType>
+										<option value="${(stapType.id)!''}">${(stapType.name)!''}</option>
+									</#list>
+								</#if>
+							</select>
+						</div>
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+		<tr><td colspan="3">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">缴费开始月份：*</label>
+				<div class="layui-inline col-lg-5">  
+							<#if safeDate??>
+<!-- 								<input type="text" name="DeliverDate" id="${idBefore!''}DeliverDate" class="layui-input"   value="${((stat.insurancePaymentDate)?string('yyyy-MM'))!''}" onFocus="var endDate=$dp.$('${idBefore!''}ChargedDate');WdatePicker({onpicked:function(){getBaseStat('${idBefore!''}');}, dateFmt:'yyyy-MM', maxDate:'#F{$dp.$D(\'stopProtectMonth\')}'});" /> -->
+<input type="text" name="DeliverDate" id="${idBefore!''}DeliverDate" readonly  value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+							<#else>
+								<input type="text" name="DeliverDate" id="${idBefore!''}DeliverDate" readonly  value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+							</#if>
+				</div>
+			</td>
+			<td>
+			<label class="layui-form-label">缴费结束月份：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="ChargedDate" id="${idBefore!''}ChargedDate" readonly class="layui-input" value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+				</div>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">交费基数：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="base" id="${idBefore!''}base"   class="layui-input" onBlur="validateDouble(this)" value="" />
+					<font color="red">仅支持两位小数</font>
+				</div>
+			</td>
+			<td>
+				<label class="layui-form-label">个人缴纳：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="InsurancePersonal" id="${idBefore!''}InsurancePersonal" onBlur="validateDouble(this)" value=""  class="layui-input" />
+					<font color="red">仅支持两位小数</font>
+				</div>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">公司缴纳：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="InsuranceCompany" id="${idBefore!''}InsuranceCompany" onBlur="validateDouble(this)" class="layui-input" value="" />
+					<font color="red">仅支持两位小数</font>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+</#macro>
+
+<!-- 添加统筹信息模版 -->
+<#macro stapTemp>
+<hr/>
+<span></span>
+<div id="pStapTemp">
+<div id="stapTemp" class="addDiv" >
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+		<tr>
+			<td>
+				<input   type="checkbox"  name="checkbox" id="checkbox" value="${(idBefore)!''}" /><font color="red">*</font>
+			</td>
+			<td>
+				<label class="layui-form-label">统筹类型：*</label>
+					<div class="layui-inline col-lg-5">  
+							<select id="statType" name="statType" onchange="changeValidate(this)"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;">
+								<option value=""></option>
+								<#if tcList??>
+									<#list tcList as stapType>
+										<option value="${(stapType.id)!''}">${(stapType.name)!''}</option>
+									</#list>
+								</#if>
+							</select>
+						</div>
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+		</tr>
+	</table>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+		<tr><td colspan="3">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">缴费开始月份：*</label>
+				<div class="layui-inline col-lg-5">  
+							<#if safeDate??>
+								<input type="text" name="DeliverDate" id="DeliverDate" readonly class="layui-input" value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+							<#else>
+								<input type="text" name="DeliverDate" id="DeliverDate" readonly class="layui-input" value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+							</#if>
+				</div>
+			</td>
+			<td>
+			<label class="layui-form-label">缴费结束月份：*</label>
+				<div class="layui-inline col-lg-5">  
+			<input type="text" name="ChargedDate" id="ChargedDate" readonly class="layui-input" value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+				</div>
+			
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">交费基数：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="base" id="base"   class="layui-input" onBlur="validateDouble(this)" value="" />
+				</div>
+			</td>
+			<td>
+				<label class="layui-form-label">个人缴纳：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="InsurancePersonal" id="InsurancePersonal" onBlur="validateDouble(this)" value=""  class="layui-input" />
+				</div>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">公司缴纳：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="InsuranceCompany" id="InsuranceCompany" onBlur="validateDouble(this)" class="layui-input" value="" />
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+</div>
+</#macro>
+<!-- 单项修改统筹信息 -->
+<#macro statChipInfo idBefore stat>
+<div id="${idBefore!''}allDiv" class="addDiv">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+		<tr>
+			<td><input type="checkbox"  id="${(idBefore)!''}checkbox" value="${(idBefore)!''}" />
+			<font color="red">*</font>统筹类型：<select id="${(idBefore)!''}statType" onchange="changeValidate(this)" name="statType" style="width:320px; height: 40px;border: 1px solid #e6e6e6;">
+				<option value=""></option>
+				<#if tcList??>
+					<#list tcList as stapType>
+						<#if stat??>
+							<#if stat.insuranceType==stapType.id>
+								<option selected value="${(stapType.id)!''}">${(stapType.name)!''}</option>
+							<#else>
+								<option value="${(stapType.id)!''}">${(stapType.name)!''}</option>
+							</#if>
+						<#else>
+							<option value="${(stapType.id)!''}">${(stapType.name)!''}</option>
+						</#if> 
+					</#list>
+				</#if>
+			</select></td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4" style="font-size: 15px;">
+		<tr><td colspan="3">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">缴费开始月份：*</label>
+				<div class="layui-inline col-lg-5">  
+							<#if safeDate??>
+<!-- 								<input type="text" name="DeliverDate" id="DeliverDate" readonly class="layui-input" value="" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" /> -->
+								<input type="text" class="layui-input" name="DeliverDate" id="${idBefore!''}DeliverDate" readonly  value="${((stat.insurancePaymentDate)?string('yyyy-MM'))!''}" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+							<#else>
+								<input type="text"  class="layui-input" name="DeliverDate" id="${idBefore!''}DeliverDate" readonly  value="${((stat.insurancePaymentDate)?string('yyyy-MM'))!''}" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+							</#if>
+				</div>
+			</td>
+			<td>
+			<label class="layui-form-label">缴费结束月份：*</label>
+				<div class="layui-inline col-lg-5">  
+			<input type="text" name="ChargedDate" id="${idBefore!''}ChargedDate" class="layui-input"  value="${((stat.efficientDate)?string('yyyy-MM'))!''}" onFocus="WdatePicker({minDate:'#F{$dp.$D(\'${idBefore!''}DeliverDate\')}', dateFmt:'yyyy-MM'});" />
+				</div>
+			
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">交费基数：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="base" id="${idBefore!''}base" class="layui-input"  value="${(stat.radices)!''}" onBlur="validateDouble(this)" />
+				</div>
+			</td>
+			<td>
+				<label class="layui-form-label">个人缴纳：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="InsurancePersonal" class="layui-input" id="${idBefore!''}InsurancePersonal" onBlur="validateDouble(this)" value="${(stat.insurancePersonal)!''}" class="text60" />
+				</div>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td>
+				<label class="layui-form-label">公司缴纳：*</label>
+				<div class="layui-inline col-lg-5">  
+					<input type="text" name="InsuranceCompany" class="layui-input" id="${idBefore!''}InsuranceCompany" onBlur="validateDouble(this)"  value="${(stat.insuranceCompany)!''}" />
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+</#macro>

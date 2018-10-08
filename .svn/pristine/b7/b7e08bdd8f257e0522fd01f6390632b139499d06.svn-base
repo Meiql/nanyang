@@ -1,0 +1,232 @@
+<#ftl output_format="HTML" auto_esc=true>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	 jQuery(function(){
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(null,function(_json){
+			 if(_json.status == 'success'){
+				 layer.alert("修改成功",function(){
+					 window.location.href="${ctx}/workcontract/list?springraintoken="+springraintoken
+				 })
+			 }else{
+				 layer.alert(_json.message,{icon: 5});
+			 }
+		 });
+		 initData();
+		 $("#userId").select2({width:'320px',height:'26px'});
+		 
+		 $('#userId').change(function(){ 
+				var userId = $('#userId option:selected') .val();//选中的值
+				$.ajax({
+					url:"${ctx}/workcontract/find/userOrg",
+					type:"post",
+					dataType:"json",
+					data: {userId:userId} , 
+					async: false,
+					success:function(_json){
+						if(_json.status=='success'){
+							if(_json.data!=null){
+								var orgId = _json.data["orgId"];
+								$("#orgId").val(orgId);
+								var orgName = _json.data["orgName"];
+								$("#orgName").val(orgName);
+							}
+						}else{
+							layer.alert(_json.message,{icon: 5});
+						}
+					}
+				});
+			}) ;
+	 });
+	 
+	 function initData(){
+		 $("#userId").find("option[value='${(returnDatas.data.userId)!''}']").prop("selected","true");
+		 $("#company").find("option[value='${(returnDatas.data.company)!''}']").prop("selected","true");
+		 $("#workType").find("option[value='${(returnDatas.data.workType)!''}']").prop("selected","true");
+		 $("#contractType").find("option[value='${(returnDatas.data.contractType)!''}']").prop("selected","true");
+		 $("#state").find("option[value='${(returnDatas.data.state)!''}']").prop("selected","true"); 
+	 }
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            		
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>添加劳动合同</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/workcontract/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">用户名称*</label>
+																		<div class="layui-inline col-lg-5">
+																			<#if (returnDatas.data.userId)?? && (returnDatas.data.userId)?length gt 0 >
+																				<input type="hidden" id="id" name="userId" value="${(returnDatas.data.userId)!''}"/>	
+																				<select class="nolayer"  id="userId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" disabled="true">
+																					<@user_list active='1' userTypeStr='1'>
+																						<#if tag_list?? && (tag_list?size>0)>
+																						<option value="">==请选择==</option>
+																						<#list tag_list as _data>
+																							<option value="${(_data.id)!''}">${(_data.name)!''}-${(_data.account)!''}</option>
+																						</#list>
+																						</#if>
+																					</@user_list>
+																				</select>
+																			<#else>
+																				<select class="nolayer" name="userId" id="userId" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																					<@user_list active='1' userTypeStr='1' >
+																						<#if tag_list?? && (tag_list?size>0)>
+																						<option value="">==请选择==</option>
+																						<#list tag_list as _data>
+																							<option value="${(_data.id)!''}">${(_data.name)!''}-${(_data.account)!''}</option>
+																						</#list>
+																						</#if>
+																					</@user_list>
+																				</select>
+																			</#if>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">归属公司*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="company" id="company" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="company"/>
+																			</select>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">部门*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="hidden" name="orgId" id="orgId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.orgId)!''}">
+																			<input type="text" name="orgName" id="orgName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.orgName)!''}" readonly="readonly">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">合同编号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="contractNo" id="contractNo" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.contractNo)!''}" >
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">签订开始日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="startDate" id="startDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.startDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+																			<input type="hidden" name="endDate" id="endDate" value="${((returnDatas.data.endDate)?string('yyyy-MM-dd'))!''}" >
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">录入期限（单位：年）*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="term" id="term" datatype="zhengzhengshu" nullmsg="不能为空" errormsg="请填写正整数！" autocomplete="off" class="layui-input" value="${(returnDatas.data.term)!''}" maxlength="5">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">签订次数*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="times" id="times" datatype="zhengzhengshu" nullmsg="不能为空" errormsg="请填写正整数！" autocomplete="off" class="layui-input" value="${(returnDatas.data.times)!''}" maxlength="5">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<#--
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">签订结束日期</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<input type="datetime" name="endDate" id="endDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.endDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">合同类型*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="contractType" id="contractType" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="hetong"/>
+																			</select> 
+																			<!-- 
+																			<input type="text" name="contractType" id="contractType" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.contractType)!''}">
+																			 --> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">用工方式*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="workType" id="workType" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="yonggong"/>
+																			</select> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">备注*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="bak" id="bak" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.bak)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">是否有效*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="state" id="state" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<option value="">==请选择==</option>
+																				<option value="1">是</option>
+																				<option value="0">否</option>
+																			</select> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+															</div>
+														</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

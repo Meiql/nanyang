@@ -1,0 +1,992 @@
+package org.springrain.erp.gz.service.impl;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.DicdataTypeEnum;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.constants.ErpStateEnum.gzZjxActiveEnum;
+import org.springrain.erp.constants.ErpStateEnum.userTypeEnum;
+import org.springrain.erp.gz.entity.FormulaData;
+import org.springrain.erp.gz.entity.Salary;
+import org.springrain.erp.gz.entity.Salaryinfo;
+import org.springrain.erp.gz.service.IFormulaService;
+import org.springrain.erp.gz.service.ISalaryService;
+import org.springrain.erp.gz.service.ISalaryinfoService;
+import org.springrain.erp.gz.util.GlobalStaticVar;
+import org.springrain.erp.gz.util.GlobalStaticVar.SalaryStateEnum;
+import org.springrain.erp.gz.util.GlobalStaticVar.StoppayEnum;
+import org.springrain.erp.gz.util.MathUtils;
+import org.springrain.erp.hr.entity.UserInfo;
+import org.springrain.erp.hr.entity.UserInfoBak;
+import org.springrain.erp.hr.service.IUserInfoBakService;
+import org.springrain.erp.hr.service.IUserInfoService;
+import org.springrain.erp.tc.entity.TongchouRecord;
+import org.springrain.erp.tc.entity.TongchouZengjian;
+import org.springrain.erp.tc.service.ITongchouInfoService;
+import org.springrain.erp.tc.service.ITongchouRecordService;
+import org.springrain.erp.tc.service.ITongchouZengjianService;
+import org.springrain.frame.common.SessionUser;
+import org.springrain.frame.entity.IBaseEntity;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.Page;
+import org.springrain.frame.util.SecUtils;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.entity.Org;
+import org.springrain.system.entity.User;
+import org.springrain.system.service.BaseSpringrainServiceImpl;
+import org.springrain.system.service.IDicDataService;
+import org.springrain.system.service.IRoleService;
+import org.springrain.system.service.IUserOrgService;
+import org.springrain.system.service.IUserRoleMenuService;
+import org.springrain.system.service.IUserService;
+
+/**
+ * 工资service
+ * 
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version 2017-07-03 17:28:38
+ * @see org.springrain.erp.gz.service.impl.Salary
+ */
+@Service("salaryService")
+public class SalaryServiceImpl extends BaseSpringrainServiceImpl implements ISalaryService {
+	@Resource
+	IFormulaService formulaService;
+	@Resource
+	ISalaryinfoService salaryinfoService;
+	@Resource
+	IRoleService roleService;
+	@Resource
+	IUserOrgService userOrgService;
+	@Resource
+	IUserRoleMenuService userRoleMenuService;
+	@Resource
+	IUserInfoService userinfoService;
+	@Resource
+	IUserService userService;
+	@Resource
+	ITongchouRecordService tongchouRecordService;
+	@Resource
+	ITongchouZengjianService tongchouZengjianService;
+	@Resource
+	IDicDataService dicDataService;
+	@Resource
+	IUserInfoBakService userInfoBakService;
+	@Resource
+	private ITongchouInfoService tongchouInfoService;
+
+	@Override
+	public List<DicData> findSalaryState() throws Exception {
+		List<DicData> list = new ArrayList<DicData>();
+		DicData d1 = new DicData();
+		d1.setName(SalaryStateEnum.未生成.toString());
+		d1.setId(SalaryStateEnum.未生成.getValue().toString());
+		DicData d2 = new DicData();
+		d2.setName(SalaryStateEnum.已生成.toString());
+		d2.setId(SalaryStateEnum.已生成.getValue().toString());
+		DicData d3 = new DicData();
+		d3.setName(SalaryStateEnum.已发放.toString());
+		d3.setId(SalaryStateEnum.已发放.getValue().toString());
+		list.add(d1);
+		list.add(d2);
+		list.add(d3);
+		return list;
+	}
+
+	@Override
+	public String save(Object entity) throws Exception {
+		Salary salary = (Salary) entity;
+		return (String) super.save(salary);
+	}
+
+	@Override
+	public String saveorupdate(Object entity) throws Exception {
+		Salary salary = (Salary) entity;
+		return super.saveorupdate(salary).toString();
+	}
+
+	@Override
+	public Integer update(IBaseEntity entity) throws Exception {
+		Salary salary = (Salary) entity;
+		return super.update(salary);
+	}
+
+	@Override
+	public Salary findSalaryById(Object id) throws Exception {
+		return super.findById(id, Salary.class);
+	}
+
+	/**
+	 * 列表查询,每个service都会重载,要把sql语句封装到service中,Finder只是最后的方案
+	 * 
+	 * @param finder
+	 * @param page
+	 * @param clazz
+	 * @param o
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public <T> List<T> findListDataByFinder(Finder f, Page page, Class<T> clazz, Object o) throws Exception {
+		Finder finder = new Finder("");
+		finder.append("  select sa.*,u.entryDate,u.endDate as leaveDate from " + Finder.getTableName(Salary.class)
+				+ " as sa," + Finder.getTableName(UserInfo.class) + " as u where sa.userId=u.userId ");
+		Salary qb = new Salary();
+		if (o != null) {
+			qb = (Salary) o;
+			// super.getFinderWhereByQueryBean(finder, qb);
+			qb.setFrameTableAlias("sa");
+
+		}
+		List<T> datas = super.findListDataByFinder(finder, page, clazz, qb);
+		if (CollectionUtils.isNotEmpty(datas)) {
+			for (T t : datas) {
+				Salary sa = (Salary) t;
+				buchongSalary(sa);
+			}
+		}
+		finder.append(" order by inDate desc ");
+		return datas;
+	}
+
+	/**
+	 * 补充工资中的一些信息
+	 * 
+	 * @param sa
+	 * @throws Exception
+	 */
+	private void buchongSalary(Salary sa) throws Exception {
+		if (sa == null)
+			return;
+		// String tableExt = gtTableExt(sa.getInDate());
+		if (sa.getUserId() != null) {
+			User u = userService.findById(sa.getUserId(), User.class);
+			sa.setUserName(u.getName());
+		}
+		/*
+		 * if (sa.getUnitId() != null) {
+		 * sa.setUnitName(userOrgService.getUnitNameById(sa.getUnitId())); } if
+		 * (sa.getGradeId() != null) {
+		 * sa.setGradeName(gradeService.findNameById(sa.getGradeId())); } if
+		 * (sa.getDutyId() != null) {
+		 * sa.setDutyName(roleService.findNameById(sa.getDutyId())); }
+		 */
+		if (sa.getState() != null) {
+			sa.setStateName(SalaryStateEnum.getName(sa.getState()));
+		}
+		// 查询工资小项
+		if (sa.getUserId() != null && sa.getInDate() != null) {
+			List<Salaryinfo> listinfo = salaryinfoService.findListSalaryinfo(sa.getUserId(), sa.getInDate());
+			if (CollectionUtils.isNotEmpty(listinfo)) {
+				sa.setListinfo(listinfo);
+			}
+
+			/*
+			 * // 公式计算结果 Map<String, BigDecimal> map_salary = formulaService.getFormulaMap(
+			 * tableExt, sa.getId(), CerpGlobalStatic.salary_projectName); if (map_salary !=
+			 * null && map_salary.size() > 0) { // 查询实付工资
+			 * sa.setShifupay(map_salary.get(GlobalStaticVar.f_id_shifupay)); // 应付工资
+			 * sa.setYingfupay(map_salary.get(GlobalStaticVar.f_id_yingfupay)); // 个税
+			 * sa.setGeshui(map_salary.get(GlobalStaticVar.f_id_geshui)); }
+			 */
+		}
+
+	}
+
+	/**
+	 * 根据查询列表的宏,导出Excel
+	 * 
+	 * @param finder
+	 *            为空则只查询 clazz表
+	 * @param ftlurl
+	 *            类表的模版宏
+	 * @param page
+	 *            分页对象
+	 * @param clazz
+	 *            要查询的对象
+	 * @param o
+	 *            querybean
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public <T> File findDataExportExcel(Finder finder, String ftlurl, Page page, Class<T> clazz, Object o)
+			throws Exception {
+		return super.findDataExportExcel(finder, ftlurl, page, clazz, o);
+	}
+
+	@Override
+	public void saveGenUserInfo(Date month, List<String> listuserid) throws Exception {
+		Date thisMonthFirstDay = DateUtils.getMonthFirstDay(month);
+		Date nextMonthFirstDay = DateUtils.plusMonth(thisMonthFirstDay, 1);
+		// 生成在职人员、上月离职未停发人员的备份
+		Finder finder = new Finder(
+				" select * from " + Finder.getTableName(UserInfoBak.class) + "  where month=:month ");
+		finder.setParam("month", thisMonthFirstDay);
+		// 有效的用戶 非系统用户
+		// finder.append(" and active=1 and userType=:userType ").setParam("userType",
+		// userTypeEnum.员工.getValue());
+		finder.append("  and userType=:userType ").setParam("userType", userTypeEnum.员工.getValue());
+
+		// 未停发工资（离职员工生成工资以后就停发）
+		finder.append("  and stoppay=:stoppay ").setParam("stoppay", StoppayEnum.正常.getValue());
+		// 入职日期下月1号之前
+		finder.append(" and (entryDate is null or (entryDate<:nextMonthFirstDay))").setParam("nextMonthFirstDay", nextMonthFirstDay);
+		// 未离职或上月离职
+		finder.append(" and (endDate is null or (endDate>=:startDate))");
+		finder.setParam("startDate", thisMonthFirstDay);
+
+		// 限定人员
+		if (CollectionUtils.isNotEmpty(listuserid)) {
+			finder.append(" and userId in (:listuserid)").setParam("listuserid", listuserid);
+		}
+		List<UserInfoBak> listuser = queryForList(finder, UserInfoBak.class);
+
+		List<Salary> listsa = new ArrayList<Salary>();
+		if (CollectionUtils.isNotEmpty(listuser)) {
+			for (UserInfoBak u : listuser) {
+				Salary sa = new Salary();
+				sa.setId(gtYear(thisMonthFirstDay) + SecUtils.getUUID());
+				sa.setInDate(thisMonthFirstDay);
+				sa.setUserId(u.getUserId());
+				List<Org> listorg = userOrgService.findOrgByUserId(u.getUserId());
+				if (CollectionUtils.isNotEmpty(listorg)) {
+					sa.setUnitId(listorg.get(0).getId());
+				}
+
+				sa.setJibenpay(u.getJibenpay() == null ? new BigDecimal(0) : u.getJibenpay());
+				sa.setKaohepay(u.getKaohepay() == null ? new BigDecimal(0) : u.getKaohepay());
+				sa.setGangweipay(u.getGangweipay() == null ? new BigDecimal(0) : u.getGangweipay());
+				sa.setMobilePay(u.getMobilePay() == null ? new BigDecimal(0) : u.getMobilePay());
+				sa.setRipay(new BigDecimal(0));
+				sa.setState(SalaryStateEnum.未生成.getValue());
+				// 在职天数（离职当天不算）分新入职和离职
+				Date startDate = thisMonthFirstDay;
+				Date endDate = nextMonthFirstDay;
+				// 入职日期在本月1号之后
+				if (u.getEntryDate() != null && u.getEntryDate().getTime() - thisMonthFirstDay.getTime() > 0) {
+					startDate = u.getEntryDate();
+				}
+				// 离职日期在下月1号之前
+				if (u.getEndDate() != null && u.getEndDate().getTime() - nextMonthFirstDay.getTime() < 0) {
+					endDate = u.getEndDate();
+				}
+				sa.setStartDate(startDate);
+				sa.setEndDate(endDate);
+				// 本月在职天数 入职离职只算1天
+				Integer ondutydays = DateUtils.bTDays(startDate, endDate);
+				sa.setOndutydays(ondutydays);
+
+				listsa.add(sa);
+			}
+			super.save(listsa);
+		}
+
+	}
+
+	/**
+	 * 正常生成指定月份工资（已备份人员信息）
+	 */
+	@Override
+	public void saveGenSalary(List<String> listSalaryId, Date inDate) throws Exception {
+		// 查询未生成状态的人员工资备份
+		List<Salary> list = findListSalary(inDate, listSalaryId, SalaryStateEnum.未生成);
+		// 绑定增减项
+		udpateZengjianSalaryId(list);
+		// 生成实付工资、应付工资
+		List<String> listuserid = new ArrayList<String>();
+		if (CollectionUtils.isNotEmpty(list)) {
+			for (Salary sa : list) {
+				listuserid.add(sa.getUserId());
+				saveSalaryFormulaMoney(sa.getId());
+			}
+		}
+		// 生成以后将离职人员的工资状态改为停发
+		// updateStoppay(listuserid, inDate);
+	}
+
+	// 当月离职的员工 工资生成以后 判断工资和统筹信息是否停发
+	private void updateStoppay(String userId, Date inDate) throws Exception {
+		if (StringUtils.isEmpty(userId) || inDate == null) {
+			return;
+		}
+		UserInfo userInfo = userinfoService.findUserInfoById(userId);
+		if (userInfo == null) {
+			return;
+		}
+		// 如果离职日期是结算日期则进行标注工资状态停发，同时触发统筹停保不生成下月记录。
+		Date lizhidate = userInfo.getEntryDate();
+		lizhidate = DateUtils.formatDate("yyyy-MM", inDate);
+		if (lizhidate.getTime() - inDate.getTime() == 0) {
+
+			Date monthFirstDay = DateUtils.getMonthFirstDay(inDate);
+			Date nextMonthFirstDay = DateUtils.plusMonth(monthFirstDay, 1);
+			Finder finder = new Finder(" update " + Finder.getTableName(UserInfo.class)
+					+ " set stoppay=:stoppay where userId =:userId and endDate>=:datebe and endDate<:dateend ");
+			finder.setParam("datebe", monthFirstDay);
+			finder.setParam("dateend", nextMonthFirstDay);
+			finder.setParam("userId", userId);
+			finder.setParam("stoppay", StoppayEnum.停发.getValue());
+			super.update(finder);
+			/*//修改统筹信息同时不进行修改
+			// 修改统筹信息同时不进行修改
+			List<TongchouInfo> tcList = tongchouInfoService.finderInfoByUserId(userId);
+			for (TongchouInfo tongchouInfo : tcList) {
+				tongchouInfo.setStopProtectMonth(lizhidate);// 暂时是离职日期为停保日期
+				tongchouInfo.setState(ErpStateEnum.tcstateEnum.否.getValue());
+			}
+			tongchouInfoService.update(tcList);*/
+		}
+
+	}
+
+	/**
+	 * 当月结算工资（多用于离职情况，先备份人员信息）
+	 */
+	@Override
+	public void saveGenLeaveSalary(List<String> listuserid, Date inDate) throws Exception {
+		Date thisMonthFirstDay = DateUtils.getMonthFirstDay(inDate);
+		// 备份人员信息
+		userInfoBakService.saveUserInfoBak(thisMonthFirstDay);
+		saveGenUserInfo(thisMonthFirstDay, listuserid);
+		List<String> listSalaryId = findUserSalary(listuserid, thisMonthFirstDay);
+		saveGenSalary(listSalaryId, thisMonthFirstDay);
+	}
+
+	List<String> findUserSalary(List<String> listuserid, Date inDate) throws Exception {
+		if (CollectionUtils.isEmpty(listuserid) || inDate == null) {
+			return null;
+		}
+		Finder finder = new Finder(" select id from " + Finder.getTableName(Salary.class)
+				+ "  where inDate=:inDate and userId in (:listuserid)").setParam("inDate", inDate)
+						.setParam("listuserid", listuserid);
+		return super.queryForList(finder, String.class);
+	}
+
+	private String gtYear(Date inDate) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(inDate);
+		String year = String.valueOf(cal.get(Calendar.YEAR));
+		return year;
+	}
+
+	/*
+	 * private String gtTableExt(Date inDate) { return "_" + gtYear(inDate); }
+	 */
+
+	/**
+	 * 生成工资中配置公式的各项的值
+	 * 
+	 * @param salaryId
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("deprecation")
+	public Map<String, BigDecimal> saveSalaryFormulaMoney(String salaryId) throws Exception {
+		Salary sa = super.findById(salaryId, Salary.class);
+		Date inDate = sa.getInDate();
+		// String tableExt = gtTableExt(inDate);
+		List<String> formulaIdList = formulaService.findUserFormulaIdByProjectName(GlobalStaticVar.salary_projectName);
+
+		if (CollectionUtils.isEmpty(formulaIdList)) {
+			return null;
+		}
+		Map<String, BigDecimal> map = formulaService.getInitSysFormulaMap();
+
+		/****************** 工资中各种增减项 *************************************/
+		List<Salaryinfo> listinfo = salaryinfoService.findListSalaryinfo(sa.getUserId(), sa.getInDate());
+		//电话费
+		map.put(GlobalStaticVar.f_id_mobilePay, sa.getMobilePay());
+		if (CollectionUtils.isNotEmpty(listinfo)) {
+			for (Salaryinfo info : listinfo) {
+				map.put(info.getSalaryTypeId(), info.getAmount());
+			}
+		}
+		// 工资增减金额合计
+		BigDecimal gongziPlusPay = formulaService.getResultByMap(GlobalStaticVar.f_id_sarlaryzengjian, map);
+		sa.setGongziPlusPay(gongziPlusPay);
+		/*********************************************************************/
+		// 加上工资三项+话费补助
+		map.put(GlobalStaticVar.f_id_jibenpay, sa.getJibenpay());
+		map.put(GlobalStaticVar.f_id_kaohepay, sa.getKaohepay());
+		map.put(GlobalStaticVar.f_id_gangweipay, sa.getGangweipay());
+		
+
+		/**************************** 统筹公积金 ****************************/
+		List<TongchouRecord> lstc = tongchouRecordService.finderRecordForList(sa.getUserId(), sa.getInDate());
+		List<TongchouZengjian> lszj = tongchouZengjianService.finderTczjxForList(sa.getUserId(), sa.getInDate());
+		Map<String, BigDecimal> maptc = new HashMap<String, BigDecimal>();
+		if (CollectionUtils.isNotEmpty(lstc)) {
+			for (TongchouRecord rd : lstc) {
+				String key = rd.getInsuranceType();
+				BigDecimal value = BigDecimal.ZERO;
+				if (maptc.containsKey(rd.getInsuranceType())) {
+					value = maptc.get(key);
+				}
+				value = value.add(rd.getInsurancePersonal());
+				maptc.put(key, value);
+
+				// 对已经引用的统筹记录进行赋值
+				rd.setSalayid(salaryId);
+			}
+			super.update(lstc);
+		}
+		if (CollectionUtils.isNotEmpty(lszj)) {
+			for (TongchouZengjian rd : lszj) {
+				String key = rd.getInsuranceType();
+				BigDecimal value = BigDecimal.ZERO;
+				if (maptc.containsKey(rd.getInsuranceType())) {
+					value = maptc.get(key);
+				}
+				value = value.add(rd.getInsurancePersonal());
+				maptc.put(key, value);
+				// 对已经引用的增减项进行赋值
+				rd.setSalayid(salaryId);
+				rd.setIsused(ErpStateEnum.tcZjxStateEnum.是.getValue());
+			}
+			super.update(lszj);
+		}
+		if (maptc != null && maptc.size() > 0) {
+			for (String key : maptc.keySet()) {
+				map.put(key, maptc.get(key));
+			}
+		}
+		// 统筹公积金合计
+		BigDecimal tongchougjj = formulaService.getResultByMap(GlobalStaticVar.f_id_tongchougjj, map);
+		sa.setTongchoupay(tongchougjj);
+		/**************************************************************/
+
+		// 在职天数（离职当天不算）分新入职和离职
+		Date monthFirstDay = DateUtils.getMonthFirstDay(inDate);
+		Date nextMonthFirstDay = DateUtils.plusMonth(monthFirstDay, 1);
+		// 本月天数
+		Date monthMaxDate = DateUtils.plusDay(nextMonthFirstDay, -1);
+		BigDecimal maxday = gtMonthDays(monthMaxDate);
+		map.put(GlobalStaticVar.f_id_monthdays, maxday);
+
+		/******** 计算个税 **********/
+		map.put(GlobalStaticVar.f_id_ondutydays, new BigDecimal(sa.getOndutydays()));
+		// 个税基数
+		BigDecimal taxbase = formulaService.getResultByMap(GlobalStaticVar.f_id_taxbase, map);
+		String[] aa = gtGeshui(taxbase);
+		BigDecimal taxrate = new BigDecimal(0);
+		BigDecimal taxshu = new BigDecimal(0);
+		if (aa != null && aa.length > 0) {
+			taxrate = new BigDecimal(aa[0]);
+			taxshu = new BigDecimal(aa[1]);
+		}
+		map.put(GlobalStaticVar.f_id_taxrate, taxrate);
+		map.put(GlobalStaticVar.f_id_taxshu, taxshu);
+
+		// 公式解析
+		Map<String, BigDecimal> formulaMap = new HashMap<String, BigDecimal>();
+		if (CollectionUtils.isNotEmpty(formulaIdList)) {
+			for (String id : formulaIdList) {
+				formulaMap.put(id, formulaService.getResultByMap(id, map));
+			}
+			// 保存
+			for (Map.Entry<String, BigDecimal> entry : formulaMap.entrySet()) {
+				FormulaData fd = new FormulaData();
+				fd.setBusinessId(salaryId);
+				fd.setFormulaId(entry.getKey());
+				fd.setAmount(entry.getValue());
+				// rebf.setExt(tableExt);
+				fd.setId(String.valueOf(inDate.getYear() + 1900) + SecUtils.getUUID());
+				fd.setProjectName(GlobalStaticVar.salary_projectName);
+				super.save(fd);
+			}
+		}
+
+		// 更新一些固定的工资信息，个税，应付，实付
+		if (formulaMap != null && formulaMap.size() > 0) {
+			// 查询实付工资
+			sa.setShifupay(formulaMap.get(GlobalStaticVar.f_id_shifupay));
+			// 应付工资
+			sa.setYingfupay(formulaMap.get(GlobalStaticVar.f_id_yingfupay));
+			// 个税
+			sa.setGeshui(formulaMap.get(GlobalStaticVar.f_id_geshui));
+			// 日工资
+			sa.setRipay(formulaMap.get(GlobalStaticVar.f_id_salaryDay));
+			// 修改状态为生成
+			sa.setState(SalaryStateEnum.已生成.getValue());
+			super.update(sa);
+		}
+		return map;
+
+	}
+
+	// 获取某个日期在本月的天数
+	private BigDecimal gtMonthDays(Date date) throws Exception {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return new BigDecimal(cal.get(Calendar.DAY_OF_MONTH));
+	}
+
+	@Override
+	public void updateSalarySend(List<String> salaryIds, Date sendDate, Date inDate) throws Exception {
+
+		Finder finder = new Finder(" update " + Finder.getTableName(Salary.class)
+				+ "  set state=:state,sendDate=:sendDate,sendTime=:sendTime,sendPerson=:sendPerson where  state=:shengcheng ");
+		if (CollectionUtils.isNotEmpty(salaryIds)) {
+			finder.append(" and id in (:listId) ").setParam("listId", salaryIds);
+		}
+		if (inDate != null) {
+			finder.append(" and inDate=:inDate").setParam("inDate", inDate);
+		}
+		finder.setParam("state", SalaryStateEnum.已发放.getValue()).setParam("sendDate", sendDate)
+				.setParam("sendTime", new Date()).setParam("sendPerson", SessionUser.getUserId())
+				.setParam("shengcheng", SalaryStateEnum.已生成.getValue());
+		super.update(finder);
+	}
+
+	// /**
+	// * 发放完某月工资以后，将该月离职员工的工资状态置为 停发(勾选时只处理勾选部分)
+	// *
+	// * @param listSalaryId
+	// * @param inDate
+	// * @throws Exception
+	// */
+	// private void updateStoppayBySend(List<String> listSalaryId, Date inDate)
+	// throws Exception {
+	// if (CollectionUtils.isEmpty(listSalaryId) || inDate == null) {
+	// return;
+	// }
+	// Date monthFirstDay = DateUtils.getMonthFirstDay(inDate);
+	// Date nextMonthFirstDay = DateUtils.getNextMonthFirstDay(inDate);
+	// Finder finder = new Finder(
+	// " update t_user set stoppay=:stoppay where endDate>=:datebe and
+	// endDate<:dateend ");
+	// finder.setParam("stoppay", StoppayEnum.停发.getValue());
+	// finder.setParam("datebe", monthFirstDay);
+	// finder.setParam("dateend", nextMonthFirstDay);
+	//
+	// if (CollectionUtils.isNotEmpty(listSalaryId)) {
+	// finder
+	// .append(
+	// " and id in ( select userId from salary where id in (:listSalaryId) ) ")
+	// .setParam("listSalaryId", listSalaryId);
+	// }
+	// super.update(finder);
+	// }
+
+	private List<Salary> findListSalary(Date inDate, List<String> listSalaryId, SalaryStateEnum state)
+			throws Exception {
+		Finder finder = new Finder(" select * from  " + Finder.getTableName(Salary.class) + "  where 1=1 ");
+		if (state != null) {
+			finder.append(" and state=:state").setParam("state", state.getValue());
+		}
+		if (inDate != null) {
+			finder.append(" and inDate=:indate ");
+			finder.setParam("indate", inDate);
+		}
+		if (CollectionUtils.isNotEmpty(listSalaryId)) {
+			finder.append(" and id in (:listid) ");
+			finder.setParam("listid", listSalaryId);
+		}
+		List<Salary> list = super.queryForList(finder, Salary.class);
+		return list;
+	}
+
+	private void udpateZengjianSalaryId(List<Salary> list) throws Exception {
+		if (CollectionUtils.isNotEmpty(list)) {
+			for (Salary sa : list) {
+				Finder f = new Finder(" update " + Finder.getTableName(Salaryinfo.class)
+						+ "  set salaryId=:salaryId , active=:active where userId=:userId and inDate=:inDate ");
+				f.setParam("userId", sa.getUserId()).setParam("salaryId", sa.getId()).setParam("inDate",
+						sa.getInDate());
+				f.setParam("active", gzZjxActiveEnum.是.getValue());
+				super.update(f);
+			}
+		}
+	}
+
+	@Override
+	public List<Salary> findLeaveUserSalary(Salary qb, Page page) throws Exception {
+		// 查询本月离职未结算人员，构造出listsalary
+		if (qb.getInDate() == null) {
+			return null;
+		}
+		Date thisMonthFirstDay = DateUtils.getMonthFirstDay(qb.getInDate());
+		Date nextMonthFirstDay = DateUtils.plusMonth(thisMonthFirstDay, 1);
+
+		Finder finder = new Finder(
+				" select sa.id as id,sa.state,u.id as userId,u.jibeipay as jibenpay,u.kaohepay,u.gonglingpay,u.gradeId,u.stoppay,u.entryDate,u.endDate "
+						+ "  from " + Finder.getTableName(User.class) + "  as u LEFT JOIN "
+						+ Finder.getTableName(Salary.class) + "  as sa on u.id=sa.userId ");
+
+		// 查询本月工资
+		finder.append(" and sa.inDate=:inDate").setParam("inDate", thisMonthFirstDay);
+
+		// 人员信息查询条件
+		finder.append(" where 1=1 ");
+		if (qb != null) {
+			if (qb.getInDate() != null) {
+				finder.append(" and u.endDate>=:datebe and u.endDate<:dateend  ");
+				finder.setParam("datebe", thisMonthFirstDay);
+				finder.setParam("dateend", nextMonthFirstDay);
+			}
+			if (StringUtils.isNotBlank(qb.getUserId())) {
+				finder.append(" and u.id=:userId").setParam("userId", qb.getUserId());
+			}
+		}
+		finder.append(" order by u.name ");
+		List<Salary> list = super.queryForList(finder, Salary.class);
+		if (CollectionUtils.isNotEmpty(list)) {
+			for (Salary sa : list) {
+				sa.setInDate(thisMonthFirstDay);
+				buchongSalary(sa);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * 获取个税参数
+	 * 
+	 * @param geShuiBase
+	 * @return
+	 */
+	private static String[] gtGeshui(BigDecimal geShuiBase) {
+		if (geShuiBase == null) {
+			return null;
+		}
+		// 减3500后余额
+		BigDecimal cha = geShuiBase.subtract(new BigDecimal(3500));
+		Double base = cha.doubleValue();
+		String[] aa = new String[2];
+		if (0 < base && base <= 1500) {
+			aa[0] = "0.03";
+			aa[1] = "0";
+		} else if (1500 < base && base <= 4500) {
+			aa[0] = "0.1";
+			aa[1] = "105";
+		} else if (4500 < base && base <= 9000) {
+			aa[0] = "0.2";
+			aa[1] = "555";
+		} else if (9000 < base && base <= 35000) {
+			aa[0] = "0.25";
+			aa[1] = "1005";
+		} else if (35000 < base && base <= 55000) {
+			aa[0] = "0.3";
+			aa[1] = "2755";
+		} else if (55000 < base && base <= 80000) {
+			aa[0] = "0.35";
+			aa[1] = "5505";
+		} else if (80000 < base) {
+			aa[0] = "0.45";
+			aa[1] = "13505";
+		} else {
+			aa[0] = "0";
+			aa[1] = "0";
+		}
+		return aa;
+	}
+
+	private void appendDelCondition(Finder finder, List<String> listSalaryId, Date inDate, String salaryIdColumn,
+			String inDateColumn) {
+		if (inDate != null) {
+			finder.append(" and " + inDateColumn + "=:inDate ").setParam("inDate", inDate);
+		}
+		if (CollectionUtils.isNotEmpty(listSalaryId)) {
+			finder.append(" and " + salaryIdColumn + " in (:listSalaryId) ").setParam("listSalaryId", listSalaryId);
+		}
+	}
+
+	@Override
+	public void deleteSalary(List<String> listSalaryId, Date inDate) throws Exception {
+		if (inDate == null) {
+			throw new Exception("日期不能为空！");
+		}
+		// 清除增减表绑定
+		Finder f1 = new Finder(" update " + Finder.getTableName(Salaryinfo.class) + " set salaryId=null where 1=1 ");
+		appendDelCondition(f1, listSalaryId, inDate, "salaryId", "inDate");
+		super.update(f1);
+		// 删除公式中金额
+		Finder f3 = new Finder(
+				" delete from " + Finder.getTableName(FormulaData.class) + " where businessid in ( select id from "
+						+ Finder.getTableName(Salary.class) + "  where 1=1 and state=:shengcheng ");
+		f3.setParam("shengcheng", SalaryStateEnum.已生成.getValue());
+		appendDelCondition(f3, listSalaryId, inDate, "id", "inDate");
+		f3.append(")");
+		super.update(f3);
+		// 更新目前是已生成的salary状态为未生成
+		Finder f2 = new Finder(
+				" update " + Finder.getTableName(Salary.class) + " set state=:noshengcheng where state=:shengcheng")
+						.setParam("noshengcheng", SalaryStateEnum.未生成.getValue())
+						.setParam("shengcheng", SalaryStateEnum.已生成.getValue());
+		appendDelCondition(f2, listSalaryId, inDate, "id", "inDate");
+		super.update(f2);
+		// 修改涉及到的离职人员的停发工资状态
+		Finder f4 = new Finder("update " + Finder.getTableName(User.class)
+				+ " set stoppay=:zhengchang where stoppay=:tingfa and id in ( select userid from "
+				+ Finder.getTableName(Salary.class) + " where 1=1 ");
+		appendDelCondition(f4, listSalaryId, inDate, "id", "inDate");
+		f4.append(")");
+		f4.setParam("zhengchang", StoppayEnum.正常.getValue());
+		f4.setParam("tingfa", StoppayEnum.停发.getValue());
+		super.update(f4);
+	}
+
+	@Override
+	public void deleteSalaryIncludeBak(List<String> listSalaryId, Date inDate) throws Exception {
+		deleteSalary(listSalaryId, inDate);
+		// 删除人员备份信息(在上步中 生成状态已改为未生成)
+		Finder finder = new Finder(
+				" delete from " + Finder.getTableName(Salary.class) + "  where 1=1 and state=:noshengcheng ");
+		finder.setParam("noshengcheng", SalaryStateEnum.未生成.getValue());
+		appendDelCondition(finder, listSalaryId, inDate, "id", "inDate");
+		super.update(finder);
+	}
+
+	@Override
+	public List<Salary> findUserBasicSalary(Salary salary, Page page) throws Exception {
+		List<DicData> datas = dicDataService.findListDicData(DicdataTypeEnum.员工工资查询时间.getValue(), null, null);
+		DicData sj = null;
+		if (CollectionUtils.isNotEmpty(datas)) {
+			sj = datas.get(0);
+		}
+		if (StringUtils.isNotBlank(salary.getOper())
+				&& ErpStateEnum.operSalaryEnum.员工工资查询.getValue().equals(salary.getOper())) {
+			if (sj != null) {
+//				Calendar c = Calendar.getInstance();
+//				c.set(Calendar.DAY_OF_MONTH, NumberUtils.toInt(sj.getCode()));
+//				c.add(Calendar.MONTH, -1);
+//				Date maxChakanDate = c.getTime();
+				Calendar c1 = Calendar.getInstance();
+				c1.setTime(salary.getInDate());
+				c1.set(Calendar.DAY_OF_MONTH, NumberUtils.toInt(sj.getCode()));
+				c1.add(Calendar.MONTH, 1);
+				if (c1.getTime().after(new Date())) {
+					return null;
+				}
+			}
+		}
+		Finder finder = Finder.getSelectFinder(Salary.class,
+				"s.*,u.name userName,ui.company as companyId,ui.bankAccountName as bankAccountName,ui.bankId as bankId,ui.bankState as bankState ");
+		finder.append(" as s left join ").append(Finder.getTableName(User.class)).append(" as u on s.userId = u.id ")
+				.append(" left join ").append(Finder.getTableName(UserInfo.class)).append(" ui on u.id = ui.userId ");
+
+		finder.append(" where 1 = 1 ");
+
+		if (StringUtils.isNotBlank(salary.getUserId())) {
+			finder.append(" and s.userId = :userId ").setParam("userId", salary.getUserId());
+		}
+		if (salary.getInDate() != null) {
+			finder.append(" and s.inDate = :inDate ").setParam("inDate", salary.getInDate());
+		}
+		if (StringUtils.isNotBlank(salary.getUnitId())) {
+			finder.append(" and s.unitId like :unitId ").setParam("unitId", "%" + salary.getUnitId() + "%");
+		}
+		if (StringUtils.isNotBlank(salary.getUserName())) {
+			finder.append(" and u.name like :uname ").setParam("uname", "%" + salary.getUserName() + "%");
+		}
+		if (StringUtils.isNotEmpty(salary.getCompanyId())) {
+			finder.append(" and ui.company = :company ").setParam("company", salary.getCompanyId());
+		}
+		if (StringUtils.isNotBlank(salary.getOper())
+				&& (ErpStateEnum.operSalaryEnum.员工工资查询.getValue().equals(salary.getOper()))) {
+			finder.append(" and (s.state = :yifafang or s.state = :yishengcheng )")
+					.setParam("yifafang", SalaryStateEnum.已发放.getValue())
+					.setParam("yishengcheng", SalaryStateEnum.已生成.getValue());
+			Finder qxfinder = userOrgService.findOrgIdsSQLByManagerUserId(SessionUser
+					.getUserId());
+			if (StringUtils.isNotBlank(qxfinder.getSql())) {
+				// 有权限的时候
+				finder.append(" and s.unitId in (").appendFinder(qxfinder).append(")");
+			} else {
+				// 没有权限的时候
+				finder.append(" and s.userId = :userId ").setParam("userId", SessionUser.getUserId());
+			}
+		}
+		if (StringUtils.isNotBlank(salary.getOper()) && ErpStateEnum.operSalaryEnum.工资发放.getValue().equals(salary.getOper())){
+			finder.append(" and (s.state = :yifafang or s.state = :yishengcheng )")
+			.setParam("yifafang", SalaryStateEnum.已发放.getValue())
+			.setParam("yishengcheng", SalaryStateEnum.已生成.getValue());
+		}
+		if (salary.getState() != null) {
+			finder.append(" and s.state = :state ").setParam("state", salary.getState());
+		}
+
+		return super.queryForList(finder, Salary.class, page);
+	}
+
+	@Override
+	public Salary finderSalaryInfo(String userId, Date indate) throws Exception {
+		if (StringUtils.isBlank(userId) && indate == null) {
+			return null;
+		}
+		Finder f = new Finder();
+		f.append("select * from " + Finder.getTableName(Salary.class) + " where 1=1");
+		if (StringUtils.isNotBlank(userId)) {
+			f.append(" and userId =:userId");
+		}
+		if (indate != null) {
+			f.append(" and indate=:indate");
+		}
+		f.setParam("userId", userId);
+		f.setParam("indate", indate);
+		return queryForObject(f, Salary.class);
+	}
+
+	@Override
+	public List<String> findSalaryIdsByStateAndInDate(Integer state, Date inDate) throws Exception {
+		if (state == null || inDate == null) {
+			return null;
+		}
+		Finder finder = Finder.getSelectFinder(Salary.class, "id");
+		finder.append(" where 1 = 1 ");
+		finder.append(" and state = :state").setParam("state", state);
+		finder.append(" and inDate = :inDate ").setParam("inDate", inDate);
+		return super.queryForList(finder, String.class);
+	}
+
+	@Override
+	public void updateCancelGenSalary(List<String> salaryIds, Date inDate) throws Exception {
+		Finder finder = Finder.getUpdateFinder(Salary.class,
+				"tongchoupay=0.00,gongziPlusPay=0.00,geshui=0.00,yingfupay=0.00,shifupay=0.00,state = :weishengcheng");
+		finder.append(" where 1 = 1 and state = :state ")
+				.setParam("state", GlobalStaticVar.SalaryStateEnum.已生成.getValue())
+				.setParam("weishengcheng", GlobalStaticVar.SalaryStateEnum.未生成.getValue());
+		if (CollectionUtils.isNotEmpty(salaryIds)) {
+			finder.append(" and id in (:salaryIds) ").setParam("salaryIds", salaryIds);
+		}
+		if (inDate != null) {
+			finder.append(" and inDate = :inDate ").setParam("inDate", inDate);
+		}
+		super.update(finder);
+	}
+
+	@Override
+	public void updateCancelSendSalary(List<String> salaryIds, Date inDate) throws Exception {
+		Finder finder = Finder.getUpdateFinder(Salary.class,
+				"state = :shengcheng ,sendDate = null, sendTime = null ,sendPerson = null");
+		finder.append(" where 1 = 1 and state = :state ")
+				.setParam("state", GlobalStaticVar.SalaryStateEnum.已发放.getValue())
+				.setParam("shengcheng", GlobalStaticVar.SalaryStateEnum.已生成.getValue());
+		if (CollectionUtils.isNotEmpty(salaryIds)) {
+			finder.append(" and id in (:salaryIds) ").setParam("salaryIds", salaryIds);
+		}
+		if (inDate != null) {
+			finder.append(" and inDate = :inDate ").setParam("inDate", inDate);
+		}
+		super.update(finder);
+	}
+
+	/**
+	 * 员工离职 一生成备份需要重新生成备份信息
+	 * 
+	 * @param userId
+	 * @param indate
+	 * @throws Exception
+	 */
+	@Override
+	public void saveGenSalaryForLizhi(String userId, Date indate) throws Exception {
+		// 根据uiserId indaye 查找已经备份的工资信息并删除
+		Salary salary = finderSalaryInfo(userId, indate);
+		if (salary == null) {
+			return;
+		}
+		super.deleteById(salary.getId(), Salary.class);
+		// 重新生成工资
+		List<Salary> list = new ArrayList<Salary>();
+		List<String> listuserid = new ArrayList<String>();
+		listuserid.add(userId);
+		saveGenUserInfo(indate, listuserid);
+		// 重新查询
+		Salary salaryAgain = finderSalaryInfo(userId, indate);
+		list.add(salaryAgain);
+		// 绑定增减项
+		udpateZengjianSalaryId(list);
+		// 生成实付工资、应付工资
+		saveSalaryFormulaMoney(salaryAgain.getId());
+		// 生成以后将离职人员的工资状态改为停发
+		updateStoppay(userId, indate);
+
+	}
+
+	// 员工离职未生成该人员备份
+	@Override
+	public void saveGenSalaryforLizhinow(String userid, Date indate) throws Exception {
+		Date thisMonthFirstDay = DateUtils.getMonthFirstDay(indate);
+		// 备份人员信息
+		saveUserInfoBak(thisMonthFirstDay, userid);
+		List<String> listuserid = new ArrayList<String>();
+		listuserid.add(userid);
+		saveGenUserInfo(thisMonthFirstDay, listuserid);
+		List<String> listSalaryId = findUserSalary(listuserid, thisMonthFirstDay);
+		saveGenSalary(listSalaryId, thisMonthFirstDay);
+		// 生成以后将离职人员的工资状态改为停发
+		updateStoppay(userid, indate);
+	}
+
+	private String saveUserInfoBak(Date month, String userId) throws Exception {
+		Finder finder = new Finder(
+				" select ui.*,u.name,u.account,u.sex,u.userType,u.active from " + Finder.getTableName(UserInfo.class)
+						+ " as ui," + Finder.getTableName(User.class) + " as u where ui.userId=u.id  ");
+		finder.append(" and ui.userId=:userId").setParam("userId", userId);
+		List<UserInfoBak> listbak = super.queryForList(finder, UserInfoBak.class);
+		if (CollectionUtils.isNotEmpty(listbak)) {
+			// 保存之前先删除用户备份
+			Finder f = new Finder(" delete from " + Finder.getTableName(UserInfoBak.class));
+			finder.append(" where month=:month and userId=:userId").setParam("month", month).setParam("userId", userId);
+			super.update(f);
+
+			for (UserInfoBak u : listbak) {
+				u.setMonth(month);
+				u.setId(null);
+			}
+			super.save(listbak);
+		}
+
+		return null;
+	}
+
+	@Override
+	public BigDecimal findUserDayPay(String userId, Date month) throws Exception {
+		if (StringUtils.isBlank(userId) || month == null) {
+			return BigDecimal.ZERO;
+		}
+		// 日工资=（基本工资+考核工资+岗位工资）/(当月天数)
+		BigDecimal jibenpay = BigDecimal.ZERO;
+		BigDecimal kaohepay = BigDecimal.ZERO;
+		BigDecimal gangweipay = BigDecimal.ZERO;
+
+		// 如果月份是当前月，直接用用户表取数据，如果在当前月之前，取历史表
+		Date thismonthfirstday = DateUtils.getMonthFirstDay(new Date());
+		if (month.getTime() - thismonthfirstday.getTime() < 0) {
+			// 本月之前
+			UserInfoBak info = userInfoBakService.findUserMonthBak(DateUtils.formatDate("yyyy-MM-dd 00:00:00", month), userId);
+			if(info!=null){
+				jibenpay = info.getJibenpay();
+				kaohepay = info.getKaohepay();
+				gangweipay = info.getGangweipay();
+			}
+		} else {
+			// 本月之后
+			UserInfo info = userService.findById(userId, UserInfo.class);
+			jibenpay = info.getJibenpay();
+			kaohepay = info.getKaohepay();
+			gangweipay = info.getGangweipay();
+		}
+
+		int monthday = DateUtils.getDaysOfMonth(month);
+		BigDecimal sum = jibenpay.add(kaohepay).add(gangweipay);
+		String daypay = MathUtils.divScale(sum.toString(), String.valueOf(monthday), 0);
+
+		return new BigDecimal(daypay);
+	}
+}

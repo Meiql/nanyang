@@ -1,0 +1,46 @@
+package org.springrain.erp.hr.service;
+
+import java.util.Date;
+
+import org.springrain.erp.hr.entity.UserInfoBak;
+import org.springrain.system.service.IBaseSpringrainService;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:47:33
+ * @see org.springrain.erp.hr.service.UserInfoBak
+ */
+public interface IUserInfoBakService extends IBaseSpringrainService {
+	
+	/**
+	 * 根据ID查找
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	UserInfoBak findUserInfoBakById(Object id) throws Exception;
+	/**
+	 * 生成某月人员备份
+	 * @param month
+	 * @return
+	 * @throws Exception
+	 */
+	String saveUserInfoBak(Date month)throws Exception;
+	/**
+	 * 删除某个月的备份
+	 * @param month
+	 * @return
+	 * @throws Exception
+	 */
+	String deleteUserInfoBak(Date month)throws Exception;
+	/**
+	 * 查询某人某月备份
+	 * @param month
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	UserInfoBak findUserMonthBak(Date month,String userId)throws Exception;
+	
+}

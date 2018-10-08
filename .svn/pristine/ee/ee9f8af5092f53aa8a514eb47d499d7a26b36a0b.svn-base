@@ -1,0 +1,437 @@
+<#ftl output_format="HTML" auto_esc=true>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<script src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<script src="${ctx}/js/ueditor/ueditor.config.js"></script>
+<script src="${ctx}/js/ueditor/ueditor.all.js"></script>
+<script src="${ctx}/js/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script>
+	 jQuery(function(){
+		 var ue = UE.getEditor('container',{
+				autoHeight: false
+		 })
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(
+			function(){
+				var content = ue.getContent();
+				 if(!(!!content)){
+					 springrain.alert("教育经历不能为空",null);
+					 return false;
+				 }
+		 	},
+		 	function(_json){
+				 if(_json.status == 'success'){
+					 layer.alert("修改成功",function(){
+						 window.location.href="${ctx}/userinfo/list?springraintoken="+springraintoken
+					 })
+				 }else{
+					 layer.alert(_json.message,{icon: 5});
+				 }
+			 }
+		 );
+		 initData();
+		 
+		 var uploader = WebUploader.create({
+			 	auto:true,
+			    // swf文件路径
+			    swf: '${ctx}/js/webuploader/Uploader.swf',
+			    // 文件接收服务端。
+			    // 选择文件的按钮。可选。
+			    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+			    pick: {
+			    	id:$('#filePicker'),
+			    	multiple: false
+			    },
+			    // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+			     accept: {
+			        title: 'Images',
+			        extensions: 'gif,jpg,jpeg,bmp,png',
+			        mimeTypes: 'image/*'
+			    }
+			});
+			
+			 uploader.on( 'fileQueued', function( file ) {
+				 $("#tmpLogo").remove();
+			    var $li = $('<div id="' + file.id + '" class="file-item thumbnail layui-inline">' +
+			                '<img>' +
+			                '<div class="info">' + file.name + '</div>' 
+			                +'</div>'),
+		        $img = $li.find('img');
+
+
+			    // $list为容器jQuery实例
+			    $list = $("#fileList");
+			    $list.html( $li );
+
+			    // 创建缩略图
+			    // 如果为非图片文件，可以不用调用此方法。
+			    // thumbnailWidth x thumbnailHeight 为 100 x 100
+			    var thumbnailWidth = thumbnailHeight = 100;
+			    uploader.makeThumb( file, function( error, src ) {
+			        if ( error ) {
+			            $img.replaceWith('<span>不能预览</span>');
+			            return;
+			        }
+
+			        $img.attr( 'src', src );
+			    }, thumbnailWidth, thumbnailHeight );
+			});
+			 
+			// 文件上传过程中创建进度条实时显示。
+			 uploader.on( 'uploadProgress', function( file, percentage ) {
+			     var $li = $( '#'+file.id ),
+			         $percent = $li.find('.progress span');
+
+			     // 避免重复创建
+			     if ( !$percent.length ) {
+			         $percent = $('<p class="progress"><span></span></p>')
+			                 .appendTo( $li )
+			                 .find('span');
+			     }
+
+			     $percent.css( 'width', percentage * 100 + '%' );
+			 });
+
+			 // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+			 uploader.on( 'uploadSuccess', function( file,response ) {
+				 $("[name=cover]").val(JSON.stringify(response.data));
+			     $( '#'+file.id ).addClass('upload-state-done');
+			 });
+
+			 // 文件上传失败，显示上传出错。
+			 uploader.on( 'uploadError', function( file ) {
+			     var $li = $( '#'+file.id ),
+		         $error = $li.find('div.error');
+
+			     // 避免重复创建
+			     if ( !$error.length ) {
+			         $error = $('<div class="error"></div>').appendTo( $li );
+			     }
+
+			     $error.text('上传失败');
+			 });
+		
+			 // 完成上传完了，成功或者失败，先删除进度条。
+			 uploader.on( 'uploadComplete', function( file ) {
+			     $( '#'+file.id ).find('.progress').remove();
+			 });
+	 });
+	 function initData(){
+		 $("#company").find("option[value='${(returnDatas.data.company)!''}']").prop("selected","true");
+		 $("#tongchou").find("option[value='${(returnDatas.data.tongchou)!''}']").prop("selected","true");
+		 $("#gangwei").find("option[value='${(returnDatas.data.gangwei)!''}']").prop("selected","true");
+		 $("#marryState").find("option[value='${(returnDatas.data.marryState)!''}']").prop("selected","true");
+		 $("#health").find("option[value='${(returnDatas.data.health)!''}']").prop("selected","true");
+		 $("#entryCity").find("option[value='${(returnDatas.data.entryCity)!''}']").prop("selected","true");
+		 $("#minzu").find("option[value='${(returnDatas.data.minzu)!''}']").prop("selected","true");
+		 $("#politicsStatus").find("option[value='${(returnDatas.data.politicsStatus)!''}']").prop("selected","true");
+		 $("#zuigaoxueli").find("option[value='${(returnDatas.data.zuigaoxueli)!''}']").prop("selected","true");
+		 $("input[value='${(returnDatas.data.entryType)!''}']").prop("checked","true");
+	 }
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            		
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>修改用户基本信息</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/userinfo/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">员工姓名</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="userName" id="userName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.userName)!''}" readonly="readonly">
+																			<input type="hidden" name="userId" id="userId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.uid)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">员工代码</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="userCode" id="userCode"  autocomplete="off" class="layui-input" value="${(returnDatas.data.userCode)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">出生日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="birthday" id="birthday" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.birthday)?string('yyyy-MM-dd'))!''}" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})" readonly="readonly">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">工号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="workno" id="workno" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.workno)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">身份证号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="idCard" id="idCard" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.idCard)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">公司*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="company" id="company" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="company"/>
+																			</select>
+																			<!--
+																			  <input type="text" name="company" id="company" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.company)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">统筹缴纳地*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="tongchou" id="tongchou" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="tcjnd"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="tongchou" id="tongchou" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.tongchou)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">岗位*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="gangwei" id="gangwei" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="gangwei"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="gangwei" id="gangwei" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.gangwei)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入职日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="entryDate" id="entryDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.entryDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">转正日期</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="startDate" id="startDate"  autocomplete="off" class="layui-input" value="${((returnDatas.data.startDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">离职日期</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="endDate" id="endDate"  autocomplete="off" class="layui-input" value="${((returnDatas.data.endDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">移动电话1*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="mobile1" id="mobile1" datatype="phone" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.mobile1)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">移动电话2</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="mobile2" id="mobile2"  class="layui-input" value="${(returnDatas.data.mobile2)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">固定电话</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="telephone" id="telephone"  class="layui-input" value="${(returnDatas.data.telephone)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">电子邮箱*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="email" id="email" datatype="email" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.email)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">婚否*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="marryState" id="marryState" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<option value="">请选择</option>
+																				<option value="未婚">未婚</option>
+																				<option value="已婚">已婚</option>
+																				<option value="离异">离异</option>
+																			</select>
+																			<!-- 
+																			<input type="text" name="marryState" id="marryState" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.marryState)!''}">
+																			 -->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">健康状态*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="health" id="health" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<option value="">请选择</option>
+																				<option value="健康">健康</option>
+																				<option value="良好">良好</option>
+																				<option value="一般">一般</option>
+																			</select>
+																			<!-- 
+																			<input type="text" name="health" id="health" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.health)!''}">
+																			 --> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入职城市*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="entryCity" id="entryCity" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="rzcs"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="entryCity" id="entryCity" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.entryCity)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入职方式*</label>
+																		<div class="layui-inline col-lg-5">
+																			<input class="entryType" type="radio" name="entryType" value="社招" title="社招" checked="">
+																	     	<input class="entryType" type="radio" name="entryType" value="内推" title="内推">
+																			<!-- 
+																				<input type="text" name="entryType" id="entryType" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.entryType)!''}">
+																			 -->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">介绍人</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="introducer" id="introducer" class="layui-input" value="${(returnDatas.data.introducer)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">民族*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="minzu" id="minzu" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="minzu"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="minzu" id="minzu" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.minzu)!''}">
+																			--> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">政治面貌*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="politicsStatus" id="politicsStatus" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="zzmm"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="politicsStatus" id="politicsStatus" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.politicsStatus)!''}">
+																			--> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">最高学历*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="zuigaoxueli" id="zuigaoxueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="xueli"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="zuigaoxueli" id="zuigaoxueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zuigaoxueli)!''}">
+																			--> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">教育经历*</label>
+																		<div class="layui-inline col-lg-5">
+																			<#noautoesc>
+																				<script id="container" name="jiaoyujingli" type="text/plain">${(returnDatas.data.jiaoyujingli)!'填写教育经历'}</script>
+																			</#noautoesc>
+																			<!-- 
+																			<input type="text" name="jiaoyujingli" id="jiaoyujingli" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.jiaoyujingli)!''}">
+																			 -->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">紧急联系人*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="fireName" id="fireName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.fireName)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">紧急联系电话*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="firePhone" id="firePhone" datatype="phone" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.firePhone)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">备注</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="bak" id="bak"  autocomplete="off" class="layui-input" value="${(returnDatas.data.bak)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+															</div>
+														</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

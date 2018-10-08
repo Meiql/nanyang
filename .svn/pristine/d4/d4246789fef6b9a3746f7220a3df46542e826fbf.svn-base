@@ -1,0 +1,213 @@
+package org.springrain.erp.hr.service.impl;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.DicdataTypeEnum;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.hr.entity.WorkContract;
+import org.springrain.erp.hr.service.IWorkContractService;
+import org.springrain.frame.common.SessionUser;
+import org.springrain.frame.entity.IBaseEntity;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.Page;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.entity.Org;
+import org.springrain.system.entity.User;
+import org.springrain.system.service.BaseSpringrainServiceImpl;
+import org.springrain.system.service.IDicDataService;
+import org.springrain.system.service.IOrgService;
+
+
+
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:48:09
+ * @see org.springrain.erp.hr.service.impl.WorkContract
+ */
+@Service("workContractService")
+public class WorkContractServiceImpl extends BaseSpringrainServiceImpl implements IWorkContractService {
+	@Resource
+	private IDicDataService dicDataService;
+	@Resource
+	private IOrgService orgService;
+   
+    @Override
+	public String  save(Object entity ) throws Exception{
+	      WorkContract workContract=(WorkContract) entity;
+	       return super.save(workContract).toString();
+	}
+
+    @Override
+	public String  saveorupdate(Object entity ) throws Exception{
+	      WorkContract workContract=(WorkContract) entity;
+		 return super.saveorupdate(workContract).toString();
+	}
+	
+	@Override
+    public Integer update(IBaseEntity entity ) throws Exception{
+	 WorkContract workContract=(WorkContract) entity;
+	return super.update(workContract);
+    }
+    @Override
+	public WorkContract findWorkContractById(Object id) throws Exception{
+	 return super.findById(id,WorkContract.class);
+	}
+	
+/**
+ * 列表查询,每个service都会重载,要把sql语句封装到service中,Finder只是最后的方案
+ * @param finder
+ * @param page
+ * @param clazz
+ * @param o
+ * @return
+ * @throws Exception
+ */
+        @SuppressWarnings("unchecked")
+		@Override
+    public <T> List<T> findListDataByFinder(Finder finder, Page page, Class<T> clazz,
+			Object o) throws Exception{
+			 return ((List<T>) findWorkContractByQuery((WorkContract) o, page));
+		}
+	/**
+	 * 根据查询列表的宏,导出Excel
+	 * @param finder 为空则只查询 clazz表
+	 * @param ftlurl 类表的模版宏
+	 * @param page 分页对象
+	 * @param clazz 要查询的对象
+	 * @param o  querybean
+	 * @return
+	 * @throws Exception
+	 */
+		@Override
+	public <T> File findDataExportExcel(Finder finder,String ftlurl, Page page,
+			Class<T> clazz, Object o)
+			throws Exception {
+			 return super.findDataExportExcel(finder,ftlurl,page,clazz,o);
+		}
+
+	@Override
+	public List<WorkContract> findWorkContractByQuery(WorkContract query,Page page)
+			throws Exception {
+		Finder finder = Finder.getSelectFinder(WorkContract.class,"c.*,u.name userName ,u.account userAccount");
+		finder.append(" as c left join ").append(Finder.getTableName(User.class)).append(" as u on c.userId = u.id ");
+		finder.append(" where 1 = 1 ");
+		if(StringUtils.isNotBlank(query.getUserName())){
+			finder.append(" and u.name like :userName ").setParam("userName", "%"+query.getUserName()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getState()) ){
+			finder.append(" and c.state = :state ").setParam("state", query.getState());
+		}
+		List<WorkContract> datas = super.queryForList(finder, WorkContract.class, page);
+		if(CollectionUtils.isNotEmpty(datas)){
+			Date nowDate=new Date();
+			for(WorkContract e:datas){
+				
+				if(StringUtils.isNotBlank(e.getCompany())){
+					DicData company = dicDataService.findDicDataById(e.getCompany());
+					e.setCompanyName(company.getName());
+				}
+				if(StringUtils.isNotBlank(e.getWorkType())){
+					DicData workType = dicDataService.findDicDataById(e.getWorkType());
+					e.setWorkTypeName(workType.getName());
+				}
+				if(StringUtils.isNotBlank(e.getContractType())){
+					DicData contractType = dicDataService.findDicDataById(e.getContractType());
+					e.setContractTypeName(contractType.getName());
+				}
+
+				if(StringUtils.isNotBlank(e.getOrgId())){
+					List<Org> orgList = orgService.findOrgByOrgIds(e.getOrgId());
+					StringBuilder orgName = new StringBuilder();
+					if(CollectionUtils.isNotEmpty(orgList)){
+						for(Org o : orgList){
+							orgName.append(o.getName()).append(",");
+						}
+						e.setOrgName(orgName.toString());
+					}
+				}
+				
+				//判断合同是否过期 过期合同不能被修改
+				if(e.getEndDate()!=null){
+					if(nowDate.getTime()>e.getEndDate().getTime()){
+						e.setViewModify(0);
+					}else{
+						e.setViewModify(1);
+					}
+				}else{
+					e.setViewModify(1);
+				}
+			}
+		}
+		return datas;
+	}
+
+	@Override
+	public List<WorkContract> findWorkContractByUserId(String userId)
+			throws Exception {
+		Finder finder = Finder.getSelectFinder(WorkContract.class);
+		finder.append(" where 1 = 1 and userId = :userId ").setParam("userId", userId);
+		finder.append(" order by startDate desc ");
+		List<WorkContract> datas = super.queryForList(finder, WorkContract.class);
+		return datas;
+	}
+
+	@Override
+	public void updateUserLizheWorkContract(String userId) throws Exception {
+		if(StringUtils.isBlank(userId)){
+			return ;
+		}
+		Date now = new Date();
+		Finder finder = Finder.getUpdateFinder(WorkContract.class,"endDate = :endDate , state = :shixiaostate , editPerson = :editPerson , editDate = :now");
+		finder.append("where 1 = 1 and userId = :userId ");
+		finder.append(" and startDate < :now and endDate > :now and state = :youxiao ");
+		finder.setParam("endDate", DateUtils.convertDate2String(now)).setParam("shixiaostate", ErpStateEnum.stateEnum.否.getValue());
+		finder.setParam("youxiao", ErpStateEnum.stateEnum.是.getValue());
+		finder.setParam("now", now).setParam("editPerson", SessionUser.getUserId()).setParam("userId",userId);
+		super.update(finder);
+		
+	}
+
+	@Override
+	public List<WorkContract> findJiJiangShixiaoWorkContract() throws Exception {
+		DicData dicData = null;
+		List<DicData> dicDatas = dicDataService.findListDicData(DicdataTypeEnum.发送邮件时间.getValue(), null, null);
+		if(CollectionUtils.isEmpty(dicDatas)){
+			return null;
+		}
+		dicData = dicDatas.get(0);
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DAY_OF_YEAR, Integer.parseInt(dicData.getCode()));
+		Date endDate = DateUtils.formatDate(c.getTime());
+		Finder finder = Finder.getSelectFinder(WorkContract.class);
+		finder.append("where 1 = 1 ");
+		finder.append(" and state = :state and endDate <= :endDate ").setParam("state", ErpStateEnum.stateEnum.是.getValue());
+		finder.setParam("endDate",endDate);
+		return super.queryForList(finder, WorkContract.class);
+	}
+
+	@Override
+	public void updateWorkContractShixiao() throws Exception {
+		Date now = new Date();
+		Finder finder = Finder.getUpdateFinder(WorkContract.class,"state = :shixiaostate , editPerson = :editPerson , editDate = :now");
+		finder.append("where 1 = 1  ");
+		finder.append(" and endDate <= :now  and state = :youxiao");
+		finder.setParam("endDate", DateUtils.formatDate(now)).setParam("shixiaostate", ErpStateEnum.stateEnum.否.getValue());
+		finder.setParam("now", now).setParam("editPerson", ErpStateEnum.adminIdEnum.admin.getValue());
+		finder.setParam("youxiao", ErpStateEnum.stateEnum.是.getValue());
+		super.update(finder);
+	}
+
+	
+	
+}

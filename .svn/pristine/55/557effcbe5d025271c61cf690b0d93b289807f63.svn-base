@@ -1,0 +1,322 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<script src="${ctx}/js/custom/common/form.js"></script>
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	jQuery(function(){
+		jQuery("#checkAll").bind('click',function(){
+			var _is_check=jQuery(this).get(0).checked;
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				jQuery(_o).get(0).checked=_is_check;
+			});
+		});
+		
+		var _recordTh = $("#recordTh");
+		var _num = $("#resultTable tbody tr:first td").size();
+		if(_num == 0){
+			_num = $("#titleTr th").size();
+		}
+		_recordTh.attr("colspan",_num);
+		
+		$("#searchCompany").find("option[value='${(returnDatas.queryBean.companyId)!''}']").prop("selected","true");
+		$("#searchUnit").find("option[value='${(returnDatas.queryBean.unitId)!''}']").prop("selected","true");
+		$("#searchstate").find("option[value='${(returnDatas.queryBean.state)!''}']").prop("selected","true");
+	});
+	
+	function sendGongzi(type){
+		var salaryIds='';
+		if("all" == type){
+			salaryIds = "all";
+		}else if("check" == type){
+			salaryIds='';
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				if(jQuery(_o).get(0).checked){
+					salaryIds += jQuery(_o).val()+",";
+				}
+			});
+		}else{
+			salaryIds='';
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				salaryIds += jQuery(_o).val()+",";
+			});
+		}
+		if(salaryIds == ''){
+			layer.alert('请选择要发放工资的员工',{icon: 5});
+		}
+		layer.confirm("确定发放工资？",function(){
+			jQuery.ajax({
+				url : "${ctx}/user/salary/send/gongzi",
+				data : {'salaryIds':salaryIds,'inDate':"${((returnDatas.queryBean.inDate)?string('yyyy-MM-dd'))!''}"},
+				type : "post",
+				dataType : "json",
+				success : function(_json){
+					if(_json.status =="success"){
+						layer.alert("发放成功！",function(){location.reload();});
+					}else{
+						layer.alert(_json.message,{icon: 5});
+					}
+				}
+			});
+		});
+	}
+	function cancelGongzi(type){
+		var salaryIds='';
+		if("all" == type){
+			salaryIds = "all";
+		}else if("check" == type){
+			salaryIds='';
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				if(jQuery(_o).get(0).checked){
+					salaryIds += jQuery(_o).val()+",";
+				}
+			});
+		}else{
+			salaryIds='';
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				salaryIds += jQuery(_o).val()+",";
+			});
+		}
+		if(salaryIds == ''){
+			layer.alert('请选择要取消发放工资的员工',{icon: 5});
+		}
+		layer.confirm("确定取消发放工资",function(){
+			jQuery.ajax({
+				url : "${ctx}/user/salary/cancel/send/gongzi",
+				data : {'salaryIds':salaryIds,'inDate':"${((returnDatas.queryBean.inDate)?string('yyyy-MM-dd'))!''}"},
+				type : "post",
+				dataType : "json",
+				success : function(_json){
+					if(_json.status =="success"){
+						layer.alert("取消生成成功！",function(){location.reload();});
+					}else{
+						layer.alert(_json.message,{icon: 5});
+					}
+				}
+			});
+		});
+	}
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+		             </li>
+		             <li style="float:right;">
+		             	<@shiro.hasPermission name="/user/salary/list/export/send" >
+				        	<button type="button"  onclick="myexport('searchForm','${ctx}/user/salary/list/export/send')" class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/user/salary/send/gongzi/per" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<td colspan="2">
+							          				<b>工资发放搜索</b>
+							          				<@shiro.hasPermission name="/user/salary/send/gongzi" >
+							          			    <div style="margin-left: 5px;" class="layui-inline">
+								          			   	<div class="layui-inline">
+										                    <button class="layui-btn" type="button" onclick="sendGongzi('all')">发放上月所有人工资</button>
+										                </div>
+								          			   	<div class="layui-inline">
+										                   	 <button class="layui-btn" type="button" onclick="sendGongzi('check')">按勾选发放上月工资</button>
+										                </div>
+								          			   	<div class="layui-inline">
+										                    <button class="layui-btn" type="button" onclick="sendGongzi('search')">按查询发放上月工资</button>
+										                </div>
+							          			  	</div>
+							          			  	</@shiro.hasPermission>
+							          				<@shiro.hasPermission name="/user/salary/cancel/send/gongzi" >
+							          			    <div style="margin-left: 5px;" class="layui-inline">
+								          			   	<div class="layui-inline">
+										                    <button class="layui-btn" type="button" onclick="cancelGongzi('all')">取消发放上月所有人工资</button>
+										                </div>
+								          			   	<div class="layui-inline">
+										                   	 <button class="layui-btn" type="button" onclick="cancelGongzi('check')">按勾选取消发放上月工资</button>
+										                </div>
+								          			   	<div class="layui-inline">
+										                    <button class="layui-btn" type="button" onclick="cancelGongzi('search')">按查询取消发放上月工资</button>
+										                </div>
+							          			  	</div>
+							          			  	</@shiro.hasPermission>
+							          			</td>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">名称</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="userName" value="${(returnDatas.queryBean.userName)!''}" placeholder="请输入名称 " class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">公司名称</label>
+									                    <div class="layui-input-inline">
+									                        <select name="companyId" id="searchCompany" class="layui-input">
+									                          <@dic.dataList typekey="company"/>
+															</select>   
+									                    </div>
+									                </div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">部门</label>
+									                    <div class="layui-input-inline">
+									                        <select name="unitId" id="searchUnit" class="layui-input">
+									                        	<option value="">请选择</option>
+									                        	<#if orgList?? && orgList?size gt 0>
+									                        		<#list orgList as org>
+									                        			<option value="${(org.id)!''}">${(org.name)!''}</option>
+									                        		</#list>
+									                        	</#if>
+															</select>   
+									                    </div>
+									                </div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">工资状态</label>
+									                    <div class="layui-input-inline">
+									                        <select name="state" id="searchstate" class="layui-input">
+									                        	<option value="">请选择</option>
+									                        	<option value="2">生成</option>
+									                        	<option value="3">已发放</option>
+															</select>   
+									                    </div>
+									                </div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">归属月份</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="inDateStr" value="${((returnDatas.queryBean.inDate)?string('yyyy-MM'))!''}" placeholder="请输入名称 " class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM'})">
+									                    </div>
+							                		</div>
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even id="resultTable">
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												  <!--first_start_no_export-->
+												<tr>
+													<th id="recordTh" colspan="9">员工工资<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												  <!--first_end_no_export-->
+												<tr id="titleTr">
+												  <!--first_start_no_export-->
+												  		<th class="center" >
+												  			<input id="checkAll"  type="checkbox">
+												  		</th>
+												  <!--first_end_no_export-->
+														<th id="th_userName" >用户名称</th>
+														<th id="th_inDate" >归属月份</th>
+														<th id="th_companyId" >归属公司</th>
+														<th id="th_unitId" >部门</th>
+														<th id="th_bankAccountName" >账号名称</th>
+														<th id="th_bankId" >银行卡号</th>
+														<th id="th_bankState">银行卡状态</th>
+														<th id="th_yingfupay">应付工资</th>
+														<th id="th_shifupay">实付工资</th>
+														<th id="th_sendDate">发放日期</th>
+														<th id="th_state">工资状态</th>
+												</tr>
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+														<td>
+															<input name="check_li" value="${(_data.id)!''}"  type="checkbox">
+														</td>
+														<!--end_no_export-->
+														<td>
+															${(_data.userName)!''}
+														</td>
+														<td>
+															${((_data.inDate)?string('yyyy-MM'))!''}
+														</td>
+														<td>
+															${(_data.companyName)!''}
+														</td>
+														<td>
+															${(_data.unitName)!''}
+														</td>
+														<td>
+															${(_data.bankAccountName)!''}
+														</td>
+														<td>
+															${(_data.bankId)!''}&#160;
+														</td>
+														<td>
+															<#if _data.bankState?? && _data.bankState=='1'>
+															可用
+															<#else>
+															停用
+															</#if>
+														</td>
+														<td>
+															${(_data.yingfupay)!'0'}
+														</td>
+														<td>
+															${(_data.shifupay)!'0'}
+														</td>
+														<td>
+															${((_data.sendDate)?string('yyyy-MM-dd'))!''}
+														</td>
+														<td>
+															${(_data.payStateStr)!'0'}
+														</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+										<!--end_export-->
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

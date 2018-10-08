@@ -1,0 +1,422 @@
+-- ----------------------------
+-- 工资表
+-- ----------------------------
+DROP TABLE IF EXISTS `z_salary`;
+CREATE TABLE `z_salary` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) NOT NULL COMMENT '用户Id',
+  `unitId` varchar(50) NOT NULL COMMENT '部门Id',
+  `inDate` datetime DEFAULT NULL COMMENT '归属月份',
+  `startDate` datetime NOT NULL COMMENT '开始时间',
+  `endDate` datetime NOT NULL COMMENT '结束时间',
+  `jibenpay` decimal(18,5) NOT NULL COMMENT '基本工资',
+  `kaohepay` decimal(18,5) NOT NULL COMMENT '考核工资',
+  `gangweipay` decimal(18,5) NOT NULL COMMENT '岗位工资',
+  `ripay` decimal(18,5) NOT NULL COMMENT '日工资',
+  `geshui` decimal(18,2) NOT NULL COMMENT '基本工资',
+  `shifupay` decimal(18,2) NOT NULL COMMENT '考核工资',
+  `yingfupay` decimal(18,2) NOT NULL COMMENT '岗位工资',
+  `state` int(11) NOT NULL DEFAULT '1' COMMENT '状态 1是未生成 2生成 3已发放',
+  `sendDate` datetime DEFAULT NULL COMMENT '发放日期',
+  `sendTime` datetime DEFAULT NULL COMMENT '发放时间,系统时间',
+  `sendPerson` varchar(50) DEFAULT NULL COMMENT '发放人',
+  `remarker` varchar(3000) DEFAULT NULL COMMENT '说明',
+  
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工资主表';
+
+
+
+-- ----------------------------
+-- 工资子表
+-- ----------------------------
+DROP TABLE IF EXISTS `z_salaryinfo`;
+CREATE TABLE `z_salaryinfo` (
+  `id` varchar(50) NOT NULL,
+  `salaryId` varchar(50) DEFAULT NULL COMMENT '主表ID',
+  `businessId` varchar(50) DEFAULT NULL COMMENT '业务ID',
+  `salaryType` varchar(200) DEFAULT NULL COMMENT '工资类型(包括社保、公积金和自定义的工资类型)',
+  `amount` decimal(18,2) NOT NULL DEFAULT '0.00' COMMENT '金额',
+  `remarker` varchar(3000) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='工资子表';
+
+ alter table z_salaryinfo add foreign key(salaryId) references z_salary(id);
+ -- alter table salaryinfo add foreign key(salaryTypeId) references dic_salary_type(id);
+ -- alter table z_salary add foreign key(userId) references t_user(id);
+
+
+
+-- ----------------------------
+-- 公式表
+-- ----------------------------
+DROP TABLE IF EXISTS `z_formula`;
+CREATE TABLE `z_formula` (
+  `id` varchar(50) NOT NULL,
+  `name` varchar(200) NOT NULL COMMENT '名称',
+  `chineseName` varchar(500) DEFAULT NULL COMMENT '表达式的中文名称',
+  `expression` varchar(5000) DEFAULT NULL COMMENT '表达式',
+  `chineseExpression` varchar(5000) DEFAULT NULL COMMENT '表达式的中文显示',
+  `sysExpression` int(11) NOT NULL DEFAULT '0' COMMENT '是否是系统变量,0是 1否',
+  `projectName` varchar(500) NOT NULL COMMENT '项目名称,用于区分不同项目的公式',
+  `inEffectiveDate` datetime NOT NULL DEFAULT '2012-01-01 00:00:00' COMMENT '起效日期',
+  `active` int(11) NOT NULL DEFAULT '0' COMMENT '是否可用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='公式';
+
+
+-- ----------------------------
+-- 业务公式数据
+-- ----------------------------
+DROP TABLE IF EXISTS `z_formula_data_2017`;
+CREATE TABLE `z_formula_data_2017` (
+  `id` varchar(50) NOT NULL,
+  `businessId` varchar(50) NOT NULL COMMENT '业务ID',
+  `formulaId` varchar(50) NOT NULL COMMENT '公式ID',
+  `projectName` varchar(100) NOT NULL COMMENT '项目ID',
+  `amount` decimal(18,2) NOT NULL DEFAULT '0.00' COMMENT '金额',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='业务公式数据2017';
+
+DROP TABLE IF EXISTS `z_formula_data_2018`;
+CREATE TABLE `z_formula_data_2018` (
+  `id` varchar(50) NOT NULL,
+  `businessId` varchar(50) NOT NULL COMMENT '业务ID',
+  `formulaId` varchar(50) NOT NULL COMMENT '公式ID',
+  `projectName` varchar(100) NOT NULL COMMENT '项目ID',
+  `amount` decimal(18,2) NOT NULL DEFAULT '0.00' COMMENT '金额',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='业务公式数据2018';
+
+-- 初始化需要执行的系统变量
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salay_jibenpay','基本工资','基本工资',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salay_kaohepay','考核工资','考核工资',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salay_gonglingpay','工龄工资','工龄工资',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salary_monthdays','本月总天数','本月总天数',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salary_ondutydays','本月在职天数','本月在职天数',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salary_taxrate','个税税率','个税税率',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salary_taxshu','个税速算扣除数','个税速算扣除数',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salary_rfygzhj','日费用工资合计','日费用工资合计',0,'salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,projectName,inEffectiveDate)
+values('salary_rfygzhjkk','日费用工资合计扣款','日费用工资合计扣款',0,'salary','2017-07-03');
+
+-- 初始化需要执行的公式
+INSERT z_formula(id,name,chineseName,sysExpression,chineseExpression,projectName,inEffectiveDate)
+VALUES('salary_baseSalary','工资项合计','工资项合计',1,'(基本工资+考核工资+工龄工资)*本月在职天数/本月总天数','salary','2017-07-03');
+
+
+INSERT z_formula(id,name,chineseName,sysExpression,chineseExpression,projectName,inEffectiveDate)
+VALUES('salary_yingfupay','应付工资','应付工资',1,'工资项合计+日费用工资合计-日费用工资合计扣款','salary','2017-07-03');
+
+
+INSERT z_formula(id,name,chineseName,sysExpression,chineseExpression,projectName,inEffectiveDate)
+VALUES('salary_taxbase','个税基数','个税基数',1,'应付工资','salary','2017-07-03');
+
+INSERT z_formula(id,name,chineseName,sysExpression,chineseExpression,projectName,inEffectiveDate)
+values('salary_geshui','个税','个税',1,'(个税基数-3500)*个税税率-个税速算扣除数','salary','2017-07-03');
+
+
+INSERT z_formula(id,name,chineseName,sysExpression,chineseExpression,projectName,inEffectiveDate)
+VALUES('salary_shifupay','实付工资','实付工资',1,'应付工资-个税','salary','2017-07-03');
+
+
+
+-- ----------------------------
+-- 保险公积金增减项
+-- ----------------------------
+DROP TABLE IF EXISTS `z_tongchou_zengjian`;
+CREATE TABLE `z_tongchou_zengjian` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL COMMENT '用户ID',
+  `userName` varchar(50) DEFAULT NULL COMMENT '用户姓名',
+  `month` date DEFAULT NULL COMMENT '月份',
+  `insuranceCompany` decimal(18,2) DEFAULT NULL COMMENT '公司缴纳部分',
+  `insurancePersonal` decimal(18,2) DEFAULT NULL COMMENT '个人缴纳部分',
+  `insuranceType` varchar(50) DEFAULT NULL COMMENT '统筹类型',
+  `feiyongtype` varchar(50) DEFAULT NULL COMMENT '费用类型',
+  `remark` varchar(255) DEFAULT NULL,
+  `creator` varchar(50) DEFAULT NULL,
+  `createTime` datetime DEFAULT NULL,
+  `active` varchar(2) DEFAULT NULL COMMENT ' 0 否 1 是',
+  `bak1` varchar(255) DEFAULT NULL,
+  `bak2` varchar(255) DEFAULT NULL,
+  `bak3` varchar(255) DEFAULT NULL,
+  `bak4` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='保险公积金增减项';
+
+-- ----------------------------
+-- 保险公积金信息表
+-- ----------------------------
+DROP TABLE IF EXISTS `z_tongchou_info`;
+CREATE TABLE `z_tongchou_info` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL,
+  `company` varchar(50) DEFAULT NULL COMMENT '公司编号',
+  `stopProtectMonth` datetime DEFAULT NULL COMMENT '停保月份',
+  `insuranceorgongjijinAccount` varchar(255) DEFAULT NULL COMMENT '保险公积金账号',
+  `insurgongjijinType` varchar(2) DEFAULT NULL COMMENT '类型',
+  `insurancePaymentDate` datetime DEFAULT NULL COMMENT '缴费开始时间',
+  `efficientDate` datetime DEFAULT NULL COMMENT '缴费结束时间',
+  `radices` decimal(18,2) DEFAULT NULL COMMENT '基数',
+  `insuranceCompany` decimal(18,2) DEFAULT NULL COMMENT '公司缴纳部分',
+  `insurancePersonal` decimal(18,2) DEFAULT NULL COMMENT '个人缴纳部分',
+  `insuranceType` varchar(50) DEFAULT NULL COMMENT '统筹类型',
+  `remark` varchar(255) DEFAULT NULL,
+  `creator` varchar(50) DEFAULT NULL,
+  `createTime` datetime DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL COMMENT '状态 0 否 1 是',
+  `cardId` varchar(50) DEFAULT NULL COMMENT '身份证',
+  `userName` varchar(50) DEFAULT NULL,
+  `bak1` varchar(255) DEFAULT NULL,
+  `bak2` varchar(255) DEFAULT NULL,
+  `bak3` varchar(255) DEFAULT NULL,
+  `bak4` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='保险公积金信息表';
+
+
+-- ----------------------------
+--	保险公积金月度数据表
+-- ----------------------------
+DROP TABLE IF EXISTS `z_tongchou_record`;
+CREATE TABLE `z_tongchou_record` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL,
+  `company` varchar(50) DEFAULT NULL COMMENT '公司编号',
+  `stopProtectMonth` datetime DEFAULT NULL COMMENT '停保月份',
+  `insuranceorgongjijinAccount` varchar(255) DEFAULT NULL COMMENT '保险公积金账号',
+  `insurgongjijinType` varchar(2) DEFAULT NULL COMMENT '类型 1 保险账号 0 公积金账号',
+  `insurancePaymentDate` datetime DEFAULT NULL COMMENT '缴费开始时间',
+  `efficientDate` date DEFAULT NULL COMMENT '缴费结束时间',
+  `radices` decimal(18,2) DEFAULT NULL COMMENT '基数',
+  `insuranceCompany` decimal(18,2) DEFAULT NULL COMMENT '公司缴纳部分',
+  `insurancePersonal` decimal(18,2) DEFAULT NULL COMMENT '个人缴纳部分',
+  `insuranceType` varchar(255) DEFAULT NULL COMMENT '统筹类型 ',
+  `remark` varchar(255) DEFAULT NULL,
+  `creator` varchar(50) DEFAULT NULL COMMENT '创建人',
+  `createTime` datetime DEFAULT NULL COMMENT '建立时间',
+  `state` varchar(2) DEFAULT NULL COMMENT '状态 0 否 1 是',
+  `cardId` varchar(50) DEFAULT NULL COMMENT '身份证号',
+  `userName` varchar(255) DEFAULT NULL COMMENT '用户名',
+  `month` datetime DEFAULT NULL COMMENT '所属月份',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='保险公积金月度数据表';
+
+-- ----------------------------
+-- 保险公积桌面显示表
+-- ----------------------------
+DROP TABLE IF EXISTS `z_tongchou_show`;
+CREATE TABLE `z_tongchou_show` (
+  `id` varchar(50) NOT NULL COMMENT '字典id',
+  `dicttypeId` varchar(50) DEFAULT NULL,
+  `property` varchar(50) DEFAULT NULL COMMENT '属性',
+  `propertyValue` varchar(50) DEFAULT NULL COMMENT '属性值',
+  `deskShowName` varchar(255) DEFAULT NULL COMMENT '桌面显示值',
+  `showOrhidden` varchar(50) DEFAULT NULL COMMENT '是否隐藏',
+  `active` varchar(2) DEFAULT NULL COMMENT ' 0 否 1 是',
+  `type` varchar(50) DEFAULT NULL COMMENT '区分基础信息和月度数据',
+  `reportType` varchar(255) DEFAULT NULL COMMENT '主要记录缴纳类型',
+  `createUser` varchar(255) DEFAULT NULL,
+  `createTime` datetime DEFAULT NULL,
+  `bak1` varchar(255) DEFAULT NULL,
+  `bak2` varchar(255) DEFAULT NULL,
+  `bak3` varchar(255) DEFAULT NULL,
+  `bak4` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='保险公积桌面显示表';
+
+
+-- ----------------------------
+-- 劳务合同
+-- ----------------------------
+DROP TABLE IF EXISTS `z_work_contract`;
+CREATE TABLE `z_work_contract` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL,
+  `company` varchar(50) DEFAULT NULL COMMENT '归属公司',
+  `orgId` text COMMENT '部门',
+  `startDate` datetime DEFAULT NULL COMMENT '签订开始日期',
+  `endDate` datetime DEFAULT NULL COMMENT '签订结束日期',
+  `contractType` varchar(50) DEFAULT NULL COMMENT '合同类型',
+  `workType` varchar(50) DEFAULT NULL COMMENT '用工方式',
+  `bak` varchar(255) DEFAULT NULL COMMENT '备注',
+  `state` varchar(10) DEFAULT NULL COMMENT '是否有效',
+  `editPerson` varchar(50) DEFAULT NULL COMMENT '编辑人',
+  `editDate` datetime DEFAULT NULL COMMENT '编辑时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='劳务合同';
+
+
+-- ----------------------------
+-- 用户信息表
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_info`;
+CREATE TABLE `t_user_info` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL,
+  `userCode` varchar(50) DEFAULT NULL COMMENT '员工代码',
+  `birthday` datetime DEFAULT NULL COMMENT '出生日期',
+  `workno` varchar(50) DEFAULT NULL COMMENT '工号',
+  `idCard` varchar(50) DEFAULT NULL COMMENT '身份证号',
+  `company` varchar(50) DEFAULT NULL COMMENT '公司',
+  `tongchou` varchar(50) DEFAULT NULL COMMENT '统筹缴纳地',
+  `gangwei` varchar(50) DEFAULT NULL COMMENT '岗位',
+  `entryDate` datetime DEFAULT NULL COMMENT '入职日期',
+  `startDate` datetime DEFAULT NULL COMMENT '转正日期',
+  `endDate` datetime DEFAULT NULL COMMENT '离职日期',
+  `mobile1` varchar(50) DEFAULT NULL COMMENT '移动电话1',
+  `mobile2` varchar(50) DEFAULT NULL COMMENT '移动电话2',
+  `telephone` varchar(50) DEFAULT NULL COMMENT '固定电话',
+  `email` varchar(255) DEFAULT NULL COMMENT '电子邮箱',
+  `marryState` varchar(2) DEFAULT NULL COMMENT '婚否',
+  `health` varchar(50) DEFAULT NULL COMMENT '健康状态',
+  `entryCity` varchar(50) DEFAULT NULL COMMENT '入职城市',
+  `entryType` varchar(50) DEFAULT NULL COMMENT '入职方式',
+  `introducer` varchar(50) DEFAULT NULL COMMENT '介绍人',
+  `minzu` varchar(50) DEFAULT NULL COMMENT '民族',
+  `politicsStatus` varchar(50) DEFAULT NULL COMMENT '政治面貌',
+  `zuigaoxueli` varchar(50) DEFAULT NULL COMMENT '最高学历',
+  `jiaoyujingli` text COMMENT '教育经历',
+  `fireName` varchar(50) DEFAULT NULL COMMENT '紧急联系人',
+  `firePhone` varchar(50) DEFAULT NULL COMMENT '紧急联系电话',
+  `bak` varchar(255) DEFAULT NULL COMMENT '备注',
+  `bankName` varchar(50) DEFAULT NULL COMMENT '银行名称',
+  `bankAccountName` varchar(50) DEFAULT NULL COMMENT '银行帐号',
+  `bankId` varchar(50) DEFAULT NULL COMMENT '银行卡号',
+  `bankState` varchar(10) DEFAULT NULL COMMENT '卡号状态',
+  `jibenpay` decimal(18,2) DEFAULT NULL COMMENT '基本工资',
+  `kaohepay` decimal(18,2) DEFAULT NULL COMMENT '考核工资',
+  `gangweipay` decimal(18,2) DEFAULT NULL COMMENT '岗位工资',
+  `stoppay` varchar(5) DEFAULT NULL COMMENT '是否停发工资',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  COMMENT='用户信息表';
+
+-- ----------------------------
+-- 用户信息备份表
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_info_bak`;
+CREATE TABLE `t_user_info_bak` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL,
+  `userCode` varchar(50) DEFAULT NULL COMMENT '员工代码',
+  `birthday` datetime DEFAULT NULL COMMENT '出生日期',
+  `workno` varchar(50) DEFAULT NULL COMMENT '工号',
+  `idCard` varchar(50) DEFAULT NULL COMMENT '身份证号',
+  `company` varchar(50) DEFAULT NULL COMMENT '公司',
+  `tongchou` varchar(50) DEFAULT NULL COMMENT '统筹缴纳地',
+  `gangwei` varchar(50) DEFAULT NULL COMMENT '岗位',
+  `entryDate` datetime DEFAULT NULL COMMENT '入职日期',
+  `startDate` datetime DEFAULT NULL COMMENT '转正日期',
+  `endDate` datetime DEFAULT NULL COMMENT '离职日期',
+  `mobile1` varchar(50) DEFAULT NULL COMMENT '移动电话1',
+  `mobile2` varchar(50) DEFAULT NULL COMMENT '移动电话2',
+  `telephone` varchar(50) DEFAULT NULL COMMENT '固定电话',
+  `email` varchar(255) DEFAULT NULL COMMENT '电子邮箱',
+  `marryState` varchar(2) DEFAULT NULL COMMENT '婚否',
+  `health` varchar(50) DEFAULT NULL COMMENT '健康状态',
+  `entryCity` varchar(50) DEFAULT NULL COMMENT '入职城市',
+  `entryType` varchar(50) DEFAULT NULL COMMENT '入职方式',
+  `introducer` varchar(50) DEFAULT NULL COMMENT '介绍人',
+  `minzu` varchar(50) DEFAULT NULL COMMENT '民族',
+  `politicsStatus` varchar(50) DEFAULT NULL COMMENT '政治面貌',
+  `zuigaoxueli` varchar(50) DEFAULT NULL COMMENT '最高学历',
+  `jiaoyujingli` text COMMENT '教育经历',
+  `fireName` varchar(50) DEFAULT NULL COMMENT '紧急联系人',
+  `firePhone` varchar(50) DEFAULT NULL COMMENT '紧急联系电话',
+  `bak` varchar(255) DEFAULT NULL COMMENT '备注',
+  `bankName` varchar(50) DEFAULT NULL COMMENT '银行名称',
+  `bankAccountName` varchar(50) DEFAULT NULL COMMENT '银行帐号',
+  `bankId` varchar(50) DEFAULT NULL COMMENT '银行卡号',
+  `bankState` varchar(10) DEFAULT NULL COMMENT '卡号状态',
+  `jibenpay` decimal(18,2) DEFAULT NULL COMMENT '基本工资',
+  `kaohepay` decimal(18,2) DEFAULT NULL COMMENT '考核工资',
+  `gangweipay` decimal(18,2) DEFAULT NULL COMMENT '岗位工资',
+  `stoppay` varchar(5) DEFAULT NULL COMMENT '是否停发工资',
+  `month` datetime DEFAULT NULL COMMENT '所属月份',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户信息表';
+
+
+-- 统筹增减项新增字段
+
+alter table z_tongchou_zengjian add  isused VARCHAR(20) COMMENT '0 否 1 是';
+
+alter table z_tongchou_zengjian add  salayid VARCHAR(50) COMMENT '工资id';
+
+alter table z_tongchou_show add  sortno int(20) COMMENT '排序号';
+
+alter table z_tongchou_record add  salayid VARCHAR(50) COMMENT '工资id';
+
+alter table z_salaryinfo add  active VARCHAR(50) COMMENT '增减项状态 0未使用 1 使用 ';
+
+alter table t_user_info add  lizhiremark VARCHAR(200) COMMENT '离职原因';
+
+alter table t_user add  editDate datetime COMMENT '修改时间-员工离职';
+
+alter table t_user add  editUser VARCHAR(50) COMMENT '修改人-员工离职';
+-- 停保
+ALTER table z_tongchou_info add operationUser VARCHAR(50) COMMENT '停保操作人';
+
+ALTER table z_tongchou_info add operationDate datetime COMMENT '停保操作时间';
+-- 天数
+alter table z_salaryinfo add decimal(18,2) COMMENT '天数';
+
+ALTER table z_tongchou_info add operationDate datetime COMMENT '停保操作时间';
+
+-- 2017-07-25 合同表新增字段
+alter table z_work_contract add  term int(11) DEFAULT NULL COMMENT '录入期限';
+alter table z_work_contract add  times int(11) DEFAULT NULL COMMENT '签订次数';
+alter table z_work_contract add  contractNo varchar(50) DEFAULT NULL COMMENT '合同编号';
+
+-- 2017-07-25 用户基本信息表增加字段
+alter table t_user_info add  firstTime datetime DEFAULT NULL COMMENT '首次参加工作时间';
+alter table t_user_info add  grade varchar(50) DEFAULT NULL COMMENT '级别';
+alter table t_user_info_bak add  grade varchar(50) DEFAULT NULL COMMENT '级别';
+
+-- ----------------------------
+-- 用户教育经历表
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_educational`;
+CREATE TABLE `t_user_educational` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL COMMENT '用户ID',
+  `startDate` datetime DEFAULT NULL COMMENT '开始时间',
+  `endDate` datetime DEFAULT NULL COMMENT '结束时间',
+  `xuexiao` varchar(255) DEFAULT NULL COMMENT '学校名称',
+  `xueli` varchar(255) DEFAULT NULL COMMENT '学历',
+  `zhaoshengfangshi` varchar(255) DEFAULT NULL COMMENT '招生方式',
+  `sort` int(11) DEFAULT NULL COMMENT '排序',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户教育经历表';
+
+-- ----------------------------
+-- 用户证书表
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_certificate`;
+CREATE TABLE `t_user_certificate` (
+  `id` varchar(50) NOT NULL,
+  `userId` varchar(50) DEFAULT NULL COMMENT '用户名称',
+  `bianhao` varchar(255) DEFAULT NULL COMMENT '编号',
+  `name` varchar(255) DEFAULT NULL COMMENT '证书名称',
+  `banzhengjigou` varchar(255) DEFAULT NULL COMMENT '颁证机构',
+  `passDate` datetime DEFAULT NULL COMMENT '通过日期',
+  `youxiaoqi` datetime DEFAULT NULL COMMENT '有效期',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户证书表';

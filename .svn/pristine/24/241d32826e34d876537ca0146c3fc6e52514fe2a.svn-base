@@ -1,0 +1,48 @@
+package org.springrain.erp.constants;
+
+/**
+ * 
+ * 
+ * 
+ *
+ */
+public class TcshowEnum {
+	/**
+	 * tc桌面展示
+	 * @author Administrator
+	 *
+	 */
+	public enum tcDeskShowEnum{
+		员工统筹公积金("员工统筹公积金","tcbz"),统筹月度数据("统筹月度数据","tcrecord"),统筹代扣代缴("统筹代扣代缴","tcdkdj"),公积金代扣代缴("公积金代扣代缴","gjjdkdj");
+		
+		private String name;
+		
+		private String value;
+		
+		private tcDeskShowEnum(String name,String value){
+			this.name = name ;
+			this.value = value;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+		
+		
+	}
+
+	
+
+}

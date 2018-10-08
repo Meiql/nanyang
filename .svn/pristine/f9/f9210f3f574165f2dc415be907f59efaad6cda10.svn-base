@@ -1,0 +1,400 @@
+package org.springrain.erp.hr.service.impl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.constants.ErpStateEnum.userActiveEnum;
+import org.springrain.erp.gz.util.GlobalStaticVar;
+import org.springrain.erp.hr.entity.UserCertificate;
+import org.springrain.erp.hr.entity.UserEducational;
+import org.springrain.erp.hr.entity.UserInfo;
+import org.springrain.erp.hr.service.IOaOrgService;
+import org.springrain.erp.hr.service.IOaUserOrgService;
+import org.springrain.erp.hr.service.IOaUserService;
+import org.springrain.erp.hr.service.IUserCertificateService;
+import org.springrain.erp.hr.service.IUserEducationalService;
+import org.springrain.erp.hr.service.IUserInfoService;
+import org.springrain.erp.hr.service.IUserResumeService;
+import org.springrain.frame.common.SessionUser;
+import org.springrain.frame.entity.IBaseEntity;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.Page;
+import org.springrain.frame.util.ReturnDatas;
+import org.springrain.frame.util.property.MessageUtils;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.entity.Org;
+import org.springrain.system.entity.User;
+import org.springrain.system.service.BaseSpringrainServiceImpl;
+import org.springrain.system.service.IDicDataService;
+import org.springrain.system.service.IUserOrgService;
+import org.springrain.system.service.IUserService;
+
+
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:47:25
+ * @see org.springrain.erp.hr.service.impl.UserInfo
+ */
+@Service("userInfoService")
+public class UserInfoServiceImpl extends BaseSpringrainServiceImpl implements IUserInfoService {
+
+	@Resource
+	private IUserEducationalService userEducationalService;
+	@Resource
+	private IUserCertificateService userCertificateService;
+	@Resource
+	private IDicDataService dicDataService;
+	@Resource
+	IOaUserService oaUserService;
+	@Resource
+	IOaUserOrgService oaUserOrgService;
+	@Resource
+	IOaOrgService oaOrgService;
+	@Resource
+	IUserOrgService userOrgSerivce;
+	@Resource
+	IUserResumeService userResumeService;
+	@Resource
+	private IUserService userService;
+    @Override
+	public String  save(Object entity ) throws Exception{
+	      UserInfo userInfo=(UserInfo) entity;
+	       return super.save(userInfo).toString();
+	}
+
+    @Override
+	public String  saveorupdate(Object entity ) throws Exception{
+	      UserInfo userInfo=(UserInfo) entity;
+		 return super.saveorupdate(userInfo).toString();
+	}
+	
+	@Override
+    public Integer update(IBaseEntity entity ) throws Exception{
+	 UserInfo userInfo=(UserInfo) entity;
+	return super.update(userInfo);
+    }
+    @Override
+	public UserInfo findUserInfoById(Object id) throws Exception{
+	 return super.findById(id,UserInfo.class);
+	}
+	
+/**
+ * 列表查询,每个service都会重载,要把sql语句封装到service中,Finder只是最后的方案
+ * @param finder
+ * @param page
+ * @param clazz
+ * @param o
+ * @return
+ * @throws Exception
+ */
+        @SuppressWarnings("unchecked")
+		@Override
+    public <T> List<T> findListDataByFinder(Finder finder, Page page, Class<T> clazz,
+			Object o) throws Exception{
+        	
+        	return ((List<T>) findUserInfoByQuery((UserInfo) o, page));
+	}
+	/**
+	 * 根据查询列表的宏,导出Excel
+	 * @param finder 为空则只查询 clazz表
+	 * @param ftlurl 类表的模版宏
+	 * @param page 分页对象
+	 * @param clazz 要查询的对象
+	 * @param o  querybean
+	 * @return
+	 * @throws Exception
+	 */
+		@Override
+	public <T> File findDataExportExcel(Finder finder,String ftlurl, Page page,
+			Class<T> clazz, Object o)
+			throws Exception {
+			 return super.findDataExportExcel(finder,ftlurl,page,clazz,o);
+		}
+		/**
+		 * 查找用户的详细信息
+		 */	
+	@Override
+	public UserInfo finderUserInfo(UserInfo userInfo)
+			throws Exception {
+		if(StringUtils.isEmpty(userInfo.getUserId())){
+			return null;
+		}
+		Finder f = new Finder();
+		f.append("select * from "+Finder.getTableName(UserInfo.class)+"");
+		f.append(" where userId = :userId").setParam("userId", userInfo.getUserId());
+		return super.queryForObject(userInfo);
+	}
+
+	@Override
+	public List<UserInfo> findUserInfoByQuery(UserInfo query, Page page)
+			throws Exception {
+		
+		Finder finder = Finder.getSelectFinder(User.class,"u.active userActive,u.state state,u.name userName,u.id uid,u.account account,u.active userActive,u.editDate editLeaveDate,u.editUser ,ui.*");
+		finder.append(" as u LEFT JOIN ").append(Finder.getTableName(UserInfo.class)).append(" as ui ON u.id = ui.userId ");
+		finder.append(" where 1 = 1  and u.userType = :utype ")
+			  .setParam("utype", ErpStateEnum.userTypeEnum.员工.getValue());
+		if(query.getUserActive() != null){
+			finder.append(" and u.active = :active ").setParam("active", query.getUserActive());
+		}else{
+			finder.append(" and u.active = :active ").setParam("active", ErpStateEnum.userActiveEnum.在职.getValue());
+		}
+		if(StringUtils.isNotBlank(query.getUserName())){
+			finder.append(" and u.name like :uname ").setParam("uname", "%"+query.getUserName()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getWorkno())){
+			finder.append(" and ui.workno like :workno ").setParam("workno", "%"+query.getWorkno()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getBankAccountName())){
+			finder.append(" and ui.bankAccountName like :bankAccountName ").setParam("bankAccountName", "%"+query.getBankAccountName()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getBankId())){
+			finder.append(" and ui.bankId like :bankId ").setParam("bankId", "%"+query.getBankId()+"%");
+		}
+		if(StringUtils.isNotBlank(query.getCompany())){
+			finder.append(" and ui.company = :company ").setParam("company", query.getCompany());
+		}
+		if(StringUtils.isNotBlank(query.getTongchou())){
+			finder.append(" and ui.tongchou = :tongchou ").setParam("tongchou", query.getTongchou());
+		}
+		if(StringUtils.isNotBlank(query.getGangwei())){
+			finder.append(" and ui.gangwei = :gangwei ").setParam("gangwei", query.getGangwei());
+		}
+		if(StringUtils.isNotBlank(query.getGrade())){
+			finder.append(" and ui.grade = :grade ").setParam("grade", query.getGrade());
+		}
+		if(StringUtils.isNotBlank(query.getEntryCity())){
+			finder.append(" and ui.entryCity = :enytyCity ").setParam("enytyCity", query.getEntryCity());
+		}
+		if(StringUtils.isNotBlank(query.getBankName())){
+			finder.append(" and ui.bankName = :bankName ").setParam("bankName", query.getBankName());
+		}
+		if(StringUtils.isNotBlank(query.getBankState())){
+			finder.append(" and ui.bankState = :bankState ").setParam("bankState", query.getBankState());
+		}
+		if(StringUtils.isNotBlank(query.getStoppay())){
+			finder.append(" and ui.stoppay = :stoppay ").setParam("stoppay", query.getStoppay());
+		}
+		List<UserInfo> datas= super.queryForList(finder, UserInfo.class, page);
+				
+		if(CollectionUtils.isNotEmpty(datas)){
+			for(UserInfo info : datas){
+				if(StringUtils.isNotBlank(info.getEditUser())){
+					User user = userService.findById(info.getEditUser(), User.class);
+					if(user!=null)
+					info.setEditUser(user.getName());
+				}
+				if(StringUtils.isNotBlank(info.getGangwei())){
+					DicData gangwei = dicDataService.findDicDataById(info.getGangwei());
+					if(gangwei!=null)
+					info.setGangweiName(gangwei.getName());
+				}
+				if(StringUtils.isNotBlank(info.getCompany())){
+					DicData company = dicDataService.findDicDataById(info.getCompany());
+					if(company!=null)
+					info.setCompanyName(company.getName());
+				}
+				if(StringUtils.isNotBlank(info.getTongchou())){
+					DicData tongchou = dicDataService.findDicDataById(info.getTongchou());
+					if(tongchou!=null)
+					info.setTongchouName(tongchou.getName());
+				}
+				if(StringUtils.isNotBlank(info.getEntryCity())){
+					DicData entryCity = dicDataService.findDicDataById(info.getEntryCity());
+					if(entryCity!=null)
+					info.setEntryCityName(entryCity.getName());
+				}
+				if(StringUtils.isNotBlank(info.getBankName())){
+					DicData bank = dicDataService.findDicDataById(info.getBankName());
+					if(bank!=null)
+					info.setBankNameStr(bank.getName());
+				}
+				if(StringUtils.isNotBlank(info.getGrade())){
+					DicData grade = dicDataService.findDicDataById(info.getGrade());
+					if(grade!=null)
+					info.setGradeName(grade.getName());
+				}
+				if(info.getBirthday() != null){
+					int age = DateUtils.bTYears(info.getBirthday(), new Date());
+					info.setAge(age);
+				}
+				if(info.getFirstTime() != null){
+					int workingYears = DateUtils.bTYears(info.getFirstTime(), new Date());
+					info.setWorkingYears(workingYears);
+				}
+				if(info.getEntryDate() != null){
+					int ourAge = DateUtils.bTYears(info.getEntryDate(), new Date());
+					info.setOurAge(ourAge);
+				}
+				if(StringUtils.isNotBlank(info.getUserId())){
+					List<Org> orgs = userOrgSerivce.findOrgByUserId(info.getUserId());
+					int i = 0;
+					if(CollectionUtils.isNotEmpty(orgs)){
+						StringBuilder sb = new StringBuilder();
+						for(Org o : orgs){
+							if(i == 0){
+								sb.append(o.getName());
+							}else{
+								sb.append(",").append(o.getName());
+							}
+							i++;
+						}
+						info.setOrgName(sb.toString());
+					}
+				}
+				
+			}
+		}
+		return datas;
+	}
+
+	@Override
+	public UserInfo findUserInfoByUserId(String userId) throws Exception {
+		Finder finder = Finder.getSelectFinder(User.class,"u.active userActive, u.state state, u.name userName,u.id uid,u.account account,ui.*");
+		finder.append(" as u LEFT JOIN ").append(Finder.getTableName(UserInfo.class)).append(" as ui ON u.id = ui.userId ");
+		finder.append(" where 1 = 1 and u.id = :id ").setParam("id", userId);
+		UserInfo userInfo = super.queryForObject(finder, UserInfo.class);
+		if(userInfo==null){
+			return userInfo;
+		}
+		if(userInfo.getUserActive()== userActiveEnum.在职.getValue()){
+			userInfo.setUserActiveStr(userActiveEnum.在职.getName());
+		}else{
+			userInfo.setUserActiveStr(userActiveEnum.离职.getName());
+		}
+		//公司
+		if(StringUtils.isNotBlank(userInfo.getCompany())){
+			DicData dicData = dicDataService.findDicDataById(userInfo.getCompany());
+			userInfo.setCompanyName(dicData.getName());
+		}
+		//岗位
+		if(StringUtils.isNotBlank(userInfo.getGangwei())){
+			DicData dicData = dicDataService.findDicDataById(userInfo.getGangwei());
+			userInfo.setGangweiName(dicData.getName());
+		}
+		List<Org> listOrg = userOrgSerivce.findOrgByUserId(userId);
+		if(CollectionUtils.isNotEmpty(listOrg)){
+			userInfo.setOrgName(listOrg.get(0).getName());
+		}		
+		return userInfo;
+	}
+
+	@Override
+	public ReturnDatas saveOrUpdate(UserInfo userInfo) throws Exception {
+		ReturnDatas returnObject = ReturnDatas.getSuccessReturnDatas();
+		try {
+			java.lang.String id =userInfo.getId();
+			userInfo.setEditPerson(SessionUser.getUserId());
+			userInfo.setEditDate(new Date());
+			if(StringUtils.isNotBlank(userInfo.getIdCard())){
+				String message = GlobalStaticVar.checkIDCard(userInfo.getIdCard());
+				if(StringUtils.isNotBlank(message)){
+					return new ReturnDatas(ReturnDatas.ERROR,message);
+				}
+				if(userInfo.getBirthday() == null){
+					String birthday = null;
+					if(userInfo.getIdCard().length() == 18){
+						birthday = userInfo.getIdCard().substring(6,14);
+					}
+					Date birthDay = DateUtils.convertString2Date("yyyyMMdd",birthday);
+					userInfo.setBirthday(birthDay);
+				}
+			}
+			if(StringUtils.isBlank(id)){
+				userInfo.setId(userInfo.getUserId());
+				super.save(userInfo);
+			}else{
+				UserInfo oinfo = findUserInfoByUserId(userInfo.getUserId());
+//				if(StringUtils.isNotBlank(userInfo.getFlag())){
+					userResumeService.saveUserResume(oinfo, userInfo);
+//				}
+				super.update(userInfo, true);
+			}
+			if(StringUtils.isNotBlank(userInfo.getFlag())){
+				if(CollectionUtils.isNotEmpty(userInfo.getEducational())){
+					List<String> educationalIds = new ArrayList<String>();
+					for(UserEducational ue : userInfo.getEducational()){
+						if(StringUtils.isNotBlank(ue.getId())){
+							educationalIds.add(ue.getId());
+						}
+					}
+					userEducationalService.deleteNotInIdsAndUserId(userInfo.getUserId(), educationalIds);
+					int i = 0;
+					for(UserEducational ue : userInfo.getEducational()){
+						if(StringUtils.isBlank(ue.getId())){
+							ue.setId(null);
+						}
+						if(StringUtils.isBlank(ue.getUserId())){
+							ue.setUserId(userInfo.getUserId());
+						}
+						ue.setSort(i);
+						i++;
+						userEducationalService.saveorupdate(ue);
+					}
+				}
+				List<String> certificatelIds = new ArrayList<String>();
+				if(CollectionUtils.isNotEmpty(userInfo.getCertificate())){
+					for(UserCertificate ce : userInfo.getCertificate()){
+						if(StringUtils.isNotBlank(ce.getId())){
+							certificatelIds.add(ce.getId());
+						}
+					}
+				}
+				userCertificateService.deleteNotInIdsAndUserId(userInfo.getUserId(), certificatelIds);
+				if(CollectionUtils.isNotEmpty(userInfo.getCertificate())){
+					for(UserCertificate ce : userInfo.getCertificate()){
+						if(StringUtils.isBlank(ce.getId())){
+							ce.setId(null);
+						}
+						if(StringUtils.isBlank(ce.getUserId())){
+							ce.setUserId(userInfo.getUserId());
+						}
+						userCertificateService.saveorupdate(ce);
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			returnObject.setStatus(ReturnDatas.ERROR);
+			returnObject.setMessage(MessageUtils.UPDATE_ERROR);
+		}
+		return returnObject;
+	}
+
+	@Override
+	public void savesyndata() throws Exception {
+		oaOrgService.updateSynOaOrg();
+		oaUserService.saveOaUserForsyn();
+		oaUserOrgService.saveOaUserOrg();		
+	}
+
+	@Override
+	public void saveorupdateUserBaseInfo(List<UserInfo> userInfos)
+			throws Exception {
+		if(CollectionUtils.isNotEmpty(userInfos)){
+			for(UserInfo userinfo : userInfos){
+				userinfo.setEditDate(new Date());
+				userinfo.setEditPerson(SessionUser.getUserId());
+				UserInfo u = super.findById(userinfo.getId(), UserInfo.class);
+				if(u != null){
+					super.update(userinfo, true);
+				}else{
+					super.save(userinfo);
+				}
+			}
+		}
+		
+	}
+
+	
+}

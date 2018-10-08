@@ -1,0 +1,230 @@
+package org.springrain.erp.gz.service.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.DicdataTypeEnum;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.gz.util.BaseImport;
+import org.springrain.erp.tc.entity.TongchouInfo;
+import org.springrain.erp.tc.service.ITongchouInfoService;
+import org.springrain.frame.common.SessionUser;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.entity.Org;
+import org.springrain.system.entity.User;
+import org.springrain.system.service.IDicDataService;
+import org.springrain.system.service.IUserOrgService;
+import org.springrain.system.service.IUserService;
+
+@Service("tcInfoImportService")
+public class TongchouinfoImportService extends BaseImport {
+	@Resource
+	private ITongchouInfoService ITongchouInfoService;
+	@Resource
+	private IUserService userService;
+	@Resource
+	private IDicDataService dicDataService;	
+	@Resource
+	private IUserOrgService userOrgService;
+	public static String[] titles = { "姓名", "统筹缴纳地","归属公司","统筹类型", "统筹账号", "缴费开始月份","缴费结束月份","缴费基数","个人缴纳","单位缴纳" };
+	List<String> listTitle = Arrays.asList(titles);
+	private static final String entityKey = "key";
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	protected String checkData() throws Exception {
+		TongchouInfo dto = new TongchouInfo();
+		// 姓名
+		int index = 0;
+		String indexvalue = rowCells.get(index).trim();
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		String name2 = indexvalue.replaceAll(" ", "");
+		List<User> list = userService.finderUserByUserName(indexvalue,name2);
+		if(CollectionUtils.isEmpty(list)){
+			return "系统中不存在"+indexvalue+"用户";
+		}
+		dto.setUserName(list.get(0).getName());
+		//设置部门
+		List<Org> listOrg = userOrgService.findOrgByUserId(list.get(0).getId());
+		if(CollectionUtils.isNotEmpty(listOrg)){
+			dto.setDepartment(listOrg.get(0).getId());
+		}
+		//统筹缴纳地
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明统筹缴纳地不对
+		DicData qbjnd=new DicData();
+		qbjnd.setName(indexvalue);
+		qbjnd.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> lstcjnd= dicDataService.findListDicData(DicdataTypeEnum.统筹缴纳地.getValue(), null, qbjnd);
+		if(CollectionUtils.isEmpty(lstcjnd)){
+			return getCellPosition(index)+ "统筹缴纳地【"+ indexvalue + "】系统中不存在";
+		};
+		DicData da= lstcjnd.get(0);
+		if(da!=null) {
+			dto.setTcjiaonadi(da.getId());
+		}
+		//归属公司
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明归属公司不对
+		DicData qbgsgs=new DicData();
+		qbgsgs.setName(indexvalue);
+		qbgsgs.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> ls= dicDataService.findListDicData(DicdataTypeEnum.公司.getValue(), null, qbgsgs);
+		if(CollectionUtils.isEmpty(ls)){
+			return getCellPosition(index) +"归属公司【"+ indexvalue + "】系统中不存在";
+		};
+		DicData dagsgs= ls.get(0);
+		if(dagsgs!=null) {
+			dto.setCompany(dagsgs.getId());
+		}
+		//统筹类型
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+				return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明归属公司不对
+		DicData qbtc=new DicData();
+		qbtc.setName(indexvalue);
+		qbtc.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> lstc= dicDataService.findListDicData(DicdataTypeEnum.统筹类型.getValue(), null, qbtc);
+		if(CollectionUtils.isEmpty(lstc)){
+			return getCellPosition(index)+"统筹类型【" + indexvalue + "】不存在";
+		};
+		DicData datc= lstc.get(0);
+		if(datc!=null) {
+			dto.setInsuranceType(datc.getId());
+		}
+		//根据统筹类型和用户名称判断tongchouinfo表中是否存在数据
+		TongchouInfo info = ITongchouInfoService.validateMsg(dto.getUserName(), dto.getInsuranceType());
+		if(info!=null){
+			if(ErpStateEnum.stateEnum.否.getValue().equals(info.getState())){
+				return getCellPosition(index) +"【"+ info.getUserName()+ "】已经停保";
+			}
+			dto.setId(info.getId());
+		}
+		dto.setUserId(list.get(0).getId());
+		//统筹账号
+		index+=1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		dto.setInsuranceorgongjijinAccount(indexvalue);
+		if(dto.getInsuranceType().equals(ErpStateEnum.gongjijinId.公积金ID.getValue())){
+			dto.setInsurgongjijinType(ErpStateEnum.tcAccountTypeEnum.公积金.getValue());
+		}else{
+			dto.setInsurgongjijinType(ErpStateEnum.tcAccountTypeEnum.社保.getValue());
+		}
+		//缴费开始月份
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		Date insurancePaymentDate = DateUtils.convertString2Date(indexvalue + "-01");
+		dto.setInsurancePaymentDate(insurancePaymentDate);	
+		//缴费结束月份月份
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		Date efficientDate = DateUtils.convertString2Date(indexvalue + "-01");
+		dto.setEfficientDate(efficientDate);	
+		//结束月份不能小于开始月份
+		if(dto.getEfficientDate().getTime()-dto.getInsurancePaymentDate().getTime()<0){
+			return getCellPosition(index) + "结束月份不能小于开始月份";
+		}
+		//缴费基数
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		if(new BigDecimal(indexvalue).signum()<0){
+			return getCellPosition(index) +"【"+ listTitle.get(index) + "】不能为负数";
+		}
+		dto.setRadices(new BigDecimal(indexvalue));
+		//个人缴纳
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		if(new BigDecimal(indexvalue).signum()<0){
+			return getCellPosition(index) +"【"+ listTitle.get(index) + "】不能为负数";
+		}
+		dto.setInsurancePersonal(new BigDecimal(indexvalue));
+		//公司缴纳
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		if(new BigDecimal(indexvalue).signum()<0){
+			return getCellPosition(index) +"【"+ listTitle.get(index) + "】不能为负数";
+		}
+		dto.setInsuranceCompany(new BigDecimal(indexvalue));
+		dto.setCreateTime(new Date());
+		dto.setCreator(SessionUser.getUserId());
+		dto.setState(ErpStateEnum.stateEnum.是.getValue());
+		dto.setCardId(list.get(0).getIdCard());
+		Map m = new HashMap();
+		m.put(entityKey, dto);
+		if (listEntities == null)
+			listEntities = new ArrayList<Map>();
+		listEntities.add(m);
+		return null;
+	}
+
+	@Override
+	protected String extraCheck() throws Exception {
+		// 额外校验
+		return null;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	protected boolean saveData() throws Exception {
+		List<TongchouInfo> list = new ArrayList<TongchouInfo>();
+		for (Map m : listEntities) {
+			if (m.get(entityKey) != null) {
+				TongchouInfo u = (TongchouInfo) m.get(entityKey);
+				list.add(u);
+			}
+		}
+		ITongchouInfoService.saveOrUpdate(list);
+		return true;
+
+	}
+
+	@Override
+	protected void initOtherParam() {
+		// 初始化参数
+
+	}
+
+}

@@ -1,0 +1,247 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/custom/common/form.js"></script>
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	jQuery(function(){ 
+		var _recordTh = $("#recordTh");
+		var _num = $("#resultTable tbody tr:first td").size();
+		if(_num == 0){
+			_num = $("#titleTr th").size();
+		}
+		_recordTh.attr("colspan",_num);
+	});
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+		             </li>
+		             <li style="float:right;">
+		             	<@shiro.hasPermission name="/user/salary/list/export/me" >
+				        	<button type="button"  onclick="myexport('searchForm','${ctx}/user/salary/list/export/me')" class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/user/salary/list/me" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">员工工资搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">归属月份</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="inDateStr" value="${((returnDatas.queryBean.inDate)?string('yyyy-MM'))!''}" placeholder="请输入名称 " class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM'})">
+									                    </div>
+							                		</div>
+									                 <!-- <div class="layui-inline">
+									                    <label class="layui-form-label">是否可用</label>
+									                    <div class="layui-input-inline">
+									                        <select name="active" id="active" class="layui-input">
+									                          <option value="">==请选择==</option>
+															  <option value="1">是</option>
+															  <option value="0">否</option>
+															</select>   
+									                    </div>
+									                </div> -->
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even id="resultTable">
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												  <!--first_start_no_export-->
+												<tr>
+													<th id="recordTh" colspan="9">员工工资<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												  <!--first_end_no_export-->
+												<tr id="titleTr">
+														<th id="th_userName" rowspan="2">用户名称</th>
+														<th id="th_inDate" rowspan="2">归属月份</th>
+														<th id="th_companyId" rowspan="2">归属公司</th>
+														<th id="th_jibenpay" rowspan="2">基本工资</th>
+														<th id="th_kaohepay" rowspan="2">考核工资</th>
+														<th id="th_gangweipay" rowspan="2">岗位工资</th>
+														<th id="th_ondutydays" rowspan="2">本月在职天数</th>
+														<th id="th_ripay" rowspan="2">日工资</th>
+														<#if (titleList)?? && (titleList)?size gt 0>
+															<#list titleList as set>
+																<#if set_index == 0 && set?size gt 0>
+																	<th colspan="${(set?size)!0}" style="text-align: center">工资增减项</th>
+																</#if>
+																<#if set_index == 1 && set?size gt 0>
+																	<th colspan="${(set?size)!0}" style="text-align: center">统筹</th>
+																</#if>
+																<#if set_index == 2 && set?size gt 0>
+																	<th colspan="${(set?size)!0}" style="text-align: center">统筹增减项</th>
+																</#if>
+															</#list>
+														</#if>
+														<th id="th_geshui" rowspan="2">个税</th>
+														<!-- <th id="th_tongchoupay" rowspan="2">统筹公积金金额</th>
+														<th id="th_gongziPlusPay" rowspan="2">工资增减金额</th> -->
+														<th id="th_yingfupay" rowspan="2">应付工资</th>
+														<th id="th_shifupay" rowspan="2">实付工资</th>
+														<th id="th_state" rowspan="2">工资状态</th>
+												</tr> 
+												<#if (titleList)?? && (titleList)?size gt 0>
+												<tr>
+													<#list titleList as set>
+														<#list set as title>
+															<th>${title}</th>
+														</#list>
+													</#list>
+												</tr>	
+												</#if> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+													<tr class="">
+														<td>
+															${(_data.userName)!''}
+														</td>
+														<td>
+															${((_data.inDate)?string('yyyy-MM'))!''}
+														</td>
+														<td>
+															${(_data.companyName)!''}
+														</td>
+														<td>
+															${(_data.jibenpay)!'0'}
+														</td>
+														<td>
+															${(_data.kaohepay)!'0'}
+														</td>
+														<td>
+															${(_data.gangweipay)!'0'}
+														</td>
+														<td>
+															${(_data.ondutydays)!'0'}
+														</td>
+														<td>
+															${(_data.ripay)!'0'}
+														</td>
+														<#if (titleList)?? && (titleList)?size gt 0>
+															<#list titleList as set>
+																	<#if set_index == 0>
+																	<#list set as title>
+																		<td>
+																		<#if (_data.salaryinfoMap)?? && ((_data.salaryinfoMap)?keys)?size gt 0>
+																		 	${(_data.salaryinfoMap[title])!'0'}
+																		<#else>
+																			0
+																		</#if>
+																		</td>
+																	</#list>
+																	</#if>
+															</#list>
+														</#if>
+														<#if (titleList)?? && (titleList)?size gt 0>
+															<#list titleList as set>
+																	<#if set_index == 1>
+																	<#list set as title>
+																		<td>
+																		<#if (_data.tongchouRecordMap)??&& ((_data.tongchouRecordMap)?keys)?size gt 0>
+																	 		${(_data.tongchouRecordMap[title])!'0'}
+																	 	<#else>
+																			0
+																		</#if>
+																		</td>
+																	</#list>
+																	</#if>
+															</#list>
+														</#if>
+														<#if (titleList)?? && (titleList)?size gt 0>
+															<#list titleList as set>
+																	<#if set_index == 2>
+																	<#list set as title>
+																		<td>
+																		<#if (_data.tongchouZengjianMap)??&& ((_data.tongchouZengjianMap)?keys)?size gt 0>
+																		 	${(_data.tongchouZengjianMap[title])!'0'}
+																		<#else>
+																			0
+																		</#if>
+																		</td>
+																	</#list>
+																	</#if>
+															</#list>
+														</#if>
+														<td>
+															${(_data.geshui)!'0'}
+														</td>
+														<!-- <td>
+															${(_data.tongchoupay)!'0'}
+														</td>
+														<td>
+															${(_data.gongziPlusPay)!'0'}
+														</td> -->
+														<td>
+															${(_data.yingfupay)!'0'}
+														</td>
+														<td>
+															${(_data.shifupay)!'0'}
+														</td>
+														<td>
+															${(_data.payStateStr)!'0'}
+														</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+										<!--end_export-->
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

@@ -1,0 +1,567 @@
+package org.springrain.erp.tc.entity;
+
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springrain.frame.annotation.WhereSQL;
+import org.springrain.frame.entity.BaseEntity;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:42:27
+ * @see org.springrain.erp.tc.entity.TongchouRecord
+ */
+@Table(name="z_tongchou_record")
+public class TongchouRecord  extends BaseEntity {
+	
+	private static final long serialVersionUID = 1L;
+
+	//alias
+	/*
+	public static final String TABLE_ALIAS = "TongchouRecord";
+	public static final String ALIAS_ID = "id";
+	public static final String ALIAS_USERID = "userId";
+	public static final String ALIAS_COMPANY = "公司编号";
+	public static final String ALIAS_STOPPROTECTMONTH = "停保月份";
+	public static final String ALIAS_INSURANCEORGONGJIJINACCOUNT = "保险公积金账号";
+	public static final String ALIAS_INSURGONGJIJINTYPE = "类型 1 保险账号 0 公积金账号";
+	public static final String ALIAS_INSURANCEPAYMENTDATE = "缴费开始时间";
+	public static final String ALIAS_EFFICIENTDATE = "缴费结束时间";
+	public static final String ALIAS_RADICES = "基数";
+	public static final String ALIAS_INSURANCECOMPANY = "公司缴纳部分";
+	public static final String ALIAS_INSURANCEPERSONAL = "个人缴纳部分";
+	public static final String ALIAS_INSURANCETYPE = "统筹类型 ";
+	public static final String ALIAS_REMARK = "remark";
+	public static final String ALIAS_CREATOR = "创建人";
+	public static final String ALIAS_CREATETIME = "建立时间";
+	public static final String ALIAS_STATE = "状态 0 否 1 是";
+	public static final String ALIAS_CARDID = "身份证号";
+	public static final String ALIAS_USERNAME = "用户名";
+	public static final String ALIAS_MONTH = "所属月份";
+    */
+	//date formats
+	//public static final String FORMAT_STOPPROTECTMONTH = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_INSURANCEPAYMENTDATE = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_EFFICIENTDATE = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_CREATETIME = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_MONTH = DateUtils.DATETIME_FORMAT;
+	
+	//columns START
+	/**
+	 * id
+	 */
+	private java.lang.String id;
+	/**
+	 * userId
+	 */
+	private java.lang.String userId;
+	/**
+	 * 公司编号
+	 */
+	private java.lang.String company;
+	/**
+	 * 停保月份
+	 */
+	private java.util.Date stopProtectMonth;
+	/**
+	 * 保险公积金账号
+	 */
+	private java.lang.String insuranceorgongjijinAccount;
+	/**
+	 * 类型 1 保险账号 0 公积金账号
+	 */
+	private java.lang.String insurgongjijinType;
+	/**
+	 * 缴费开始时间
+	 */
+	private java.util.Date insurancePaymentDate;
+	/**
+	 * 缴费结束时间
+	 */
+	private java.util.Date efficientDate;
+	/**
+	 * 基数
+	 */
+	private java.math.BigDecimal radices;
+	/**
+	 * 公司缴纳部分
+	 */
+	private java.math.BigDecimal insuranceCompany;
+	/**
+	 * 个人缴纳部分
+	 */
+	private java.math.BigDecimal insurancePersonal;
+	/**
+	 * 统筹类型 
+	 */
+	private java.lang.String insuranceType;
+	/**
+	 * remark
+	 */
+	private java.lang.String remark;
+	/**
+	 * 创建人
+	 */
+	private java.lang.String creator;
+	/**
+	 * 建立时间
+	 */
+	private java.util.Date createTime;
+	/**
+	 * 状态 0 否 1 是
+	 */
+	private java.lang.String state;
+	/**
+	 * 身份证号
+	 */
+	private java.lang.String cardId;
+	/**
+	 * 用户名
+	 */
+	private java.lang.String userName;
+	/**
+	 * 所属月份
+	 */
+	private java.util.Date month;
+	//columns END 数据库字段结束
+	//concstructor
+
+	public TongchouRecord(){
+	}
+
+	public TongchouRecord(
+		java.lang.String id
+	){
+		this.id = id;
+	}
+
+	//get and set
+		/**
+		 * id
+		 */
+	public void setId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.id = value;
+	}
+	
+	
+	
+	/**
+	 * id
+	 */
+	@Id
+     @WhereSQL(sql="id=:TongchouRecord_id")
+	public java.lang.String getId() {
+		return this.id;
+	}
+		/**
+		 * userId
+		 */
+	public void setUserId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.userId = value;
+	}
+	
+	
+	
+	/**
+	 * userId
+	 */
+     @WhereSQL(sql="userId=:TongchouRecord_userId")
+	public java.lang.String getUserId() {
+		return this.userId;
+	}
+		/**
+		 * 公司编号
+		 */
+	public void setCompany(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.company = value;
+	}
+	
+
+	/**
+	 * 公司编号
+	 */
+     @WhereSQL(sql="company=:TongchouRecord_company")
+	public java.lang.String getCompany() {
+		return this.company;
+	}
+		/*
+	public String getstopProtectMonthString() {
+		return DateUtils.convertDate2String(FORMAT_STOPPROTECTMONTH, getstopProtectMonth());
+	}
+	public void setstopProtectMonthString(String value) throws ParseException{
+		setstopProtectMonth(DateUtils.convertString2Date(FORMAT_STOPPROTECTMONTH,value));
+	}*/
+	
+		/**
+		 * 停保月份
+		 */
+	public void setStopProtectMonth(java.util.Date value) {
+		this.stopProtectMonth = value;
+	}
+	
+	
+	
+	/**
+	 * 停保月份
+	 */
+     @WhereSQL(sql="stopProtectMonth=:TongchouRecord_stopProtectMonth")
+	public java.util.Date getStopProtectMonth() {
+		return this.stopProtectMonth;
+	}
+		/**
+		 * 保险公积金账号
+		 */
+	public void setInsuranceorgongjijinAccount(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.insuranceorgongjijinAccount = value;
+	}
+	
+	
+	
+	/**
+	 * 保险公积金账号
+	 */
+     @WhereSQL(sql="insuranceorgongjijinAccount=:TongchouRecord_insuranceorgongjijinAccount")
+	public java.lang.String getInsuranceorgongjijinAccount() {
+		return this.insuranceorgongjijinAccount;
+	}
+		/**
+		 * 类型 1 保险账号 0 公积金账号
+		 */
+	public void setInsurgongjijinType(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.insurgongjijinType = value;
+	}
+	
+	
+	
+	/**
+	 * 类型 1 保险账号 0 公积金账号
+	 */
+     @WhereSQL(sql="insurgongjijinType=:TongchouRecord_insurgongjijinType")
+	public java.lang.String getInsurgongjijinType() {
+		return this.insurgongjijinType;
+	}
+		/*
+	public String getinsurancePaymentDateString() {
+		return DateUtils.convertDate2String(FORMAT_INSURANCEPAYMENTDATE, getinsurancePaymentDate());
+	}
+	public void setinsurancePaymentDateString(String value) throws ParseException{
+		setinsurancePaymentDate(DateUtils.convertString2Date(FORMAT_INSURANCEPAYMENTDATE,value));
+	}*/
+	
+		/**
+		 * 缴费开始时间
+		 */
+	public void setInsurancePaymentDate(java.util.Date value) {
+		this.insurancePaymentDate = value;
+	}
+	
+	
+	
+	/**
+	 * 缴费开始时间
+	 */
+     @WhereSQL(sql="insurancePaymentDate=:TongchouRecord_insurancePaymentDate")
+	public java.util.Date getInsurancePaymentDate() {
+		return this.insurancePaymentDate;
+	}
+		/*
+	public String getefficientDateString() {
+		return DateUtils.convertDate2String(FORMAT_EFFICIENTDATE, getefficientDate());
+	}
+	public void setefficientDateString(String value) throws ParseException{
+		setefficientDate(DateUtils.convertString2Date(FORMAT_EFFICIENTDATE,value));
+	}*/
+	
+		/**
+		 * 缴费结束时间
+		 */
+	public void setEfficientDate(java.util.Date value) {
+		this.efficientDate = value;
+	}
+	
+	
+	
+	/**
+	 * 缴费结束时间
+	 */
+     @WhereSQL(sql="efficientDate=:TongchouRecord_efficientDate")
+	public java.util.Date getEfficientDate() {
+		return this.efficientDate;
+	}
+		/**
+		 * 基数
+		 */
+	public void setRadices(java.math.BigDecimal value) {
+		this.radices = value;
+	}
+	
+	
+	
+	/**
+	 * 基数
+	 */
+     @WhereSQL(sql="radices=:TongchouRecord_radices")
+	public java.math.BigDecimal getRadices() {
+		return this.radices;
+	}
+		/**
+		 * 公司缴纳部分
+		 */
+	public void setInsuranceCompany(java.math.BigDecimal value) {
+		this.insuranceCompany = value;
+	}
+	
+	
+	
+	/**
+	 * 公司缴纳部分
+	 */
+     @WhereSQL(sql="insuranceCompany=:TongchouRecord_insuranceCompany")
+	public java.math.BigDecimal getInsuranceCompany() {
+		return this.insuranceCompany;
+	}
+		/**
+		 * 个人缴纳部分
+		 */
+	public void setInsurancePersonal(java.math.BigDecimal value) {
+		this.insurancePersonal = value;
+	}
+	
+	
+	
+	/**
+	 * 个人缴纳部分
+	 */
+     @WhereSQL(sql="insurancePersonal=:TongchouRecord_insurancePersonal")
+	public java.math.BigDecimal getInsurancePersonal() {
+		return this.insurancePersonal;
+	}
+		/**
+		 * 统筹类型 
+		 */
+	public void setInsuranceType(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.insuranceType = value;
+	}
+	
+	
+	
+	/**
+	 * 统筹类型 
+	 */
+     @WhereSQL(sql="insuranceType=:TongchouRecord_insuranceType")
+	public java.lang.String getInsuranceType() {
+		return this.insuranceType;
+	}
+		/**
+		 * remark
+		 */
+	public void setRemark(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.remark = value;
+	}
+	
+	
+	
+	/**
+	 * remark
+	 */
+     @WhereSQL(sql="remark=:TongchouRecord_remark")
+	public java.lang.String getRemark() {
+		return this.remark;
+	}
+		/**
+		 * 创建人
+		 */
+	public void setCreator(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.creator = value;
+	}
+	
+	
+	
+	/**
+	 * 创建人
+	 */
+     @WhereSQL(sql="creator=:TongchouRecord_creator")
+	public java.lang.String getCreator() {
+		return this.creator;
+	}
+		/*
+	public String getcreateTimeString() {
+		return DateUtils.convertDate2String(FORMAT_CREATETIME, getcreateTime());
+	}
+	public void setcreateTimeString(String value) throws ParseException{
+		setcreateTime(DateUtils.convertString2Date(FORMAT_CREATETIME,value));
+	}*/
+	
+		/**
+		 * 建立时间
+		 */
+	public void setCreateTime(java.util.Date value) {
+		this.createTime = value;
+	}
+	
+	
+	
+	/**
+	 * 建立时间
+	 */
+     @WhereSQL(sql="createTime=:TongchouRecord_createTime")
+	public java.util.Date getCreateTime() {
+		return this.createTime;
+	}
+		/**
+		 * 状态 0 否 1 是
+		 */
+	public void setState(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.state = value;
+	}
+	
+	
+	
+	/**
+	 * 状态 0 否 1 是
+	 */
+     @WhereSQL(sql="state=:TongchouRecord_state")
+	public java.lang.String getState() {
+		return this.state;
+	}
+		/**
+		 * 身份证号
+		 */
+	public void setCardId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.cardId = value;
+	}
+	
+	
+	
+	/**
+	 * 身份证号
+	 */
+     @WhereSQL(sql="cardId=:TongchouRecord_cardId")
+	public java.lang.String getCardId() {
+		return this.cardId;
+	}
+		/**
+		 * 用户名
+		 */
+	public void setUserName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.userName = value;
+	}
+	
+	
+	
+	/**
+	 * 用户名
+	 */
+     @WhereSQL(sql="userName=:TongchouRecord_userName")
+	public java.lang.String getUserName() {
+		return this.userName;
+	}
+		/*
+	public String getmonthString() {
+		return DateUtils.convertDate2String(FORMAT_MONTH, getmonth());
+	}
+	public void setmonthString(String value) throws ParseException{
+		setmonth(DateUtils.convertString2Date(FORMAT_MONTH,value));
+	}*/
+	
+		/**
+		 * 所属月份
+		 */
+	public void setMonth(java.util.Date value) {
+		this.month = value;
+	}
+	
+	
+	
+	/**
+	 * 所属月份
+	 */
+     @WhereSQL(sql="month=:TongchouRecord_month")
+	public java.util.Date getMonth() {
+		return this.month;
+	}
+	@Override
+	public String toString() {
+		return new StringBuilder()
+			.append("id[").append(getId()).append("],")
+			.append("userId[").append(getUserId()).append("],")
+			.append("公司编号[").append(getCompany()).append("],")
+			.append("停保月份[").append(getStopProtectMonth()).append("],")
+			.append("保险公积金账号[").append(getInsuranceorgongjijinAccount()).append("],")
+			.append("类型 1 保险账号 0 公积金账号[").append(getInsurgongjijinType()).append("],")
+			.append("缴费开始时间[").append(getInsurancePaymentDate()).append("],")
+			.append("缴费结束时间[").append(getEfficientDate()).append("],")
+			.append("基数[").append(getRadices()).append("],")
+			.append("公司缴纳部分[").append(getInsuranceCompany()).append("],")
+			.append("个人缴纳部分[").append(getInsurancePersonal()).append("],")
+			.append("统筹类型 [").append(getInsuranceType()).append("],")
+			.append("remark[").append(getRemark()).append("],")
+			.append("创建人[").append(getCreator()).append("],")
+			.append("建立时间[").append(getCreateTime()).append("],")
+			.append("状态 0 否 1 是[").append(getState()).append("],")
+			.append("身份证号[").append(getCardId()).append("],")
+			.append("用户名[").append(getUserName()).append("],")
+			.append("所属月份[").append(getMonth()).append("],")
+			.toString();
+	}
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(getId())
+			.toHashCode();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof TongchouRecord == false){
+			return false;
+		}
+			
+		if(this == obj){
+			return true;
+		}
+		
+		TongchouRecord other = (TongchouRecord)obj;
+		return new EqualsBuilder()
+			.append(getId(),other.getId())
+			.isEquals();
+	}
+}
+
+	

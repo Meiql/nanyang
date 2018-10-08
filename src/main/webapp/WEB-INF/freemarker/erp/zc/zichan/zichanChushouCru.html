@@ -1,0 +1,95 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<script>
+$(function(){
+});
+function chushou(){
+	if($("#renum").val() == ''){
+		layer.alert("请输入出售数量！");
+		return false;
+	}
+	var _zhengzhengshu = /^\+?[1-9][0-9]*$/;
+	if(!_zhengzhengshu.test($("#renum").val())){
+		layer.alert("出售数量只能为正整数！");
+		return false;
+	}
+	if(parseInt($("#renum").val()) > parseInt("${(zichan.kucun)!'0'}")){
+		layer.alert("出售数量不能超过库存数量！");
+		return false;
+	}
+	if($("#redate").val() == ''){
+		layer.alert("请选择出售日期！");
+		return false;
+	}
+	var _moneyReg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+	if(!_moneyReg.test($("#remoney").val())){
+		layer.alert("请输入正确的出售金额！");
+		return false;
+	}
+	jQuery.ajax({
+		url : "${ctx}/zichan/chushou",
+		data :  $("#form_lingyong").serialize(),
+		type : "post",
+		dataType : "json",
+		success : function(_json){
+			if(_json.status == 'success'){
+				layer.alert(_json.message,function(){
+					parent.layer.close(parent._openWindow);
+					parent.location.reload();
+				});
+			}else{
+				layer.alert(_json.message);
+			}
+		}
+		
+	});
+}
+</script>
+</head>
+<body>
+<form id="form_lingyong" method="post" class="layui-form" >
+	<table class="layui-table">
+		<tr>
+			<td>出售数量*</td>
+			<td>
+				<input type="hidden" name="zcid" id="zcid" value="${(zichan.id)!''}">  
+				<input type="text" name="renum" id="renum" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input"  >
+			</td>
+		</tr>
+		<tr>
+			<td>出售金额*</td>
+			<td>
+				<input type="text" name="remoney" id="remoney"  autocomplete="off" class="layui-input" maxlength="15">
+			</td>
+		</tr>
+		<tr>
+			<td>出售日期*</td>
+			<td>
+				<input type="text" name="redate" id="redate"  class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+			</td>
+		</tr>
+		<tr>
+			<td>审核人*</td>
+			<td>
+				<input type="text" name="bak1" id="bak1"  autocomplete="off" class="layui-input" >
+			</td>
+		</tr>
+		<tr>
+			<td>备注</td>
+			<td>
+				<input type="text" name="remark" id="remark"  autocomplete="off" class="layui-input" >
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<button type="button" onclick="chushou()" class="layui-btn layui-btn-small" style="margin-top:8px;">出售</button>
+			</td>
+		</tr>
+	</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<#ftl output_format="HTML" auto_esc=true>
+<#import "/erp/gz/dimission/dimissionmacro.html" as lizhi>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+var panelElement = 0;
+jQuery(function(){
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(null,function(){window.location.href="${ctx}/tongchouinfo/list?springraintoken="+springraintoken});
+	 });
+	 jQuery(document).ready(function(){
+		$("#user").select2({width:'320px',height:'26px'});
+		
+		//选择角色给其他信息自动填充；
+		$('#user').change(function(){
+			cleanMessage();
+			var userId = $('#user option:selected') .val();//选中的值
+			$.ajax({
+				url:"${ctx}/lastdimission/userInfoMsg",
+				type:"post",
+				dataType:"json",
+				data: {userId:userId} , 
+				async: false,
+				success:function(_json){
+					if(_json.status=='success'){
+						if(_json.data!=null){
+							$("#userId").val(_json.data.userId);
+							$("#salaryId").val(_json.data.salaryId);
+							$("#workno").val(_json.data.jobNumber);
+							$("#gangwei").val(_json.data.dutyTypeName);
+							$("#cardId").val(_json.data.cardId);
+							$("#jibenpay").val(_json.data.jibenpay);
+							$("#kaohepay").val(_json.data.kaohepay);
+							$("#gangweipay").val(_json.data.gangweipay);
+							$("#company").val(_json.data.inCompany);
+							$("#inDateStr").val(_json.queryBean);
+							var _html1 = "<tr><td>个人缴纳</td>"
+							var _html2="";
+							var _html3 = "</tr>";
+							var html1 = "<tr><td>公司缴纳</td>";
+							var html3 = "</tr>";
+							var html2="";
+							$.each(_json.data.tcrecordList,function(i,value){
+								_html2+="<td>"+value.insurancePersonal+"</td>";
+								html2+="<td>"+value.insuranceCompany+"</td>";
+							});
+							
+							$("#personrecordList").append(_html1+_html2+_html3);
+							$("#companyList").append(html1+html2+html3);
+							
+							var tczengjianhtml="";
+							$.each(_json.data.zjList,function(i,value){
+								tczengjianhtml+="<tr><td>"+value.monthStr+"</td><td>"+value.tcname+"</td><td>"+value.fyname+"</td><td>"+value.insuranceCompany+"</td><td>"+value.insurancePersonal+"</td></tr>";
+							});
+							$("#tczengjian").append(tczengjianhtml);
+							
+							var salaryhtml="";
+							$.each(_json.data.salarInfoyList,function(i,value){
+								salaryhtml+="<tr><td>"+value.monthStr+"</td><td>"+value.salaryType+"</td><td>"+value.amount+"</td><td>"+value.remarker+"</td></tr>";
+							});
+							$("tbody#salary").append(salaryhtml);
+							$("#hide").hide(); 
+							$("#show").show();
+						}
+					}else{
+						layer.alert(_json.message,{icon: 5});
+						$("#hide").show(); 
+						$("#show").hide();
+					}
+				}
+			});
+			})
+			
+			//添加增减项
+			jQuery("#addPanel").click(function(){
+				var num = panelElement;
+				panelElement++;
+				// 面板副本ID
+				var panelId = "infoPanel_" + panelElement;
+				// 副本
+				var panelObject = jQuery("#infoPanel_0").clone();
+				jQuery(panelObject).attr("id",panelId);
+// 				jQuery(panelObject).find("#0_monthdate").attr("id",panelElement+"_monthdate");
+				jQuery(panelObject).find("#0_salaryArray").attr("id",panelElement+"_salaryArray");
+				jQuery(panelObject).find("#0_money").attr("id",panelElement+"_money");
+				// 清空
+				resetText(panelObject);
+				// 副本中CHECKBOX存放当前面板ID
+				var checkBoxObject = jQuery(panelObject).find(".panelBox");
+				jQuery(checkBoxObject).attr("panelId",panelId);
+				// 复制模板到顶级的后边
+				jQuery("#infoPanel_"+num+"").after(panelObject);
+			});
+		//删除增减项
+		jQuery("#deletePanel").click(function(){
+			// 删除所有选中的模板
+			var selectedArray = jQuery(".panelBox:checked");
+				if(selectedArray.length > 0){
+						var confirm = 	layer.confirm('你确定要删除所选中的面板信息？',function(){
+								var panelId;
+								jQuery.each(selectedArray,function(i,o){
+									panelId = jQuery(o).attr("panelId");
+									if(panelId != null && panelId != "" && panelId != "#"){
+											jQuery("#"+panelId).remove();
+									}else{
+											alert("首面板无法删除！");
+											var checkBoxObject = jQuery("#infoPanel_0").find(".panelBox");
+											jQuery(checkBoxObject).attr("checked",false);		
+										}
+								});
+								panelElement=0;
+								layer.close(confirm)
+						});
+					}else{
+						layer.alert("没有选中任何信息面板！");			
+					}
+			});
+		
+		// 添加面板和重置动作清空数据
+		function resetText(panelObject){
+				if(panelObject != null){
+					debugger
+					// panelBox
+					var panelBoxObject = jQuery(panelObject).find("#panelBox");
+					jQuery(panelBoxObject).attr("checked",false);
+					// 月份
+// 					var monthObject = jQuery(panelObject).find("#"+panelElement+"_monthdate");
+// 					jQuery(monthObject).val("");
+					// 工资增减项类型
+					var companyObject = jQuery(panelObject).find("#"+panelElement+"_salaryArray");
+					jQuery(companyObject).val("");
+					// 金额
+					var personObject = jQuery(panelObject).find("#"+panelElement+"_money");
+					jQuery(personObject).val("");
+				}else{
+					// 清空
+// 					jQuery("#0_monthdate").val("");
+					jQuery("#0_salaryArray").val("");
+					jQuery("#0_money").val("");
+				}
+			}
+		}) ;
+	 
+	 function cleanMessage(){
+		 $("#userId").val("");
+			$("#salaryId").val("");
+			$("#workno").val("");
+			$("#gangwei").val("");
+			$("#cardId").val("");
+			$("#jibenpay").val("");
+			$("#kaohepay").val("");
+			$("#gangweipay").val("");
+			$("#company").val("");
+			$("#salary").empty();
+			$("#tczengjian").empty();
+			$("#personrecordList").empty();
+			$("#companyList").empty();
+		 jQuery.each(jQuery(":checkbox"), function(i,n){
+	 			if(i!=0){
+	 			jQuery("#infoPanel_"+i+"").remove();
+	 			}
+	 			panelElement=0;
+			}); 
+// 	 		jQuery("#0_monthdate").val("");
+			jQuery("#0_salaryArray").val("");
+			jQuery("#0_money").val("");
+		}
+	 
+	 	 function saveForm() {
+	 		var userId = $('#user option:selected') .val();//选中的值
+	 		if(userId==""){
+	 			layer.alert("请选择用户");
+	 			return;
+	 		}
+	 		var isvalited = true;
+	 		jQuery.each(jQuery(":checkbox"), function(i,n){
+				var number = i;
+				debugger
+	 	 		//起始交费月份非空验证
+	 	 		if(jQuery("#"+number+"_salaryArray").val()==""){
+	 	 			layer.alert("请选择增减项类型！");
+	 	 			jQuery("#"+number+"_salaryArray").focus();
+	 	 			isvalited = false;
+	 	 			return false;
+	 	 		}
+	 	 		//实际扣款月份非空验证
+	 	 		if(jQuery("#"+number+"_money").val()==""){
+	 	 			layer.alert("请填写金额！");
+	 	 			jQuery("#"+number+"_money").focus();
+	 	 			isvalited = false;
+	 	 			return false;
+	 	 		}
+	 	 	});
+	 		if(isvalited == false){
+	 			return;
+	 		}
+			$("#salary").empty();
+			 $.ajax({
+				url :"${ctx}/lastdimission/update", 
+			    type :"post",
+			    data:jQuery("#validForm").serialize(),
+				dataType : "json",
+				success:function(ret){
+					if(ret.status=="success"){
+						if(ret.data!=null){
+							var salaryhtml="";
+							$.each(ret.data,function(i,value){
+								salaryhtml+="<tr><td>"+value.monthStr+"</td><td>"+value.salaryType+"</td><td>"+value.amount+"</td><td>"+value.remarker+"</td></tr>";
+							});
+							$("#salary").append(salaryhtml);
+							 //清空checkbox
+					 		 jQuery.each(jQuery(":checkbox"), function(i,n){
+					 			if(i!=0){
+					 			jQuery("#infoPanel_"+i+"").remove();
+					 			}
+					 			panelElement=0;
+							}); 
+					 		jQuery("#monthdate").val("");
+							jQuery("#salaryArray").val("");
+							jQuery("#money").val("");
+							
+						}
+					}else{
+						layer.alert(ret.message,{icon: 5});
+					}
+				},
+				error:function(){
+					layer.closeAll('loading')
+					layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+				}
+			}); 
+	}
+	 	//生成工资离职
+		 function productSalary() {
+			 var salaryId = $("#salaryId").val();
+			 var userId = $("#userId").val();
+			 var inDateStr = $("#inDateStr").val();
+				var userId = $('#user option:selected') .val();//选中的值
+		 		if(userId==""){
+		 			layer.alert("请选择用户");
+		 			return;
+		 		}
+			 $.ajax({
+					url :"${ctx}/lastdimission/update/pre", 
+				    type :"post",
+				    data: {"salaryId":salaryId,"userId":userId},
+					dataType : "json",
+					success:function(ret){
+						if(ret.status=="success"){
+							layer.alert(ret.message, {icon: 1},function(){
+								layer.closeAll();
+								window.location.href="${ctx}/user/salary/send/gongzi/per?inDateStr="+inDateStr+"&userId="+userId+"&springraintoken="+springraintoken});
+//	 						layer.alert(ret.message,{icon: 5});
+						}else{
+							layer.alert(ret.message,{icon: 5});
+						}
+					},
+					error:function(){
+						layer.closeAll('loading')
+						layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+					}
+				});
+		}
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+												<div class="larry-personal-body clearfix changepwd">
+													<@lizhi.userbaseInfo /><!-- 基本信息 -->
+													<@lizhi.userlasttcInfo />	<!-- 统筹信息 -->
+													<@lizhi.usersalaryInfo />	<!-- 工资增减项 -->
+													<form id="validForm" class="nolayer"  method="post" action="${ctx}/tongchouinfo/update">
+														<input type="hidden" name="userId" id="userId" value=""/>
+														<input type="hidden" name="salaryId" id="salaryId" value=""/>
+														<input type="hidden" name="inDateStr" id="inDateStr" value=""/>
+															<div>
+																<input class="linkButton" type="button" id="addPanel" value="添加新项" />
+																<input class="linkButton" type="button" id="deletePanel" value="删除选项" />
+															</div>
+																<div id="infoPanel_0">
+															<hr/>
+																	<table border="0" cellpadding="0" cellspacing="0" width="100%" class="Table4">
+																		<tr>
+																			<td align="left">
+																				<input type="checkbox" class="panelBox" id="panelBox" title="是否选中面板" panelId="" />
+																			</td>
+																			<td></td>
+																		</tr>
+<!-- 																		<tr> -->
+<!-- 																			<td> -->
+<!-- 																				<label class="layui-form-label">月份*</label> -->
+<!-- 																				<div class="layui-inline col-lg-5">   -->
+<!-- 																					<input type="text" name="monthdate" id="0_monthdate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" onfocus="WdatePicker({dateFmt:'yyyy-MM'})" class="layui-input" value="${(returnDatas.data.month)!''}"> -->
+<!-- 																				</div> -->
+<!-- 																			</td>		 -->
+<!-- 																		</tr> -->
+																		<tr><td colspan="2">&nbsp;</td></tr>
+																		<tr>
+																			<td>			
+																				<label class="layui-form-label">工资增减项类型*</label>
+																				<div class="layui-inline col-lg-5">  
+																					<select style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  name="salaryArray" id="0_salaryArray" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																						<option selected="selected" value="">-增减项类型-</option>
+																						<#if salaydicList??>
+																							<#list salaydicList as tc>
+																								<option value="${(tc.id)!''}">${(tc.name)!''}</option>
+																							</#list>
+																						</#if>
+																					</select>
+																				</div>
+																			</td>
+																			 <td>
+																					<label class="layui-form-label">金额*</label>
+																					<div class="layui-inline col-lg-5">  
+																						<input type="text" class="layui-input" id ="0_money"  name="money" datatype="*" nullmsg="不能为空" errormsg="不能为空！" />
+																					</div>
+																			</td>
+																		</tr>
+																	</table>
+																	</div>
+																		<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" id="show" class="layui-btn" onclick="saveForm();">提交增减项</button>
+																<button type="button" id="hide" class="layui-btn" style="background-color: #c9c9c9;display:none;">保存</button>
+															</div>
+															<hr/>
+													<div class="layui-inline center " >
+																<button type="button" id="show" class="layui-btn" style="background-color: #ff5722;" onclick="productSalary();">生成工资</button>
+															</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

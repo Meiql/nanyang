@@ -1,0 +1,277 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<script src="${ctx}/js/custom/common/form.js"></script>
+
+<script>
+	var _state;
+	jQuery(function(){ 
+		_state="${(returnDatas.queryBean.active)!''}";
+		jQuery("#active").val(_state);
+		/*
+		全选、反选
+		*/
+		jQuery("#checkAll").bind('click',function(){
+			var _is_check=jQuery(this).get(0).checked;
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				jQuery(_o).get(0).checked=_is_check;
+			});
+		});
+		initData();
+	});
+	function del(_id){
+		springrain.mydelete(_id,"${ctx}/userinfo/delete");
+	}
+	function initData(){
+		 $("#searchCompany").find("option[value='${(returnDatas.queryBean.company)!''}']").prop("selected","true");
+		 $("#searchTongchou").find("option[value='${(returnDatas.queryBean.tongchou)!''}']").prop("selected","true");
+		 $("#searchGangwei").find("option[value='${(returnDatas.queryBean.gangwei)!''}']").prop("selected","true");
+		 $("#searchEntryCity").find("option[value='${(returnDatas.queryBean.entryCity)!''}']").prop("selected","true");
+		 $("#searchGrade").find("option[value='${(returnDatas.queryBean.grade)!''}']").prop("selected","true");
+	 }
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+		             		
+		             </li>
+					 <li style="float:right;">
+		             	<@shiro.hasPermission name="/userinfo/list/export" >
+				        	<button type="button"   class="layui-btn layui-btn-small" onclick="myexport('searchForm','${ctx}/userinfo/list/export')"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		                <button type="button"  class="layui-btn layui-btn-warm layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe601;</i>导入</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/userinfo/list" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">用户基本信息搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">名称</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="userName" value="${(returnDatas.queryBean.userName)!''}" placeholder="请输入名称 " class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">工号</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="workno" value="${(returnDatas.queryBean.workno)!''}" placeholder="请输入工号" class="layui-input">
+									                    </div>
+							                		</div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">公司名称</label>
+									                    <div class="layui-input-inline">
+									                        <select name="company" id="searchCompany" class="layui-input">
+									                          <@dic.dataList typekey="company"/>
+															</select>   
+									                    </div>
+									                </div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">统筹缴纳地</label>
+									                    <div class="layui-input-inline">
+									                        <select name="tongchou" id="searchTongchou" class="layui-input">
+									                          <@dic.dataList typekey="tcjnd"/>
+															</select>   
+									                    </div>
+									                </div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">岗位</label>
+									                    <div class="layui-input-inline">
+									                        <select name="gangwei" id="searchGangwei" class="layui-input">
+									                          <@dic.dataList typekey="gangwei"/>
+															</select>   
+									                    </div>
+									                </div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">级别</label>
+									                    <div class="layui-input-inline">
+									                        <select name="grade" id="searchGrade" class="layui-input">
+									                          <@dic.dataList typekey="grade"/>
+															</select>   
+									                    </div>
+									                </div>
+									                <div class="layui-inline">
+									                    <label class="layui-form-label">入职城市</label>
+									                    <div class="layui-input-inline">
+									                        <select name="entryCity" id="searchEntryCity" class="layui-input">
+									                          <@dic.dataList typekey="rzcs"/>
+															</select>   
+									                    </div>
+									                </div>
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even>
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												  <!--first_start_no_export-->
+												<tr>
+													<th colspan="18">用户基本信息列表<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												  <!--first_end_no_export-->
+												<tr>
+												  <!--first_start_no_export-->
+												  <th>操作</th>
+												  <!--first_end_no_export-->
+														<th id="th_userId" >员工姓名</th>
+														<th id="th_workno" >工号</th>
+														<th id="th_idCard" >身份证号</th>
+														<th id="th_company" >公司</th>
+														<th id="th_tongchou" >统筹缴纳地</th>
+														<th id="th_gangwei" >岗位</th>
+														<th id="th_grade" >级别</th>
+														<th id="th_age" >年龄</th>
+														<th id="th_workingYears" >工龄</th>
+														<th id="th_ourAge" >司龄</th>
+														<th id="th_mobile1" >性别</th>
+														<th id="th_mobile1" >移动电话</th>
+														<th id="th_mobile1" >移动电话1</th>
+														<th id="th_mobile2" >移动电话2</th>
+														<th id="th_telephone" >固定电话</th>
+														<th id="th_email" >电子邮箱</th>
+														<th id="th_entryCity" >入职城市</th>
+														<th id="th_fireName" >紧急联系人</th>
+														<th id="th_firePhone" >紧急联系电话</th>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+														<td >
+															<@shiro.hasPermission name="/userinfo/update" >
+								                           		 <a href="#" data-action="${ctx}/userinfo/update/pre?userId=${(_data.uid)!''}" class="layui-btn layui-btn-normal layui-btn-mini">编辑</a>
+								                            </@shiro.hasPermission>
+								                            <#--
+								                            <@shiro.hasPermission name="/userinfo/delete" >
+								                            	<a href="javascript:del('${(_data.id)!''}')" class="layui-btn layui-btn-danger layui-btn-mini ajax-delete">删除</a>
+								                            </@shiro.hasPermission>
+								                            -->
+								                            <br/><br/>
+								                            <@shiro.hasPermission name="/system/user/lizhi" >
+								                          			  <#if (_data.active)?? && (_data.active=='1')>
+								                            <a href="#" data-action="${ctx}/system/user/lizhi/pre?id=${(_data.id)!''}" class="layui-btn layui-btn-normal layui-btn-mini">办理离职</a>
+											                           		 
+																		</#if>
+								                            </@shiro.hasPermission>
+														</td>
+														<!--end_no_export-->
+														<td >
+															${(_data.userName)!''}(${(_data.account)!''})
+														</td>
+														<td >
+															${(_data.workno)!''}
+														</td>
+														<td >
+															${(_data.idCard)!''}&#160;
+														</td>
+														<td >
+															${(_data.companyName)!''}
+														</td>
+														<td >
+															${(_data.tongchouName)!''}
+														</td>
+														<td >
+															${(_data.gangweiName)!''}
+														</td>
+														<td >
+															${(_data.gradeName)!''}
+														</td>
+														<td >
+															${(_data.age)!''}
+														</td>
+														<td >
+															${(_data.workingYears)!''}
+														</td>
+														<td >
+															${(_data.ourAge)!''}
+														</td>
+															<td >
+															${(_data.sex)!''}
+														</td>
+															<td >
+															${(_data.mobile)!''}
+														</td>
+														<td >
+															${(_data.mobile1)!''}&#160;
+														</td>
+														<td >
+															${(_data.mobile2)!''}&#160;
+														</td>
+														<td >
+															${(_data.telephone)!''}&#160;
+														</td>
+														<td >
+															${(_data.email)!''}
+														</td>
+														<td >
+															${(_data.entryCityName)!''}
+														</td>
+														<td >
+															${(_data.fireName)!''}&#160;
+														</td>
+														<td >
+															${(_data.firePhone)!''}&#160;
+														</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+										<!--end_export-->
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

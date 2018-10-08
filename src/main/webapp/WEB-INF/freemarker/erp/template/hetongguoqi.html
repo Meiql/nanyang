@@ -1,0 +1,23 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<body>	
+你好:<br/><br/>
+	以下合同即将过期请续签!
+	<table>
+		<tr>
+			<th style="width: 150px;">员工姓名</th>
+			<th style="width: 150px;">合同编号</th>
+			<th style="width: 150px;">到期时间</th>
+		</tr>
+		<#if returnDatas.data?? && returnDatas.data?size gt 0>
+			<#list returnDatas.data as _data>
+				<tr>
+					<td style="text-align: center">${(_data.userName)!''}</td>
+					<td style="text-align: center">${(_data.contractNo)!''}</td>
+					<td style="text-align: center">${((_data.endDate)?string('yyyy-MM-dd'))!''}</td>
+				</tr>
+			</#list>
+		</#if>
+	</table>
+</body>
+</html>

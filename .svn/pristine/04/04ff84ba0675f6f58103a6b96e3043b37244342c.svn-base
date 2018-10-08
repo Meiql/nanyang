@@ -1,0 +1,229 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/custom/common/form.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/tc/add.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var _state;
+	jQuery(function(){ 
+		_state="${(returnDatas.queryBean.active)!''}";
+		jQuery("#active").val(_state);
+		/*
+		全选、反选
+		*/
+		jQuery("#checkAll").bind('click',function(){
+			var _is_check=jQuery(this).get(0).checked;
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				jQuery(_o).get(0).checked=_is_check;
+			});
+		});
+	});
+	function del(_id){
+		springrain.mydelete(_id,"${ctx}/gzdkdjrecord/delete");
+	}
+	jQuery(document).ready(function(){
+		$("#userName").select2({width:'320px',height:'26px'});
+		$("#userName").val('${(returnDatas.queryBean.userName)!''}').trigger("change");
+		$("#company option[value='${(returnDatas.queryBean.company)!''}']").prop("selected",true);
+	});
+	function productRecord() {
+		
+		
+		var month = $("#month").val();
+		if(month==""){
+			layer.alert("请选择产生月份")
+			return;
+		}
+		var confirm = layer.confirm("请确认生成"+month+"月份统筹记录。<br>注意：如果该月份存在老数据，将别清除！", {icon: 3, title:'提示'}, function(idex){
+		$.ajax({
+			url :"${ctx}/gzdkdjrecord/update", 
+		    type :"post",
+		    data: {month:month} ,
+			dataType : "json",
+			beforeSend: function () {
+				 layer.load(1, {
+			    	  shade: [0.5, '#f5f5f5'] //0.1透明度的白色背景
+			    });  
+	            },
+			success:function(ret){
+				if(ret.status=="success"){
+					layer.alert(ret.message, {icon: 1},function(){
+							layer.closeAll();
+							window.location.href="${ctx}/gzdkdjrecord/list?month="+month+"&springraintoken="+springraintoken});
+					
+				}else{
+					layer.closeAll();
+					layer.alert(ret.message,{icon: 5});
+				}
+			},
+			error:function(){
+				layer.closeAll('loading')
+				layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+			}
+		});
+		});	
+	}
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+
+		             </li>
+					 <li style="float:right;">
+		             	<@shiro.hasPermission name="/gzdkdjrecord/update" >
+<!-- 		             		<button type="button"   class="layui-btn layui-btn-small" data-action="${ctx}/gzdkdjrecord/update/pre"><i class="layui-icon layui-icon-specil">&#xe61f;</i>新增</button> -->
+		             	</@shiro.hasPermission>
+		             	<@shiro.hasPermission name="/gzdkdjrecord/list/export" >
+				        	<button type="button"  onclick="myexport('searchForm','${ctx}/gzdkdjrecord/list/export')" class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+<!-- 		                <button type="button"  class="layui-btn layui-btn-warm layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe601;</i>导入</button> -->
+<!-- 		                <@shiro.hasPermission name="/gzdkdjrecord/delete" > -->
+<!-- 		               		 <button type="button"  class="layui-btn layui-btn-danger layui-btn-small"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
+<!-- 		                </@shiro.hasPermission> -->
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/gzdkdjrecord/list" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">工资代扣代缴表搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">产生月份：</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="month" id="month"  class="layui-input" readonly value= "${((returnDatas.queryBean.month)?string('yyyy-MM'))!''}"  onFocus="WdatePicker({dateFmt:'yyyy-MM'})"/>
+									                    </div>
+							                		</div>
+							                			<div class="layui-inline">
+									                    <label class="layui-form-label">员工名称</label>
+									                    <div class="layui-input-inline">
+																	 <select id="userName" name="userName"  class="nolayer" style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+																		<option value="">请选择</option>
+																		<#if listUser ??>
+																			<#list listUser as user>
+																				<option value="${(user.name)!''}" >${(user.name)!''}</option>	
+																			</#list>
+																		</#if>	
+																</select>
+									                    </div>
+							                		</div>
+									                 <div class="layui-inline">
+									                    <label class="layui-form-label">公司名称</label>
+									                    <div class="layui-input-inline">
+									                        	<select id="company" name="company"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+																		<option value="">请选择</option>
+																		<#if gsList ??>
+																			<#list gsList as unit>
+																				<option value="${(unit.id)!''}" >${(unit.name)!''}</option>	
+																			</#list>
+																		</#if>	
+																</select>
+									                    </div>
+									                </div>
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+							          			   <@shiro.hasPermission name="/gzdkdjrecord/update" >
+		             										<button type="button"   class="layui-btn layui-btn-danger layui-btn-small" onclick="productRecord()"><i class="layui-icon layui-icon-specil">&#xe61f;</i>生成数据</button>
+		             								</@shiro.hasPermission>
+									                </div>
+									                 <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even>
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												<!--first_start_no_export-->
+												<tr>
+													<th colspan="11">工资代扣代缴表列表<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												<tr>
+												  <!--first_end_no_export-->
+														<th>部门</th>	
+														<th>姓名</th>
+														<th>月份</th>
+														<#if returnDatas.queryBean.listShow?? && (returnDatas.queryBean.listShow)?size gt 0 >
+														<#list returnDatas.queryBean.listShow as showTitle>
+																<th>${showTitle.deskShowName}</th>
+															</#list>
+														</#if>
+														<th>归属公司</th>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+														<!--end_no_export-->
+														<td >${(_data.unitName)!''}</td>
+														<td>${(_data.username)!''}</td>
+														<td >${((_data.month)?string('yyyy-MM-dd'))!''}</td>
+														<#if _data.showList??>
+															<#list _data.showList as show>
+																<td >${(show.propertyValue)!'0'}&#160;</td>
+															</#list>
+														</#if>
+															<td>${(_data.inCompany)!''}</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+										<!--end_export-->
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

@@ -1,0 +1,112 @@
+package org.springrain.erp.gz.util;
+
+/**
+ * 全部静态变量类
+ * 
+ * @author wpl
+ * 
+ */
+public class GlobalStaticVar {
+	//字典类型标识
+    public static final String dic_zctype="zctype";
+
+	//公式表 工资项目名称
+	public static  final String salary_projectName="salary";
+    
+    //（跟公式表中id匹配）属于内置公式不能修改
+    public static final String f_id_shifupay="salary_shifupay";
+    public static final String f_id_yingfupay="salary_yingfupay";
+    public static final String f_id_taxbase="salary_taxbase";//个税基数
+    public static final String f_id_geshui="salary_geshui";//个税
+    public static final String f_id_tongchougjj="salary_tongchougjj";//统筹公积金
+    public static final String f_id_sarlaryzengjian="salary_zengjian";//工资增减
+
+ 
+    public static final String f_id_jibenpay="salay_jibenpay";
+    public static final String f_id_kaohepay="salay_kaohepay";
+    public static final String f_id_gangweipay="salay_gonglingpay";
+    public static final String f_id_ondutydays="salary_ondutydays";
+    public static final String f_id_monthdays="salary_monthdays";
+    public static final String f_id_taxrate="salary_taxrate";
+    public static final String f_id_taxshu="salary_taxshu";
+
+
+    //(工资查询的几个参数)
+    public static final String salary_oper_all="all";//财务工资查询
+    public static final String salary_oper_me="me";//员工工资查询
+    public static final String salary_oper_send="Send";//生成查询
+    public static final String salary_oper_gen="Gen";//发放查询
+    public static final String salary_oper_leaveGen="leaveGen";//离职员工工资生成
+
+	//是否停发工资
+	public enum StoppayEnum {
+		停发("是"), 正常("否");
+		String state;
+
+		private StoppayEnum(String state) {
+			this.state = state;
+		}
+
+		public String getValue() {
+			return state;
+		}
+	}
+	//工资状态
+	public enum SalaryStateEnum {
+		未生成(1), 生成(2), 已发放(3);
+		Integer state;
+
+		private SalaryStateEnum(Integer state) {
+			this.state = state;
+		}
+
+		public Integer getValue() {
+			return state;
+		}
+		public static String getName(Integer value){
+			String name=null;
+			if(value==未生成.getValue()){
+				name=未生成.toString();
+			}else if(value==生成.getValue()){
+				name=生成.toString();
+			}else if(value==已发放.getValue()){
+				name=已发放.toString();
+			}
+			return name;
+		}
+	}
+	//dic-->名称
+		public enum dicKeyToName{
+			xueli("学历"), placetype("地区类型"), minzu("民族"), bank("银行"), xxlx("学习类型"),worktype("用工方式")
+			,contracttype("合同类型");
+			String name;
+
+			private dicKeyToName(String name) {
+				this.name = name;
+			}
+			public static String findNameByKey(String key){
+				if(key.equals(xueli.toString())){
+					return dicKeyToName.xueli.name;
+				}
+				else if(key.equals(placetype.toString())){
+					return dicKeyToName.placetype.name;
+				}
+				else if(key.equals(minzu.toString())){
+					return dicKeyToName.minzu.name;
+				}
+				else if(key.equals(bank.toString())){
+					return dicKeyToName.bank.name;
+				}
+				else if(key.equals(xxlx.toString())){
+					return dicKeyToName.xxlx.name;
+				}
+				else {
+					return "字典管理";
+				}
+				
+			}
+			public String getValue() {
+				return name;
+			}
+		}
+}

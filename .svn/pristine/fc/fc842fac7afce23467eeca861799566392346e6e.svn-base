@@ -1,0 +1,42 @@
+<#ftl output_format="HTML" auto_esc=true> 
+<@h.commonHead title="微信认证" keywords="" description=""/>
+
+<div style="text-align: center;margin-top: 100px;">
+	  请扫描二维码进行认证：<br/><br/>
+		<img src="http://pan.baidu.com/share/qrcode?w=150&h=150&url=${wxurl!''}"/> <br/><br/>
+	<#if msg??&&msg=='error'>
+		 <span style="color:red;font-size:10px;"> 认证失败，请使用绑定的微信号扫描！</span><br/><br/>
+	</#if>
+</div>
+
+<script>
+$(function() {
+    (function checkwx() {
+        $.ajax({
+      	    url:"${ctx}/system/ajax/wxcheck",
+            dataType: "json",
+            timeout: 5000,
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                if (textStatus == "timeout") { 
+                	checkwx(); // 请求超时
+                } else { 
+                    // 其他错误，如网络错误等
+                	setTimeout(function(){
+                		checkwx();
+                	},3000);
+                }
+            },
+            success: function (json) {
+               if(json.data!=null&&json.data!=''){
+            	    location.href="${ctx}/system/index?springraintoken=${springraintoken!''}";
+               }else{
+                	setTimeout(function(){
+                		checkwx();
+                	},3000);
+               }
+            }
+        });
+    })();
+    
+});
+</script>

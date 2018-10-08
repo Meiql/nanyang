@@ -1,0 +1,201 @@
+package org.springrain.erp.gz.service.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.DicdataTypeEnum;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.gz.util.BaseImport;
+import org.springrain.erp.tc.entity.TongchouZengjian;
+import org.springrain.erp.tc.service.ITongchouZengjianService;
+import org.springrain.frame.common.SessionUser;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.system.entity.DicData;
+import org.springrain.system.entity.User;
+import org.springrain.system.service.IDicDataService;
+import org.springrain.system.service.IUserService;
+
+@Service("tongchouZjxImportService")
+public class TongchouZjxImportService extends BaseImport {
+	@Resource
+	private IUserService userService;
+	@Resource
+	private IDicDataService dicDataService;	
+	@Resource
+	private ITongchouZengjianService tongchouZengjianService;
+	public static String[] titles = { "姓名", "统筹缴纳地","归属公司","月份", "统筹类型", "费用类型","个人缴纳","单位缴纳" };
+	List<String> listTitle = Arrays.asList(titles);
+	private static final String entityKey = "key";
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	protected String checkData() throws Exception {
+		TongchouZengjian dto = new TongchouZengjian();
+		// 姓名
+		int index = 0;
+		String indexvalue = rowCells.get(index).trim();
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		String name2 = indexvalue.replaceAll(" ", "");
+		List<User> list = userService.finderUserByUserName(indexvalue,name2);
+		if(CollectionUtils.isEmpty(list)){
+			return "系统中不存在"+indexvalue+"用户";
+		}
+		dto.setUserName(list.get(0).getName());
+		dto.setUserId(list.get(0).getId());
+		//统筹缴纳地
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明统筹缴纳地不对
+		DicData qbjnd=new DicData();
+		qbjnd.setName(indexvalue);
+		qbjnd.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> lstcjnd= dicDataService.findListDicData(DicdataTypeEnum.统筹缴纳地.getValue(), null, qbjnd);
+		if(CollectionUtils.isEmpty(lstcjnd)){
+			return getCellPosition(index)+ "统筹缴纳地【"+ indexvalue + "】系统中不存在";
+		};
+		DicData da= lstcjnd.get(0);
+		if(da!=null) {
+			dto.setTcjnd(da.getId());
+		}
+		//归属公司
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明归属公司不对
+		DicData qbgsgs=new DicData();
+		qbgsgs.setName(indexvalue);
+		qbgsgs.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> ls= dicDataService.findListDicData(DicdataTypeEnum.公司.getValue(), null, qbgsgs);
+		if(CollectionUtils.isEmpty(ls)){
+			return getCellPosition(index) +"归属公司【"+ indexvalue + "】系统中不存在";
+		};
+		DicData dagsgs= ls.get(0);
+		if(dagsgs!=null) {
+			dto.setCompany(dagsgs.getId());
+		}
+		//月份
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		Date eDate = DateUtils.convertString2Date(indexvalue + "-01");
+		dto.setMonth(eDate);	
+		//统筹类型
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+				return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明归属公司不对
+		DicData qbtc=new DicData();
+		qbtc.setName(indexvalue);
+		qbtc.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> lstc= dicDataService.findListDicData(DicdataTypeEnum.统筹类型.getValue(), null, qbtc);
+		if(CollectionUtils.isEmpty(lstc)){
+			return getCellPosition(index)+"统筹类型【" + indexvalue + "】不存在";
+		};
+		DicData datc= lstc.get(0);
+		if(datc!=null) {
+			dto.setInsuranceType(datc.getId());
+		}
+		//费用类型
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+				return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		//查询字典表对应的id  如果不存在说明归属公司不对
+		DicData qbfy=new DicData();
+		qbfy.setName(indexvalue);
+		qbtc.setActive(Integer.parseInt(ErpStateEnum.stateEnum.是.getValue()));
+		List<DicData> lsfy= dicDataService.findListDicData(DicdataTypeEnum.费用类型.getValue(), null, qbfy);
+		if(CollectionUtils.isEmpty(lsfy)){
+			return getCellPosition(index)+"费用类型【" + indexvalue + "】不存在";
+		};
+		DicData dafy= lsfy.get(0);
+		if(dafy!=null) {
+			dto.setFeiyongtype(dafy.getId());
+		}
+		List<TongchouZengjian> listzj = tongchouZengjianService.finderInfoForList(null, dto);
+		if(CollectionUtils.isNotEmpty(listzj)){
+			return "用户"+dto.getUserName()+"该费用类型"+indexvalue+"的增减项已经存在";
+		}
+		//个人缴纳
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		if(new BigDecimal(indexvalue).signum()<0){
+			return getCellPosition(index) +"【"+ listTitle.get(index) + "】不能为负数";
+		}
+		dto.setInsurancePersonal(new BigDecimal(indexvalue));
+		//公司缴纳
+		index += 1;
+		indexvalue = rowCells.get(index).trim();
+		if (StringUtils.isBlank(indexvalue)) {
+			return getCellPosition(index) + listTitle.get(index) + "不能为空";
+		}
+		if(new BigDecimal(indexvalue).signum()<0){
+			return getCellPosition(index) +"【"+ listTitle.get(index) + "】不能为负数";
+		}
+		dto.setInsuranceCompany(new BigDecimal(indexvalue));
+		dto.setCreateTime(new Date());
+		dto.setCreator(SessionUser.getUserId());
+		dto.setIsused(ErpStateEnum.tcZjxStateEnum.否.getValue());//标记是否已经被引用
+		dto.setActive(ErpStateEnum.tcstateEnum.是.getValue());//是否正常
+		Map m = new HashMap();
+		m.put(entityKey, dto);
+		if (listEntities == null)
+			listEntities = new ArrayList<Map>();
+		listEntities.add(m);
+		return null;
+	}
+
+	@Override
+	protected String extraCheck() throws Exception {
+		// 额外校验
+		return null;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	protected boolean saveData() throws Exception {
+		List<TongchouZengjian> list = new ArrayList<TongchouZengjian>();
+		for (Map m : listEntities) {
+			if (m.get(entityKey) != null) {
+				TongchouZengjian u = (TongchouZengjian) m.get(entityKey);
+				list.add(u);
+			}
+		}
+		tongchouZengjianService.save(list);
+		return true;
+
+	}
+
+	@Override
+	protected void initOtherParam() {
+		// 初始化参数
+
+	}
+
+}

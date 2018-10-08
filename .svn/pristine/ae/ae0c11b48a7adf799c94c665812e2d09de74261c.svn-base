@@ -1,0 +1,153 @@
+package org.springrain.erp.tc.dto;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.util.CollectionUtils;
+import org.springrain.erp.tc.entity.TongchouInfo;
+import org.springrain.erp.tc.entity.TongchouShow;
+
+public class TongchouInfoDto {
+	private String username;//用户名
+	private String userId;//用户编号
+	private String jobNumber;//用户工号
+	private String cardId;//身份证号
+	private String unitName;//部门名称
+	private Long unitId;//部门编号
+	private String allUnitName;//所有部门
+	private String inCompany;//公司名称
+	private String company;//公司编号
+	private Date stopProtectMonth;//停保月份
+	private List<TongchouInfo> stats;//保险信息
+//	private List<CerpHrStatChipReportShow> reprotShowList;//报表保险信息
+	private List<TongchouShow> showList = new ArrayList<TongchouShow>();//页面用于显示一行里所有统筹显示信息
+	private String dutyTypeName;//岗位类型名称
+	private String dutyTypeId;//岗位类型id
+	private  String baoxianaccount;
+	private  String gongjijinaccount;
+	private Date month ;//月份
+	private String  creatDateStr ;//创建月份
+	private String state;//社保状态
+	
+	public String getAllUnitName() {
+		return allUnitName;
+	}
+	public void setAllUnitName(String allUnitName) {
+		this.allUnitName = allUnitName;
+	}
+	public String getDutyTypeId() {
+		return dutyTypeId;
+	}
+	public void setDutyTypeId(String dutyTypeId) {
+		this.dutyTypeId = dutyTypeId;
+	}
+	public List<TongchouShow> getShowList() {
+		if(CollectionUtils.isEmpty(showList))
+			return null;
+		return showList;
+	}
+	public void setShowList(List<TongchouShow> showList) {
+		this.showList = showList;
+	}
+	
+	public String getBaoxianaccount() {
+		return baoxianaccount;
+	}
+	public void setBaoxianaccount(String baoxianaccount) {
+		this.baoxianaccount = baoxianaccount;
+	}
+	public String getGongjijinaccount() {
+		return gongjijinaccount;
+	}
+	public void setGongjijinaccount(String gongjijinaccount) {
+		this.gongjijinaccount = gongjijinaccount;
+	}
+	public String getDutyTypeName() {
+		return dutyTypeName;
+	}
+	public void setDutyTypeName(String dutyTypeName) {
+		this.dutyTypeName = dutyTypeName;
+	}
+	
+	public Date getMonth() {
+		return month;
+	}
+	public void setMonth(Date month) {
+		this.month = month;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getJobNumber() {
+		return jobNumber;
+	}
+	public void setJobNumber(String jobNumber) {
+		this.jobNumber = jobNumber;
+	}
+	public String getCardId() {
+		return cardId;
+	}
+	public void setCardId(String cardId) {
+		this.cardId = cardId;
+	}
+	public String getUnitName() {
+		return unitName;
+	}
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+	public Long getUnitId() {
+		return unitId;
+	}
+	public void setUnitId(Long unitId) {
+		this.unitId = unitId;
+	}
+	public String getInCompany() {
+		return inCompany;
+	}
+	public void setInCompany(String inCompany) {
+		this.inCompany = inCompany;
+	}
+	public String getCompany() {
+		return company;
+	}
+	public void setCompany(String company) {
+		this.company = company;
+	}
+	public Date getStopProtectMonth() {
+		return stopProtectMonth;
+	}
+	public void setStopProtectMonth(Date stopProtectMonth) {
+		this.stopProtectMonth = stopProtectMonth;
+	}
+	public List<TongchouInfo> getStats() {
+		return stats;
+	}
+	public void setStats(List<TongchouInfo> stats) {
+		this.stats = stats;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+	public String getCreatDateStr() {
+		return creatDateStr;
+	}
+	public void setCreatDateStr(String creatDateStr) {
+		this.creatDateStr = creatDateStr;
+	}
+	
+}

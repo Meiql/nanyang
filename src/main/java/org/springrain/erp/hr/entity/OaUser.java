@@ -1,0 +1,1010 @@
+package org.springrain.erp.hr.entity;
+
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springrain.frame.annotation.WhereSQL;
+import org.springrain.frame.entity.BaseEntity;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-31 10:02:36
+ * @see org.springrain.erp.gz.entity.OaUser
+ */
+@Table(name="z_oa_user")
+public class OaUser  extends BaseEntity {
+	
+	private static final long serialVersionUID = 1L;
+
+	//alias
+	/*
+	public static final String TABLE_ALIAS = "用户";
+	public static final String ALIAS_ID = "编号";
+	public static final String ALIAS_NAME = "姓名";
+	public static final String ALIAS_WORKNO = "工号";
+	public static final String ALIAS_ACCOUNT = "账号";
+	public static final String ALIAS_PASSWORD = "密码";
+	public static final String ALIAS_CARDNO = "身份证";
+	public static final String ALIAS_AGE = "年龄";
+	public static final String ALIAS_SEX = "性别";
+	public static final String ALIAS_PHONE = "电话号码";
+	public static final String ALIAS_MOBILE = "手机号码";
+	public static final String ALIAS_EMAIL = "邮箱";
+	public static final String ALIAS_ADDRESS = "地址";
+	public static final String ALIAS_GRADEID = "级别";
+	public static final String ALIAS_EDUNAME = "学历";
+	public static final String ALIAS_FIRENAME = "紧急联系人";
+	public static final String ALIAS_FIREPHONE = "紧急联系电话";
+	public static final String ALIAS_DESCRIPTION = "备注";
+	public static final String ALIAS_STATE = "是否有效,是/否/离职";
+	public static final String ALIAS_DELUID = "删除人Id";
+	public static final String ALIAS_DELTIME = "删除时间";
+	public static final String ALIAS_IMEI = "imei";
+	public static final String ALIAS_IMSI = "imsi";
+	public static final String ALIAS_HEADIMG = "headimg";
+	public static final String ALIAS_COLLEGENAME = "院系名称";
+	public static final String ALIAS_SPECILENAME = "专业名称";
+	public static final String ALIAS_CLASSNAME = "班级名称";
+	public static final String ALIAS_YEARNAME = "年级";
+	public static final String ALIAS_STUDYLENGTH = "学制";
+	public static final String ALIAS_OVERTIME = "毕业日期";
+	public static final String ALIAS_QQNUM = "qq号";
+	public static final String ALIAS_FAMILYUSERNAME = "家庭联系人";
+	public static final String ALIAS_FAMILYPHONE = "家庭固话";
+	public static final String ALIAS_FAMILYMOBILE = "家庭手机";
+	public static final String ALIAS_CREATETIME = "创建日期";
+	public static final String ALIAS_MODIFYTIME = "修改日期";
+	public static final String ALIAS_TOKEN = "融云token";
+	public static final String ALIAS_QRCODE = "二维码名片";
+    */
+	//date formats
+	//public static final String FORMAT_OVERTIME = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_CREATETIME = DateUtils.DATETIME_FORMAT;
+	//public static final String FORMAT_MODIFYTIME = DateUtils.DATETIME_FORMAT;
+	
+	//columns START
+	/**
+	 * 编号
+	 */
+	private java.lang.String id;
+	/**
+	 * 姓名
+	 */
+	private java.lang.String name;
+	/**
+	 * 工号
+	 */
+	private java.lang.String workno;
+	/**
+	 * 账号
+	 */
+	private java.lang.String account;
+	/**
+	 * 密码
+	 */
+	private java.lang.String password;
+	/**
+	 * 身份证
+	 */
+	private java.lang.String cardno;
+	/**
+	 * 年龄
+	 */
+	private java.lang.Integer age;
+	/**
+	 * 性别
+	 */
+	private java.lang.String sex;
+	/**
+	 * 电话号码
+	 */
+	private java.lang.String phone;
+	/**
+	 * 手机号码
+	 */
+	private java.lang.String mobile;
+	/**
+	 * 邮箱
+	 */
+	private java.lang.String email;
+	/**
+	 * 地址
+	 */
+	private java.lang.String address;
+	/**
+	 * 级别
+	 */
+	private java.lang.String gradeId;
+	/**
+	 * 学历
+	 */
+	private java.lang.String eduName;
+	/**
+	 * 紧急联系人
+	 */
+	private java.lang.String fireName;
+	/**
+	 * 紧急联系电话
+	 */
+	private java.lang.String firePhone;
+	/**
+	 * 备注
+	 */
+	private java.lang.String description;
+	/**
+	 * 是否有效,是/否/离职
+	 */
+	private java.lang.String state;
+	/**
+	 * 删除人Id
+	 */
+	private java.lang.String delUid;
+	/**
+	 * 删除时间
+	 */
+	private java.lang.Long delTime;
+	/**
+	 * imei
+	 */
+	private java.lang.String imei;
+	/**
+	 * imsi
+	 */
+	private java.lang.String imsi;
+	/**
+	 * headimg
+	 */
+	private java.lang.String headimg;
+	/**
+	 * 院系名称
+	 */
+	private java.lang.String collegeName;
+	/**
+	 * 专业名称
+	 */
+	private java.lang.String specileName;
+	/**
+	 * 班级名称
+	 */
+	private java.lang.String className;
+	/**
+	 * 年级
+	 */
+	private java.lang.String yearName;
+	/**
+	 * 学制
+	 */
+	private java.lang.String studyLength;
+	/**
+	 * 毕业日期
+	 */
+	private java.util.Date overtime;
+	/**
+	 * qq号
+	 */
+	private java.lang.String qqnum;
+	/**
+	 * 家庭联系人
+	 */
+	private java.lang.String familyUserName;
+	/**
+	 * 家庭固话
+	 */
+	private java.lang.String familyPhone;
+	/**
+	 * 家庭手机
+	 */
+	private java.lang.String familyMobile;
+	/**
+	 * 创建日期
+	 */
+	private java.util.Date createtime;
+	/**
+	 * 修改日期
+	 */
+	private java.util.Date modifytime;
+	/**
+	 * 融云token
+	 */
+	private java.lang.String token;
+	/**
+	 * 二维码名片
+	 */
+	private java.lang.String qrcode;
+	//columns END 数据库字段结束
+	
+	//concstructor
+
+	public OaUser(){
+	}
+
+	public OaUser(
+		java.lang.String id
+	){
+		this.id = id;
+	}
+
+	//get and set
+		/**
+		 * 编号
+		 */
+	public void setId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.id = value;
+	}
+	
+	
+	
+	/**
+	 * 编号
+	 */
+	@Id
+     @WhereSQL(sql="id=:OaUser_id")
+	public java.lang.String getId() {
+		return this.id;
+	}
+		/**
+		 * 姓名
+		 */
+	public void setName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.name = value;
+	}
+	
+	
+	
+	/**
+	 * 姓名
+	 */
+     @WhereSQL(sql="name=:OaUser_name")
+	public java.lang.String getName() {
+		return this.name;
+	}
+		/**
+		 * 工号
+		 */
+	public void setWorkno(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.workno = value;
+	}
+	
+	
+	
+	/**
+	 * 工号
+	 */
+     @WhereSQL(sql="workno=:OaUser_workno")
+	public java.lang.String getWorkno() {
+		return this.workno;
+	}
+		/**
+		 * 账号
+		 */
+	public void setAccount(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.account = value;
+	}
+	
+	
+	
+	/**
+	 * 账号
+	 */
+     @WhereSQL(sql="account=:OaUser_account")
+	public java.lang.String getAccount() {
+		return this.account;
+	}
+		/**
+		 * 密码
+		 */
+	public void setPassword(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.password = value;
+	}
+	
+	
+	
+	/**
+	 * 密码
+	 */
+     @WhereSQL(sql="password=:OaUser_password")
+	public java.lang.String getPassword() {
+		return this.password;
+	}
+		/**
+		 * 身份证
+		 */
+	public void setCardno(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.cardno = value;
+	}
+	
+	
+	
+	/**
+	 * 身份证
+	 */
+     @WhereSQL(sql="cardno=:OaUser_cardno")
+	public java.lang.String getCardno() {
+		return this.cardno;
+	}
+		/**
+		 * 年龄
+		 */
+	public void setAge(java.lang.Integer value) {
+		this.age = value;
+	}
+	
+	
+	
+	/**
+	 * 年龄
+	 */
+     @WhereSQL(sql="age=:OaUser_age")
+	public java.lang.Integer getAge() {
+		return this.age;
+	}
+		/**
+		 * 性别
+		 */
+	public void setSex(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.sex = value;
+	}
+	
+	
+	
+	/**
+	 * 性别
+	 */
+     @WhereSQL(sql="sex=:OaUser_sex")
+	public java.lang.String getSex() {
+		return this.sex;
+	}
+		/**
+		 * 电话号码
+		 */
+	public void setPhone(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.phone = value;
+	}
+	
+	
+	
+	/**
+	 * 电话号码
+	 */
+     @WhereSQL(sql="phone=:OaUser_phone")
+	public java.lang.String getPhone() {
+		return this.phone;
+	}
+		/**
+		 * 手机号码
+		 */
+	public void setMobile(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.mobile = value;
+	}
+	
+	
+	
+	/**
+	 * 手机号码
+	 */
+     @WhereSQL(sql="mobile=:OaUser_mobile")
+	public java.lang.String getMobile() {
+		return this.mobile;
+	}
+		/**
+		 * 邮箱
+		 */
+	public void setEmail(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.email = value;
+	}
+	
+	
+	
+	/**
+	 * 邮箱
+	 */
+     @WhereSQL(sql="email=:OaUser_email")
+	public java.lang.String getEmail() {
+		return this.email;
+	}
+		/**
+		 * 地址
+		 */
+	public void setAddress(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.address = value;
+	}
+	
+	
+	
+	/**
+	 * 地址
+	 */
+     @WhereSQL(sql="address=:OaUser_address")
+	public java.lang.String getAddress() {
+		return this.address;
+	}
+		/**
+		 * 级别
+		 */
+	public void setGradeId(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.gradeId = value;
+	}
+	
+	
+	
+	/**
+	 * 级别
+	 */
+     @WhereSQL(sql="gradeId=:OaUser_gradeId")
+	public java.lang.String getGradeId() {
+		return this.gradeId;
+	}
+		/**
+		 * 学历
+		 */
+	public void setEduName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.eduName = value;
+	}
+	
+	
+	
+	/**
+	 * 学历
+	 */
+     @WhereSQL(sql="eduName=:OaUser_eduName")
+	public java.lang.String getEduName() {
+		return this.eduName;
+	}
+		/**
+		 * 紧急联系人
+		 */
+	public void setFireName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.fireName = value;
+	}
+	
+	
+	
+	/**
+	 * 紧急联系人
+	 */
+     @WhereSQL(sql="fireName=:OaUser_fireName")
+	public java.lang.String getFireName() {
+		return this.fireName;
+	}
+		/**
+		 * 紧急联系电话
+		 */
+	public void setFirePhone(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.firePhone = value;
+	}
+	
+	
+	
+	/**
+	 * 紧急联系电话
+	 */
+     @WhereSQL(sql="firePhone=:OaUser_firePhone")
+	public java.lang.String getFirePhone() {
+		return this.firePhone;
+	}
+		/**
+		 * 备注
+		 */
+	public void setDescription(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.description = value;
+	}
+	
+	
+	
+	/**
+	 * 备注
+	 */
+     @WhereSQL(sql="description=:OaUser_description")
+	public java.lang.String getDescription() {
+		return this.description;
+	}
+		/**
+		 * 是否有效,是/否/离职
+		 */
+	public void setState(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.state = value;
+	}
+	
+	
+	
+	/**
+	 * 是否有效,是/否/离职
+	 */
+     @WhereSQL(sql="state=:OaUser_state")
+	public java.lang.String getState() {
+		return this.state;
+	}
+		/**
+		 * 删除人Id
+		 */
+	public void setDelUid(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.delUid = value;
+	}
+	
+	
+	
+	/**
+	 * 删除人Id
+	 */
+     @WhereSQL(sql="delUid=:OaUser_delUid")
+	public java.lang.String getDelUid() {
+		return this.delUid;
+	}
+		/**
+		 * 删除时间
+		 */
+	public void setDelTime(java.lang.Long value) {
+		this.delTime = value;
+	}
+	
+	
+	
+	/**
+	 * 删除时间
+	 */
+     @WhereSQL(sql="delTime=:OaUser_delTime")
+	public java.lang.Long getDelTime() {
+		return this.delTime;
+	}
+		/**
+		 * imei
+		 */
+	public void setImei(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.imei = value;
+	}
+	
+	
+	
+	/**
+	 * imei
+	 */
+     @WhereSQL(sql="imei=:OaUser_imei")
+	public java.lang.String getImei() {
+		return this.imei;
+	}
+		/**
+		 * imsi
+		 */
+	public void setImsi(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.imsi = value;
+	}
+	
+	
+	
+	/**
+	 * imsi
+	 */
+     @WhereSQL(sql="imsi=:OaUser_imsi")
+	public java.lang.String getImsi() {
+		return this.imsi;
+	}
+		/**
+		 * headimg
+		 */
+	public void setHeadimg(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.headimg = value;
+	}
+	
+	
+	
+	/**
+	 * headimg
+	 */
+     @WhereSQL(sql="headimg=:OaUser_headimg")
+	public java.lang.String getHeadimg() {
+		return this.headimg;
+	}
+		/**
+		 * 院系名称
+		 */
+	public void setCollegeName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.collegeName = value;
+	}
+	
+	
+	
+	/**
+	 * 院系名称
+	 */
+     @WhereSQL(sql="collegeName=:OaUser_collegeName")
+	public java.lang.String getCollegeName() {
+		return this.collegeName;
+	}
+		/**
+		 * 专业名称
+		 */
+	public void setSpecileName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.specileName = value;
+	}
+	
+	
+	
+	/**
+	 * 专业名称
+	 */
+     @WhereSQL(sql="specileName=:OaUser_specileName")
+	public java.lang.String getSpecileName() {
+		return this.specileName;
+	}
+		/**
+		 * 班级名称
+		 */
+	public void setClassName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.className = value;
+	}
+	
+	
+	
+	/**
+	 * 班级名称
+	 */
+     @WhereSQL(sql="className=:OaUser_className")
+	public java.lang.String getClassName() {
+		return this.className;
+	}
+		/**
+		 * 年级
+		 */
+	public void setYearName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.yearName = value;
+	}
+	
+	
+	
+	/**
+	 * 年级
+	 */
+     @WhereSQL(sql="yearName=:OaUser_yearName")
+	public java.lang.String getYearName() {
+		return this.yearName;
+	}
+		/**
+		 * 学制
+		 */
+	public void setStudyLength(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.studyLength = value;
+	}
+	
+	
+	
+	/**
+	 * 学制
+	 */
+     @WhereSQL(sql="studyLength=:OaUser_studyLength")
+	public java.lang.String getStudyLength() {
+		return this.studyLength;
+	}
+		/*
+	public String getovertimeString() {
+		return DateUtils.convertDate2String(FORMAT_OVERTIME, getovertime());
+	}
+	public void setovertimeString(String value) throws ParseException{
+		setovertime(DateUtils.convertString2Date(FORMAT_OVERTIME,value));
+	}*/
+	
+		/**
+		 * 毕业日期
+		 */
+	public void setOvertime(java.util.Date value) {
+		this.overtime = value;
+	}
+	
+	
+	
+	/**
+	 * 毕业日期
+	 */
+     @WhereSQL(sql="overtime=:OaUser_overtime")
+	public java.util.Date getOvertime() {
+		return this.overtime;
+	}
+		/**
+		 * qq号
+		 */
+	public void setQqnum(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.qqnum = value;
+	}
+	
+	
+	
+	/**
+	 * qq号
+	 */
+     @WhereSQL(sql="qqnum=:OaUser_qqnum")
+	public java.lang.String getQqnum() {
+		return this.qqnum;
+	}
+		/**
+		 * 家庭联系人
+		 */
+	public void setFamilyUserName(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.familyUserName = value;
+	}
+	
+	
+	
+	/**
+	 * 家庭联系人
+	 */
+     @WhereSQL(sql="familyUserName=:OaUser_familyUserName")
+	public java.lang.String getFamilyUserName() {
+		return this.familyUserName;
+	}
+		/**
+		 * 家庭固话
+		 */
+	public void setFamilyPhone(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.familyPhone = value;
+	}
+	
+	
+	
+	/**
+	 * 家庭固话
+	 */
+     @WhereSQL(sql="familyPhone=:OaUser_familyPhone")
+	public java.lang.String getFamilyPhone() {
+		return this.familyPhone;
+	}
+		/**
+		 * 家庭手机
+		 */
+	public void setFamilyMobile(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.familyMobile = value;
+	}
+	
+	
+	
+	/**
+	 * 家庭手机
+	 */
+     @WhereSQL(sql="familyMobile=:OaUser_familyMobile")
+	public java.lang.String getFamilyMobile() {
+		return this.familyMobile;
+	}
+		/*
+	public String getcreatetimeString() {
+		return DateUtils.convertDate2String(FORMAT_CREATETIME, getcreatetime());
+	}
+	public void setcreatetimeString(String value) throws ParseException{
+		setcreatetime(DateUtils.convertString2Date(FORMAT_CREATETIME,value));
+	}*/
+	
+		/**
+		 * 创建日期
+		 */
+	public void setCreatetime(java.util.Date value) {
+		this.createtime = value;
+	}
+	
+	
+	
+	/**
+	 * 创建日期
+	 */
+     @WhereSQL(sql="createtime=:OaUser_createtime")
+	public java.util.Date getCreatetime() {
+		return this.createtime;
+	}
+		/*
+	public String getmodifytimeString() {
+		return DateUtils.convertDate2String(FORMAT_MODIFYTIME, getmodifytime());
+	}
+	public void setmodifytimeString(String value) throws ParseException{
+		setmodifytime(DateUtils.convertString2Date(FORMAT_MODIFYTIME,value));
+	}*/
+	
+		/**
+		 * 修改日期
+		 */
+	public void setModifytime(java.util.Date value) {
+		this.modifytime = value;
+	}
+	
+	
+	
+	/**
+	 * 修改日期
+	 */
+     @WhereSQL(sql="modifytime=:OaUser_modifytime")
+	public java.util.Date getModifytime() {
+		return this.modifytime;
+	}
+		/**
+		 * 融云token
+		 */
+	public void setToken(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.token = value;
+	}
+	
+	
+	
+	/**
+	 * 融云token
+	 */
+     @WhereSQL(sql="token=:OaUser_token")
+	public java.lang.String getToken() {
+		return this.token;
+	}
+		/**
+		 * 二维码名片
+		 */
+	public void setQrcode(java.lang.String value) {
+		    if(StringUtils.isNotBlank(value)){
+			 value=value.trim();
+			}
+		this.qrcode = value;
+	}
+	
+	
+	
+	/**
+	 * 二维码名片
+	 */
+     @WhereSQL(sql="qrcode=:OaUser_qrcode")
+	public java.lang.String getQrcode() {
+		return this.qrcode;
+	}
+	@Override
+	public String toString() {
+		return new StringBuilder()
+			.append("编号[").append(getId()).append("],")
+			.append("姓名[").append(getName()).append("],")
+			.append("工号[").append(getWorkno()).append("],")
+			.append("账号[").append(getAccount()).append("],")
+			.append("密码[").append(getPassword()).append("],")
+			.append("身份证[").append(getCardno()).append("],")
+			.append("年龄[").append(getAge()).append("],")
+			.append("性别[").append(getSex()).append("],")
+			.append("电话号码[").append(getPhone()).append("],")
+			.append("手机号码[").append(getMobile()).append("],")
+			.append("邮箱[").append(getEmail()).append("],")
+			.append("地址[").append(getAddress()).append("],")
+			.append("级别[").append(getGradeId()).append("],")
+			.append("学历[").append(getEduName()).append("],")
+			.append("紧急联系人[").append(getFireName()).append("],")
+			.append("紧急联系电话[").append(getFirePhone()).append("],")
+			.append("备注[").append(getDescription()).append("],")
+			.append("是否有效,是/否/离职[").append(getState()).append("],")
+			.append("删除人Id[").append(getDelUid()).append("],")
+			.append("删除时间[").append(getDelTime()).append("],")
+			.append("imei[").append(getImei()).append("],")
+			.append("imsi[").append(getImsi()).append("],")
+			.append("headimg[").append(getHeadimg()).append("],")
+			.append("院系名称[").append(getCollegeName()).append("],")
+			.append("专业名称[").append(getSpecileName()).append("],")
+			.append("班级名称[").append(getClassName()).append("],")
+			.append("年级[").append(getYearName()).append("],")
+			.append("学制[").append(getStudyLength()).append("],")
+			.append("毕业日期[").append(getOvertime()).append("],")
+			.append("qq号[").append(getQqnum()).append("],")
+			.append("家庭联系人[").append(getFamilyUserName()).append("],")
+			.append("家庭固话[").append(getFamilyPhone()).append("],")
+			.append("家庭手机[").append(getFamilyMobile()).append("],")
+			.append("创建日期[").append(getCreatetime()).append("],")
+			.append("修改日期[").append(getModifytime()).append("],")
+			.append("融云token[").append(getToken()).append("],")
+			.append("二维码名片[").append(getQrcode()).append("],")
+			.toString();
+	}
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(getId())
+			.toHashCode();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof OaUser == false){
+			return false;
+		}
+			
+		if(this == obj){
+			return true;
+		}
+		
+		OaUser other = (OaUser)obj;
+		return new EqualsBuilder()
+			.append(getId(),other.getId())
+			.isEquals();
+	}
+}
+
+	

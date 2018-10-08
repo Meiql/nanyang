@@ -1,0 +1,323 @@
+package org.springrain.erp.gz.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springrain.frame.util.DateUtils;
+
+import jxl.Cell;
+import jxl.DateCell;
+import jxl.NumberCell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+
+
+/**
+ * @author 吴培雷
+ * @date 2012-9-6 上午09:29:56
+ * @version 1.0
+ */
+public abstract class BaseImport {
+	/** 张数 */
+	protected int sheetNum = 0;
+	/** 行数 */
+	protected int rowNum = 1;
+	/** 导入excel表 */
+	protected Sheet rs = null;
+	/** 表头 */
+	protected String[] title = null;
+	/** 实体类集合 */
+	@SuppressWarnings("rawtypes")
+	protected List<Map> listEntities = new ArrayList<Map>();
+
+	protected List<Object> listObjs = new ArrayList<Object>();
+	/** excel单行数据 */
+	protected List<String> rowCells = new ArrayList<String>();
+	/** 额外信息 */
+	@SuppressWarnings("rawtypes")
+	protected Map extraMap = null;
+
+	public   Logger logger = LoggerFactory.getLogger(getClass());
+	/**
+	 * 校验数据完整性
+	 * 
+	 * @return
+	 */
+	protected abstract String checkData() throws Exception;
+
+	/**
+	 * 其它信息校验
+	 * 
+	 * @throws Exception
+	 */
+	protected abstract String extraCheck() throws Exception;
+
+	/**
+	 * 保存excel数据到数据库
+	 * 
+	 * @return
+	 */
+	protected abstract boolean saveData() throws Exception;
+
+	/**
+	 * 初始化其它全局变量
+	 * 
+	 * @throws Exception
+	 */
+	protected abstract void initOtherParam();
+
+	/**
+	 * 导入数据到内存并校验完整性
+	 * 
+	 * @return
+	 */
+	private String importExcel2Dto() throws Exception {
+		String message = null;
+		rowCells = getRowCell();
+		if (rowCells != null && rowCells.size() > 0 && !isBlankRow(rowCells)) {
+			message = checkData();
+		}
+		return message;
+	}
+
+	/**
+	 * 判断excel行是否为空行
+	 * 
+	 * @param rowData
+	 * @return
+	 */
+	private boolean isBlankRow(List<String> rowData) {
+		boolean b = true;
+		if (rowData != null && rowData.size() > 0) {
+			for (String str : rowData) {
+				if (StringUtils.isNotBlank(str))
+					b = false;
+			}
+		}
+		return b;
+	}
+
+	public String importExcel(MultipartFile uploadfile, String[] title,
+			HttpServletRequest request) throws Exception { //新增时间字段
+		String dirpath = request.getServletContext().getRealPath("/")
+				+ "/upload/temp/" + UUID.randomUUID() + "/";
+		File dir = new File(dirpath);
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		File destFile = new File(dir + "/" + uploadfile.getOriginalFilename());
+		FileCopyUtils.copy(uploadfile.getBytes(), destFile);
+
+		return importExcel(destFile.getPath(), title);
+	}
+
+	/**
+	 * 导入方法实现
+	 * 
+	 * @param filePath
+	 *            文件路径
+	 * @param title
+	 *            文件头workloadv5.utils.excel.WorkloadV5PriceStandExcelImport.
+	 *            V5StandardEmum .描述
+	 * @return
+	 * @throws ExcelException
+	 */
+	public String importExcel(String filePath, String[] title) throws Exception {
+		listObjs = new ArrayList<Object>();
+		boolean b = false;
+		String message = null;
+		InputStream is =null;
+		try {
+
+			b = checkExcelTitle(filePath, title); // 判断Excel表头是否正确
+			message = extraCheck();// 额外信息校验
+			if (message != null) {
+				return message;
+			}
+			if (b) {
+				is = new FileInputStream(filePath);
+				Workbook rwb = Workbook.getWorkbook(is);
+				sheetNum = 0;
+				rowNum = 1;
+				this.title = title;
+				rs = null;
+				for (; sheetNum < rwb.getSheets().length; sheetNum++) {
+					rs = rwb.getSheet(sheetNum);
+					int rsRows = rs.getRows(); // 获得总行数
+					for (; rowNum < rsRows; rowNum++) {
+						message = importExcel2Dto();
+						if (StringUtils.isNotBlank(message)) {
+							// initParam();// 初始化所有全局变量
+							return message;
+						}
+					}
+					rs = null;
+				}
+				if (!saveData()) {
+					message = "Excel数据导入失败！";
+				} else {
+					message = null; 
+				}
+				// 初始化全局变量
+				// initParam();
+				is.close();
+				is = null;
+				rwb = null;
+			} else {
+				message = "Excel表格表头错误！";
+			}
+			// initParam();// 初始化所有全局变量
+		} finally {
+			if(is!=null){
+			   is.close(); 
+			}
+	        File file=new File(filePath);
+	        if(file.exists()){
+	        	file.delete();
+	        }
+			initParam();// 初始化所有全局变量 
+		}
+		return message;
+	}
+
+	/**
+	 * 初始化所有全局变量
+	 */
+	private void initParam() {
+		sheetNum = 0;
+		rowNum = 1;
+		rs = null;
+		title = null;
+		listEntities = null;
+		rowCells = null;
+		extraMap = null;
+		listObjs = new ArrayList<Object>();
+		initOtherParam();
+	}
+
+	/**
+	 * 验证表头
+	 */
+	private boolean checkExcelTitle(String fileName, String[] title)
+			throws IOException, BiffException {
+		Workbook wb = Workbook.getWorkbook(new File(fileName));
+		Sheet[] sheets = wb.getSheets();
+		for (int i = 0; i < sheets.length; i++) {
+			List<String> titleString = new ArrayList<String>();
+			Sheet sheet = sheets[i];
+			Cell cell = null;
+			final int columns = sheet.getColumns();
+			String[][] strings = new String[1][columns];
+			for (int j = 0; j < strings.length; j++) {
+				for (int j2 = 0; j2 < strings[j].length; j2++) {
+					cell = sheet.getCell(j2, j);
+					if (StringUtils.isNotBlank(cell.getContents()))
+						titleString.add(cell.getContents());
+				}
+			}
+			for (int k = 0; k < titleString.size(); k++) {
+				String string = titleString.get(k).trim();
+				if (!string.equals(title[k].trim())) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * 获取一行表格的值
+	 * 
+	 * @return
+	 */
+	protected List<String> getRowCell() {
+		List<String> list = new ArrayList<String>();
+		if (title.length > 0) {
+			for (int column = 0; column < title.length; column++) {
+				String content = "";
+				Cell cell = rs.getCell(column, rowNum);
+				// 如果是日期，进行格式化
+				if (cell instanceof DateCell) {
+					Date date = ((DateCell) cell).getDate();
+					content = DateUtils.convertDate2String(DateUtils.DEFAILT_DATE_TIME_PATTERN,date);
+				} else if (cell instanceof NumberCell) {
+					NumberCell numberCell = (NumberCell) cell;
+					Double mycontent = numberCell.getValue();
+					if (mycontent != null) {
+						content = mycontent.toString();
+					}
+				} else {
+					content = cell.getContents();
+				}
+				list.add(content);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * 获取当前表格坐标
+	 * 
+	 * @param column
+	 * @return
+	 */
+	protected String getCellPosition(int column) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("第");
+		sb.append(sheetNum + 1);
+		sb.append("张工作表");
+		sb.append("第");
+		sb.append(rowNum + 1);
+		sb.append("行第");
+		sb.append(column + 1);
+		sb.append("列");
+		return sb.toString();
+	}
+
+	protected String getCellLine(int column) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("第");
+		sb.append(sheetNum + 1);
+		sb.append("张工作表");
+		sb.append("第");
+		sb.append(rowNum + 1);
+		sb.append("行");
+		return sb.toString();
+	}
+
+	protected String getCellLine() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("第");
+		sb.append(sheetNum + 1);
+		sb.append("张工作表");
+		sb.append("第");
+		sb.append(rowNum + 1);
+		sb.append("行");
+		return sb.toString();
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Map getExtraMap() {
+		return extraMap;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void setExtraMap(Map extraMap) {
+		this.extraMap = extraMap;
+	}
+}

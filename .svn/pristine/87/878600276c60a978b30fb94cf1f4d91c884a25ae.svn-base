@@ -1,0 +1,779 @@
+<#ftl output_format="HTML" auto_esc=true>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<script src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<script src="${ctx}/js/ueditor/ueditor.config.js"></script>
+<script src="${ctx}/js/ueditor/ueditor.all.js"></script>
+<script src="${ctx}/js/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script>
+	 jQuery(function(){
+		 /*
+		 init_valid(_before,_after)
+		 @_before:提交表单前，调用 的函数   可以为空，一般有validform处理不了，独自进行处理时使用
+		 @_after:保存成功后，调用的函数  可以为空，一般为对应的列表页面
+		 */
+		 springrain.initValid(
+			null,
+		 	function(_json){
+				 if(_json.status == 'success'){
+					 layer.alert("修改成功",function(){
+						 window.location.href="${ctx}/userinfo/list?springraintoken="+springraintoken
+					 })
+				 }else{
+					 layer.alert(_json.message,{icon: 5});
+				 }
+			 }
+		 );
+		 initData();
+	 });
+	 function initData(){
+		 $("#company").find("option[value='${(returnDatas.data.company)!''}']").prop("selected","true");
+		 $("#tongchou").find("option[value='${(returnDatas.data.tongchou)!''}']").prop("selected","true");
+		 $("#gangwei").find("option[value='${(returnDatas.data.gangwei)!''}']").prop("selected","true");
+		 $("#sex").find("option[value='${(returnDatas.data.sex)!''}']").prop("selected","true");
+		 $("#marryState").find("option[value='${(returnDatas.data.marryState)!''}']").prop("selected","true");
+		 $("#health").find("option[value='${(returnDatas.data.health)!''}']").prop("selected","true");
+		 $("#entryCity").find("option[value='${(returnDatas.data.entryCity)!''}']").prop("selected","true");
+		 $("#minzu").find("option[value='${(returnDatas.data.minzu)!''}']").prop("selected","true");
+		 $("#politicsStatus").find("option[value='${(returnDatas.data.politicsStatus)!''}']").prop("selected","true");
+		 $("#zuigaoxueli").find("option[value='${(returnDatas.data.zuigaoxueli)!''}']").prop("selected","true");
+		 $("#grade").find("option[value='${(returnDatas.data.grade)!''}']").prop("selected","true");
+		 $("input[value='${(returnDatas.data.entryType)!''}']").prop("checked","true");
+	 }
+</script>
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            		
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>修改用户基本信息</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/userinfo/update">
+																<input type="hidden" id="id" name="id" value="${(returnDatas.data.id)!''}"/>
+																<input type="hidden" id="flag" name="flag" value="1"/>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">员工姓名</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="userName" id="userName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.userName)!''}" readonly="readonly">
+																			<input type="hidden" name="userId" id="userId" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.uid)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">员工代码</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="userCode" id="userCode"  autocomplete="off" class="layui-input" value="${(returnDatas.data.userCode)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	 <div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">性别*</label>
+																		<div class="layui-inline col-lg-5">  
+																			 <select id="sex" name="sex" >
+																		        	<option value="男">男</option>
+																					<option value="女">女</option>
+																		      </select>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">手机号码</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="mobile" id="mobile" datatype="phone"  errormsg="手机格式不正确！"   autocomplete="off" class="layui-input" value="${(returnDatas.data.mobile)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																 	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">邮箱</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="email" id="email" datatype="email"  errormsg="邮箱格式不正确！"  autocomplete="off" class="layui-input" value="${(returnDatas.data.email)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div> 
+																	-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">出生日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="birthday" id="birthday" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.birthday)?string('yyyy-MM-dd'))!''}" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})" readonly="readonly">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">工号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="workno" id="workno" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.workno)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">身份证号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="idCard" id="idCard" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.idCard)!''}" onblur="checkIdAndGetBirthday(this);">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">公司*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="company" id="company" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="company"/>
+																			</select>
+																			<!--
+																			  <input type="text" name="company" id="company" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.company)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">统筹缴纳地*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="tongchou" id="tongchou" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="tcjnd"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="tongchou" id="tongchou" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.tongchou)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">岗位*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="gangwei" id="gangwei" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="gangwei"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="gangwei" id="gangwei" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.gangwei)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">级别*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="grade" id="grade" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="grade"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="gangwei" id="gangwei" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.gangwei)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">首次工作时间*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="firstTime" id="firstTime" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.firstTime)?string('yyyy-MM-dd'))!''}" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})" readonly="readonly">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入职日期*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="entryDate" id="entryDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${((returnDatas.data.entryDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">转正日期</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="startDate" id="startDate"  autocomplete="off" class="layui-input" value="${((returnDatas.data.startDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">离职日期</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="datetime" name="endDate" id="endDate"  autocomplete="off" class="layui-input" value="${((returnDatas.data.endDate)?string('yyyy-MM-dd'))!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">手机号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="mobile1" id="mobile1" datatype="telphone11" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.mobile1)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">备用手机号</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="mobile2" id="mobile2"  class="layui-input" value="${(returnDatas.data.mobile2)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">固定电话</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="telephone" id="telephone"  class="layui-input" value="${(returnDatas.data.telephone)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">电子邮箱</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="email" id="email" datatype="email" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.email)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">婚否*</label>
+																		<div class="layui-inline col-lg-5">
+																			<select name="marryState" id="marryState" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<option value="">请选择</option>
+																				<option value="未婚">未婚</option>
+																				<option value="已婚">已婚</option>
+																				<option value="离异">离异</option>
+																			</select>
+																			<!-- 
+																			<input type="text" name="marryState" id="marryState" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.marryState)!''}">
+																			 -->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">健康状态*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="health" id="health" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<option value="">请选择</option>
+																				<option value="健康">健康</option>
+																				<option value="良好">良好</option>
+																				<option value="一般">一般</option>
+																			</select>
+																			<!-- 
+																			<input type="text" name="health" id="health" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.health)!''}">
+																			 --> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入职城市*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="entryCity" id="entryCity" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="rzcs"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="entryCity" id="entryCity" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.entryCity)!''}">
+																			-->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">入职方式*</label>
+																		<div class="layui-inline col-lg-5">
+																			<input class="entryType" type="radio" name="entryType" value="社招" title="社招" checked="">
+																	     	<input class="entryType" type="radio" name="entryType" value="内推" title="内推">
+																			<!-- 
+																				<input type="text" name="entryType" id="entryType" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.entryType)!''}">
+																			 -->
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">介绍人</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="introducer" id="introducer" class="layui-input" value="${(returnDatas.data.introducer)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">民族*</label>
+																		<div class="layui-inline col-lg-5"> 
+																			<select name="minzu" id="minzu" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="minzu"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="minzu" id="minzu" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.minzu)!''}">
+																			--> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">政治面貌*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="politicsStatus" id="politicsStatus" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="zzmm"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="politicsStatus" id="politicsStatus" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.politicsStatus)!''}">
+																			--> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">最高学历*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<select name="zuigaoxueli" id="zuigaoxueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																				<@dic.dataList typekey="xueli"/>
+																			</select> 
+																			<!--
+																			<input type="text" name="zuigaoxueli" id="zuigaoxueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.zuigaoxueli)!''}">
+																			--> 
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">籍贯*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="jiguan" id="jiguan" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.jiguan)!''}" maxlength="50">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">户籍地址*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="hujidizhi" id="hujidizhi" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.hujidizhi)!''}" maxlength="255">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">现居住详细地址*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="address" id="address" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.address)!''}" maxlength="255">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item">
+																		<label class="layui-form-label">教育经历*</label>
+																		<div class="layui-inline col-lg-5">
+																			<table class="layui-table" id="jiaoyujingli_table">
+																				<thead>
+																					<tr>
+																						<th>
+																							时间*
+																						</th>
+																						<th>
+																							学校名称*
+																						</th>
+																						<th>
+																							学历*
+																						</th>
+																						<th>
+																							招生方式*
+																						</th>
+																						<th>
+																							专业*
+																						</th>
+																						<th>
+																							学位*
+																						</th>
+																						<th>
+																							操作
+																						</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+																					<#if (returnDatas.data.educational)?? && (returnDatas.data.educational)?size gt 0>
+																						<#list returnDatas.data.educational as educational>
+																						<tr id="jiaoyujingli${educational_index}" data-index="${educational_index}">
+																							<td>
+																								<input type="datetime" name="educational[${educational_index}].startDate" id="jyjl_startDate${educational_index}" value="${((educational.startDate)?string('yyyy-MM-dd'))!''}"data-identity="startDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																								-
+																								<input type="datetime" name="educational[${educational_index}].endDate" id="jyjl_endDate${educational_index}" value="${((educational.endDate)?string('yyyy-MM-dd'))!''}" data-identity="endDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																							</td>
+																							<td>
+																								<input type="text" name="educational[${educational_index}].xuexiao" id="jyjl_xuexiao${educational_index}" value="${(educational.xuexiao)!''}" data-identity="xuexiao" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" >
+																								<input type="hidden" name="educational[${educational_index}].id" id="jyjl_id${educational_index}" value="${(educational.id)!''}" >
+																								<input type="hidden" name="educational[${educational_index}].userId" id="jyjl_userId${educational_index}" value="${(educational.userId)!''}" >
+																								<input type="hidden" name="educational[${educational_index}].sort" id="jyjl_sort${educational_index}" value="${(educational.sort)!''}" >
+																							</td>
+																							<td>
+																								<select name="educational[${educational_index}].xueli" id="jyjl_xueli${educational_index}" data-identity="xueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																									<@dic.dataList typekey="xueli"/>
+																								</select>
+																								<script>
+																								$("#jyjl_xueli${educational_index}").find("option[value='${(educational.xueli)!''}']").prop("selected","selected");
+																								</script>
+																							</td>
+																							<td>
+																								<select name="educational[${educational_index}].zhaoshengfangshi" id="jyjl_zhaoshengfangshi${educational_index}" data-identity="zhaoshengfangshi" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																									<@dic.dataList typekey="zsfs"/>
+																								</select>
+																								<script>
+																								$("#jyjl_zhaoshengfangshi${educational_index}").find("option[value='${(educational.zhaoshengfangshi)!''}']").prop("selected","selected");
+																								</script>
+																							</td>
+																							<td>
+																								<input type="text" name="educational[${educational_index}].zhuanye" id="jyjl_zhuanye${educational_index}" value="${(educational.zhuanye)!''}" data-identity="zhuanye" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" >
+																							</td>
+																							<td>
+																								<select name="educational[${educational_index}].xuewei" id="jyjl_xuewei${educational_index}" data-identity="xuewei" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																									<@dic.dataList typekey="xuewei"/>
+																								</select>
+																								<script>
+																								$("#jyjl_xuewei${educational_index}").find("option[value='${(educational.xuewei)!''}']").prop("selected","selected");
+																								</script>
+																							</td>
+																							<td>
+																								<button type="button" class="layui-btn layui-btn-primary" onclick="deleteJiaoyujingli(this)">删除</button>
+																							</td>
+																						</tr>
+																						</#list>
+																					<#else>
+																					<tr id="jiaoyujingli0" data-index="0">
+																						<td>
+																							<input type="datetime" name="educational[0].startDate" id="jyjl_startDate0" data-identity="startDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																							-
+																							<input type="datetime" name="educational[0].endDate" id="jyjl_endDate0" data-identity="endDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																						</td>
+																						<td>
+																							<input type="text" name="educational[0].xuexiao" id="jyjl_xuexiao0" data-identity="xuexiao" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">
+	
+																						</td>
+																						<td>
+																							<select name="educational[0].xueli" id="jyjl_xueli0" data-identity="xueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																								<@dic.dataList typekey="xueli"/>
+																							</select>
+																						</td>
+																						<td>
+																							<select name="educational[0].zhaoshengfangshi" id="jyjl_zhaoshengfangshi0" data-identity="zhaoshengfangshi" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																								<@dic.dataList typekey="zsfs"/>
+																							</select>
+																						</td>
+																						<td>
+																							<input type="text" name="educational[0].zhuanye" id="jyjl_zhuanye0" data-identity="zhuanye" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">
+																						</td>
+																						<td>
+																							<select name="educational[0].xuewei" id="jyjl_xuewei0" data-identity="xuewei" datatype="*" nullmsg="不能为空" errormsg="不能为空！">
+																								<@dic.dataList typekey="xuewei"/>
+																							</select>
+																						</td>
+																						<td>
+																						</td>
+																					</tr>
+																					</#if>
+																				</tbody>
+																			</table>
+																			<div class="layui-inline">
+																				<button type="button" class="layui-btn layui-btn-primary" onclick="addTr('jiaoyujingli')">添加教育经历</button>
+																			</div>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item">
+																		<label class="layui-form-label">员工证书</label>
+																		<div class="layui-inline col-lg-5">
+																			<table class="layui-table" id="zhengshu_table">
+																				<thead>
+																					<tr>
+																						<th>
+																							证书编号*
+																						</th>
+																						<th>
+																							证书名称*
+																						</th>
+																						<th>
+																							颁证机构*
+																						</th>
+																						<th>
+																							证书通过日期*
+																						</th>
+																						<th>
+																							证书有效期
+																						</th>
+																						<th>
+																							操作
+																						</th>
+																					</tr>
+																				</thead>
+																				<tbody>
+																					<#if (returnDatas.data.certificate)?? && (returnDatas.data.certificate)?size gt 0>
+																						<#list returnDatas.data.certificate as certificate>
+																						<tr id="zhengshu${certificate_index}" data-index="${certificate_index}">
+																							<td>
+																								<input type="text" name="certificate[${certificate_index}].bianhao" id="zs_bianhao${certificate_index}" data-identity="bianhao" value="${(certificate.bianhao)!''}" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" >
+																								<input type="hidden" name="certificate[${certificate_index}].id" id="zs_id${certificate_index}" data-identity="id" value="${(certificate.id)!''}" >
+																								<input type="hidden" name="certificate[${certificate_index}].userId" id="zs_userId${certificate_index}" data-identity="userId" value="${(certificate.userId)!''}"  autocomplete="off" class="layui-input" >
+																							</td>
+																							<td>
+																								<input type="text" name="certificate[${certificate_index}].name" id="zs_name${certificate_index}" data-identity="name" value="${(certificate.name)!''}" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" >
+																							</td>
+																							<td>
+																								<input type="text" name="certificate[${certificate_index}].banzhengjigou" id="zs_banzhengjigou${certificate_index}" data-identity="banzhengjigou" value="${(certificate.banzhengjigou)!''}" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" >
+																							</td>
+																							<td>
+																								<input type="datetime" name="certificate[${certificate_index}].passDate" id="zs_passDate${certificate_index}" data-identity="passDate" value="${((certificate.passDate)?string('yyyy-MM-dd'))!''}" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input"  readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+																							</td>
+																							<td>
+																								<input type="datetime" name="certificate[${certificate_index}].youxiaoqi" id="zs_youxiaoqi${certificate_index}" data-identity="youxiaoqi" value="${((certificate.youxiaoqi)?string('yyyy-MM-dd'))!''}"  class="layui-input"  readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+																							</td>
+																							<td>
+																								<button type="button" class="layui-btn layui-btn-primary" onclick="deleteZhengshu(this)">删除</button>
+																							</td>
+																						</tr>
+																						</#list>
+																					</#if>
+																				</tbody>
+																			</table>
+																			<div class="layui-inline">
+																				<button type="button" class="layui-btn layui-btn-primary" onclick="addTr('zhengshu')">添加证书</button>
+																			</div>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">紧急联系人*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="fireName" id="fireName" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.fireName)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">紧急联系电话*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="firePhone" id="firePhone" datatype="telphone11" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.firePhone)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">与本人关系*</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="guanxi" id="guanxi" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="${(returnDatas.data.guanxi)!''}" maxlength="50">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">兴趣爱好</label>
+																		<div class="layui-inline col-lg-5">
+																			<textarea class="layui-textarea" name="xingqu" id="xingqu" maxlength="500">${(returnDatas.data.xingqu)!''}</textarea>
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">备注</label>
+																		<div class="layui-inline col-lg-5">  
+																			<input type="text" name="bak" id="bak"  autocomplete="off" class="layui-input" value="${(returnDatas.data.bak)!''}">
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	
+													<div class="layui-form-item change-submit">
+													<label class="layui-form-label"></label>
+															<div class="layui-inline">
+																<button type="button" class="layui-btn" id="smtbtn">保存</button>
+																<button type="button" class="layui-btn layui-btn-primary" id="rstbtn">重置</button>
+															</div>
+														</div>
+													</form>
+													<div style="display:none;">
+														<select  id="h_xueli" >
+															<@dic.dataList typekey="xueli"/>
+														</select>
+														<select  id="h_zhaoshengfangshi" >
+															<@dic.dataList typekey="zsfs"/>
+														</select>
+														<select  id="h_xuewei" >
+															<@dic.dataList typekey="xuewei"/>
+														</select>
+													</div>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+<script>
+function addTr(type){
+	var _num = $("#"+type+"_table tbody tr").size();
+	var flag = 0 ;
+	if(_num > 0){
+		flag = parseInt($("#"+type+"_table tbody tr:last").attr("data-index"))+1;
+	}
+	var _html;
+	if(type == "jiaoyujingli"){
+		_html = getJiaoyujingliHtml(flag);
+	}else{
+		_html = getZhengshuHtml(flag);
+	}
+	$("#"+type+"_table tbody").append(_html);
+	form.render();
+}
+
+function getJiaoyujingliHtml(falg){
+	var _html = '';
+	_html += '<tr id="jiaoyujingli'+falg+'" data-index="'+falg+'">';
+	_html += '<td>';
+	_html += '<input type="datetime" name="educational['+falg+'].startDate" id="jyjl_startDate'+falg+'" data-identity="startDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:\'yyyy-MM-dd\',maxDate:\'%y-%M-%d\'})">';
+	_html += '-';
+	_html += '<input type="datetime" name="educational['+falg+'].endDate" id="jyjl_endDate'+falg+'" data-identity="endDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:\'yyyy-MM-dd\',maxDate:\'%y-%M-%d\'})">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<input type="text" name="educational['+falg+'].xuexiao" id="jyjl_xuexiao'+falg+'" data-identity="xuexiao" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<select name="educational['+falg+'].xueli" id="jyjl_xueli'+falg+'" data-identity="xueli" datatype="*" nullmsg="不能为空" errormsg="不能为空！">';
+	_html += $("#h_xueli").html();
+	_html += '</select>';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<select name="educational['+falg+'].zhaoshengfangshi" id="jyjl_zhaoshengfangshi'+falg+'" data-identity="zhaoshengfangshi" datatype="*" nullmsg="不能为空" errormsg="不能为空！">';
+	_html += $("#h_zhaoshengfangshi").html();
+	_html += '</select>';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<input type="text" name="educational['+falg+'].zhuanye" id="jyjl_zhuanye'+falg+'" data-identity="zhuanye" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<select name="educational['+falg+'].xuewei" id="jyjl_xuewei'+falg+'" data-identity="xuewei" datatype="*" nullmsg="不能为空" errormsg="不能为空！">';
+	_html += $("#h_xuewei").html();
+	_html += '</select>';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<button type="button" class="layui-btn layui-btn-primary" onclick="deleteJiaoyujingli(this)">删除</button>';
+	_html += '</td>';
+	_html += '</tr>';
+	return _html;
+}
+function getZhengshuHtml(falg){
+	var _html = '';
+	_html += '<tr id="zhengshu'+falg+'" data-index="'+falg+'">';
+	_html += '<td>';
+	_html += '	<input type="text" name="certificate['+falg+'].bianhao" id="zs_bianhao'+falg+'" data-identity="bianhao" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">';
+	_html += '	</td>';
+	_html += '<td>';
+	_html += '	<input type="text" name="certificate['+falg+'].name" id="zs_name'+falg+'" data-identity="name" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<input type="text" name="certificate['+falg+'].banzhengjigou" id="zs_banzhengjigou'+falg+'" data-identity="banzhengjigou" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<input type="datetime" name="certificate['+falg+'].passDate" id="zs_passDate'+falg+'" data-identity="passDate" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:\'yyyy-MM-dd\',maxDate:\'%y-%M-%d\'})">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<input type="datetime" name="certificate['+falg+'].youxiaoqi" id="zs_youxiaoqi'+falg+'" data-identity="youxiaoqi" datatype="*" nullmsg="不能为空" errormsg="不能为空！" autocomplete="off" class="layui-input" value="" readonly="readonly" onfocus="WdatePicker({dateFmt:\'yyyy-MM-dd\'})">';
+	_html += '</td>';
+	_html += '<td>';
+	_html += '<button type="button" class="layui-btn layui-btn-primary" onclick="deleteZhengshu(this)">删除</button>';
+	_html += '</td>';
+	_html += '</tr>';
+	return _html;
+}
+function deleteJiaoyujingli(obj){
+	changeJiaoyijingliNextIndex($(obj).parents("tr"));
+	$(obj).parents("tr").remove();
+}
+function changeJiaoyijingliNextIndex(obj){
+	var nextObj =$(obj).next('tr');
+	var oldIndex = $(nextObj).attr("data-index");
+	var newIndex = parseInt(oldIndex) - 1;
+	if(typeof(oldIndex) != undefined && typeof(oldIndex) != "undefined"){
+		$(nextObj).attr("id","jiaoyujingli"+newIndex);
+		$(nextObj).attr("data-index",newIndex);
+		$(nextObj).find("input[data-identity='startDate']").attr("id","jyjl_startDate"+newIndex).attr("name",'educational['+newIndex+'].startDate');
+		$(nextObj).find("input[data-identity='endDate']").attr("id","jyjl_endDate"+newIndex).attr("name",'educational['+newIndex+'].endDate');
+		$(nextObj).find("input[data-identity='xuexiao']").attr("id","jyjl_xuexiao"+newIndex).attr("name",'educational['+newIndex+'].xuexiao');
+		$(nextObj).find("input[data-identity='zhuanye']").attr("id","jyjl_zhuanye"+newIndex).attr("name",'educational['+newIndex+'].zhuanye');
+		$(nextObj).find("input[data-identity='id']").attr("id","jyjl_id"+newIndex).attr("name",'educational['+newIndex+'].id');
+		$(nextObj).find("input[data-identity='userId']").attr("id","jyjl_userId"+newIndex).attr("name",'educational['+newIndex+'].userId');
+		$(nextObj).find("input[data-identity='sort']").attr("id","jyjl_sort"+newIndex).attr("name",'educational['+newIndex+'].sort');
+		$(nextObj).find("select[data-identity='xueli']").attr("id","jyjl_xueli"+newIndex).attr("name",'educational['+newIndex+'].xueli');
+		$(nextObj).find("select[data-identity='zhaoshengfangshi']").attr("id","jyjl_zhaoshengfangshi"+newIndex).attr("name",'educational['+newIndex+'].zhaoshengfangshi');
+		$(nextObj).find("select[data-identity='xuewei']").attr("id","jyjl_xuewei"+newIndex).attr("name",'educational['+newIndex+'].xuewei');
+		changeJiaoyijingliNextIndex(nextObj);
+	}
+}
+function deleteZhengshu(obj){
+	changeZhengshuNextIndex($(obj).parents("tr"));
+	$(obj).parents("tr").remove();
+}
+function changeZhengshuNextIndex(obj){
+	var nextObj =$(obj).next('tr');
+	var oldIndex = $(nextObj).attr("data-index");
+	var newIndex = parseInt(oldIndex) - 1;
+	if(typeof(oldIndex) != undefined && typeof(oldIndex) != "undefined"){
+		$(nextObj).attr("id","zhengshu"+newIndex);
+		$(nextObj).attr("data-index",newIndex);
+		$(nextObj).find("input[data-identity='bianhao']").attr("id","zs_bianhao"+newIndex).attr("name",'certificate['+newIndex+'].bianhao');
+		$(nextObj).find("input[data-identity='id']").attr("id","zs_id"+newIndex).attr("name",'certificate['+newIndex+'].id');
+		$(nextObj).find("input[data-identity='userId']").attr("id","zs_userId"+newIndex).attr("name",'certificate['+newIndex+'].userId');
+		$(nextObj).find("input[data-identity='name']").attr("id","zs_name"+newIndex).attr("name",'certificate['+newIndex+'].name');
+		$(nextObj).find("input[data-identity='banzhengjigou']").attr("id","zs_banzhengjigou"+newIndex).attr("name",'certificate['+newIndex+'].banzhengjigou');
+		$(nextObj).find("input[data-identity='passDate']").attr("id","zs_passDate"+newIndex).attr("name",'certificate['+newIndex+'].passDate');
+		$(nextObj).find("input[data-identity='youxiaoqi']").attr("id","zs_bianhao"+newIndex).attr("name",'certificate['+newIndex+'].youxiaoqi');
+		changeZhengshuNextIndex(nextObj);
+	}
+}
+//校验身份证
+function IdentityCodeValid(code) { 
+    var city={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江 ",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北 ",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏 ",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "};
+    var tip = "";
+    var pass= true;
+    
+    if(!code || !/^\d{6}(18|19|20)?\d{2}(0[1-9]|1[12])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$/i.test(code)){
+        tip = "请填写正确的身份证号(身份证号格式错误)";
+        pass = false;
+    }
+    
+   else if(!city[code.substr(0,2)]){
+        tip = "请填写正确的身份证号(地址编码错误)";
+        pass = false;
+    }
+    else{
+        //18位身份证需要验证最后一位校验位
+        if(code.length == 18){
+            code = code.split('');
+            //∑(ai×Wi)(mod 11)
+            //加权因子
+            var factor = [ 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 ];
+            //校验位
+            var parity = [ 1, 0, 'X', 9, 8, 7, 6, 5, 4, 3, 2 ];
+            var sum = 0;
+            var ai = 0;
+            var wi = 0;
+            for (var i = 0; i < 17; i++)
+            {
+                ai = code[i];
+                wi = factor[i];
+                sum += ai * wi;
+            }
+            var last = parity[sum % 11];
+            if(parity[sum % 11] != code[17]){
+                tip = "请填写正确的身份证号(校验位错误)";
+                pass =false;
+            }
+        }
+    }
+    if(!pass) layer.alert(tip);
+    return pass;
+}
+function checkIdAndGetBirthday(obj){
+	var code = $(obj).val();
+	if(IdentityCodeValid(code)){
+		if(code.length == 18){
+			var birthdayStr = code.substring(6,14);
+			var birthday = birthdayStr.substring(0,4)+"-"+birthdayStr.substring(4,6)+"-"+birthdayStr.substring(6);
+			$("#birthday").val(birthday);
+		}
+	}
+}
+</script>
+</body>
+</html>

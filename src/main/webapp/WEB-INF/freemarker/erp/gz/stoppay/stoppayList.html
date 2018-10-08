@@ -1,0 +1,219 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var _state,_orgId;
+	jQuery(function(){ 
+		_state="${(returnDatas.queryBean.state)!''}";
+		jQuery("#state").val(_state);
+		_orgId = "${(returnDatas.queryBean.orgId)!''}";
+		jQuery("#orgId").val(_orgId);
+		/*
+		全选、反选
+		*/
+	});
+	function cancelStop(id){
+		layer.confirm("确定撤销停发？",function(){
+			jQuery.ajax({
+				url : "${ctx}/stoppay/update",
+				data : {"id":id,"state":"0"},
+				dateType : "json",
+				type : "post",
+				success : function(_json){
+					if(_json.status =="success"){
+						layer.alert("撤销成功！",function(){location.reload();});
+					}else{
+						layer.alert(_json.message,{icon: 5});
+					}
+				}
+			});
+		})
+	}
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+
+		             </li>
+					 <li style="float:right;">
+		             	<@shiro.hasPermission name="/stoppay/update" >
+		             		<button type="button"   class="layui-btn layui-btn-small" data-action="${ctx}/stoppay/update/pre"><i class="layui-icon layui-icon-specil">&#xe61f;</i>新增</button>
+		             	</@shiro.hasPermission>
+		             	<@shiro.hasPermission name="/stoppay/list/export" >
+				        	<button type="button"   class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		                <button type="button"  class="layui-btn layui-btn-warm layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe601;</i>导入</button>
+		                <@shiro.hasPermission name="/stoppay/delete" >
+		               		 <button type="button"  class="layui-btn layui-btn-danger layui-btn-small"><i class="layui-icon">&#xe640;</i>批量删除</button>
+		                </@shiro.hasPermission>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/stoppay/list" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">停发工资管理搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">员工名称</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="userName" value="${(returnDatas.queryBean.userName)!''}" placeholder="请输入名称 " class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">创建时间</label>
+									                    <div class="layui-input-inline">
+									                           <input type="datetime" name="sdate" id="sdate"  class="layui-input" value="${(returnDatas.queryBean.sdate)!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+									                    </div>
+									                    -
+									                    <div class="layui-input-inline">
+									                           <input type="datetime" name="edate" id="edate" class="layui-input" value="${(returnDatas.queryBean.edate)!''}" readonly="readonly" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+									                    </div>
+							                		</div>
+									                 <div class="layui-inline">
+									                    <label class="layui-form-label">部门</label>
+									                    <div class="layui-input-inline">
+									                        <select name="orgId" id="orgId" class="layui-input">
+									                          <option value="">==请选择==</option>
+															 <#if orgList?? && orgList?size gt 0>
+															 	<#list orgList as org>
+															 		<option value="${(org.id)!''}">${(org.name)!''}</option>
+															 	</#list>
+															 </#if>
+															</select>   
+									                    </div>
+									                </div>
+									                 <div class="layui-inline">
+									                    <label class="layui-form-label">停发状态</label>
+									                    <div class="layui-input-inline">
+									                        <select name="state" id="state" class="layui-input">
+									                          <option value="">==请选择==</option>
+															  <option value="1">停止发放</option>
+															  <option value="0">已撤销</option>
+															</select>   
+									                    </div>
+									                </div>
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even>
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												<tr>
+													<th colspan="9">停发工资管理表列表<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												<tr>
+												  <!--first_start_no_export-->
+												  <th>操作</th>
+												  <!--first_end_no_export-->
+														<th id="th_orgId" >员工部门</th>
+														<th id="th_userId" >员工姓名</th>
+														<th id="th_state" >状态</th>
+														<th id="th_createPerson" >创建人</th>
+														<th id="th_createDate" >创建时间</th>
+														<th id="th_remark" >备注</th>
+														<th id="th_cancelPerson" >撤销人</th>
+														<th id="th_cancelDate" >撤销时间</th>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+														<td>
+								                            <#if _data.state?? && _data.state == 1>
+								                            	<a href="javascript:cancelStop('${(_data.id)!''}')" class="layui-btn layui-btn-danger layui-btn-mini ajax-delete">撤销停发</a>
+								                            </#if>
+														</td>
+														<!--end_no_export-->
+														<td>
+															${(_data.orgName)!''}
+														</td>
+														<td >
+															${(_data.userName)!''}
+														</td>
+														<td >
+															${(_data.stateStr)!''}
+														</td>
+														<td >
+															${(_data.createPersonName)!''}
+														</td>
+														<td >
+															<!--日期型-->
+															${((_data.createDate)?string('yyyy-MM-dd'))!''}
+														</td>
+														<td >
+															${(_data.remark)!''}
+														</td>
+														<td >
+															${(_data.cancelPersonName)!''}
+														</td>
+														<td >
+															<!--日期型-->
+															${((_data.cancelDate)?string('yyyy-MM-dd'))!''}
+														</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

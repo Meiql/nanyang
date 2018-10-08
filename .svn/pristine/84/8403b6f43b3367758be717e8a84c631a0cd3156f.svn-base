@@ -1,0 +1,11 @@
+<#ftl output_format="HTML" auto_esc=true> 
+<@h.commonHead title="微信认证结果" keywords="" description=""/>
+
+<div style="text-align: center;margin-top: 100px;">
+      <#if msg?? && msg=='success'>
+             认证成功
+       <#else>
+       认证失败
+       </#if>      
+</div>
+

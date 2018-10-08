@@ -1,0 +1,68 @@
+package org.springrain.erp.gz.web;
+
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springrain.erp.gz.service.ISalaryService;
+import org.springrain.erp.hr.service.IUserInfoBakService;
+import org.springrain.erp.tc.service.ITongchouRecordService;
+import org.springrain.frame.controller.BaseController;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.system.service.IDicDataService;
+
+/**
+ * 定时任务
+ * 
+ * @author wulei
+ *
+ */
+@Controller
+@RequestMapping(value = "/taskjob")
+public class TaskJobController extends BaseController {
+	@Resource
+	private IDicDataService dicDataService;
+	@Resource
+	private IUserInfoBakService userInfoBakService;
+	@Resource
+	private ITongchouRecordService tongchouRecordService;
+	@Resource
+	private ISalaryService salaryService;
+	/**
+	 * 生成上月人员备份信息
+	 * 
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping("/genUserInfoBak")
+	public void genUserBak(Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Date thisMonthFirstDay = DateUtils.getMonthFirstDay(new Date());
+		Date lastMonthFirstDay = DateUtils.plusMonth(thisMonthFirstDay, -1);
+//		userInfoBakService.saveUserInfoBak(lastMonthFirstDay);
+		salaryService.saveGenLeaveSalary(null, lastMonthFirstDay);;
+		response.getWriter().write("success");
+	}
+	
+	/**
+	 * 生成上月统筹备份信息
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping("/genTcBak")
+	public void gentcBak(Model model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		Date thisMonthFirstDay = DateUtils.getMonthFirstDay(new Date());
+		Date lastMonthFirstDay = DateUtils.plusMonth(thisMonthFirstDay, -1);
+		tongchouRecordService.saveTcRecord(DateUtils.convertDate2String("yyyy-MM",lastMonthFirstDay));
+		response.getWriter().write("success");
+	}
+
+}

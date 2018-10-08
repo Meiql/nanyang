@@ -1,0 +1,280 @@
+package org.springrain.erp.hr.service.impl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springrain.erp.constants.ErpStateEnum;
+import org.springrain.erp.hr.entity.OaOrg;
+import org.springrain.erp.hr.entity.OaUser;
+import org.springrain.erp.hr.entity.OaUserOrg;
+import org.springrain.erp.hr.entity.UserInfo;
+import org.springrain.erp.hr.service.IOaUserService;
+import org.springrain.frame.entity.IBaseEntity;
+import org.springrain.frame.util.DateUtils;
+import org.springrain.frame.util.Finder;
+import org.springrain.frame.util.HttpClientUtils;
+import org.springrain.frame.util.JsonUtils;
+import org.springrain.frame.util.Page;
+import org.springrain.frame.util.ReturnDatas;
+import org.springrain.frame.util.SecUtils;
+import org.springrain.frame.util.TranMap2beanUtils;
+import org.springrain.frame.util.property.HostPropertyUtil;
+import org.springrain.system.entity.User;
+import org.springrain.system.entity.UserRole;
+import org.springrain.system.service.BaseSpringrainServiceImpl;
+
+/**
+ * TODO 在此加入类描述
+ * 
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version 2017-07-31 10:02:36
+ * @see org.springrain.erp.gz.service.impl.OaUser
+ */
+@Service("oaUserService")
+public class OaUserServiceImpl extends BaseSpringrainServiceImpl implements
+		IOaUserService {
+
+	@Override
+	public String save(Object entity) throws Exception {
+		OaUser oaUser = (OaUser) entity;
+		return super.save(oaUser).toString();
+	}
+
+	@Override
+	public String saveorupdate(Object entity) throws Exception {
+		OaUser oaUser = (OaUser) entity;
+		return super.saveorupdate(oaUser).toString();
+	}
+
+	@Override
+	public Integer update(IBaseEntity entity) throws Exception {
+		OaUser oaUser = (OaUser) entity;
+		return super.update(oaUser);
+	}
+
+	@Override
+	public OaUser findOaUserById(Object id) throws Exception {
+		return super.findById(id, OaUser.class);
+	}
+
+	/**
+	 * 列表查询,每个service都会重载,要把sql语句封装到service中,Finder只是最后的方案
+	 * 
+	 * @param finder
+	 * @param page
+	 * @param clazz
+	 * @param o
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public <T> List<T> findListDataByFinder(Finder finder, Page page,
+			Class<T> clazz, Object o) throws Exception {
+		return super.findListDataByFinder(finder, page, clazz, o);
+	}
+
+	/**
+	 * 根据查询列表的宏,导出Excel
+	 * 
+	 * @param finder
+	 *            为空则只查询 clazz表
+	 * @param ftlurl
+	 *            类表的模版宏
+	 * @param page
+	 *            分页对象
+	 * @param clazz
+	 *            要查询的对象
+	 * @param o
+	 *            querybean
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public <T> File findDataExportExcel(Finder finder, String ftlurl,
+			Page page, Class<T> clazz, Object o) throws Exception {
+		return super.findDataExportExcel(finder, ftlurl, page, clazz, o);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void saveOaMsg() throws Exception {
+		String url = HostPropertyUtil.getValue("oaTongbuUrl");
+		String str = HttpClientUtils.sendHttpPost(url);
+		if (StringUtils.isEmpty(str)) {
+			return;
+		}
+		ReturnDatas returnObject = JsonUtils.readValue(str, ReturnDatas.class);
+		String status = returnObject.getStatus();
+		if (!status.equals("success")) {
+			return;
+		}
+		Map<String, List> mapStr = returnObject.getMap();
+		// oauser
+		List<LinkedHashMap> listUser = (List<LinkedHashMap>) mapStr
+				.get("userlist");
+		List<OaUser> userList = new ArrayList<OaUser>();
+		if (CollectionUtils.isNotEmpty(listUser)) {
+			for (LinkedHashMap lmap : listUser) {
+				OaUser oauser = new OaUser();
+				TranMap2beanUtils.transMap2Bean(lmap, oauser);
+				userList.add(oauser);
+			}
+		}
+		Finder f1 = Finder.getDeleteFinder(OaUser.class);
+		super.update(f1);
+		super.save(userList);
+		// oaorg
+		List<LinkedHashMap> listOaOrg = (List<LinkedHashMap>) mapStr
+				.get("orglist");
+		List<OaOrg> listorg = new ArrayList<OaOrg>();
+		if (CollectionUtils.isNotEmpty(listOaOrg)) {
+			for (LinkedHashMap lmap : listOaOrg) {
+				OaOrg oaOrg = new OaOrg();
+				TranMap2beanUtils.transMap2Bean(lmap, oaOrg);
+				listorg.add(oaOrg);
+			}
+		}
+		Finder f2 = Finder.getDeleteFinder(OaOrg.class);
+		super.update(f2);
+		super.save(listorg);
+		// oa_user_org
+		List<LinkedHashMap> listUserOrg = (List<LinkedHashMap>) mapStr
+				.get("userorglist");
+		List<OaUserOrg> listoaUserOrgs = new ArrayList<OaUserOrg>();
+		if (CollectionUtils.isNotEmpty(listUserOrg)) {
+			for (LinkedHashMap lmap : listUserOrg) {
+				OaUserOrg oaUserOrg = new OaUserOrg();
+				TranMap2beanUtils.transMap2Bean(lmap, oaUserOrg);
+				listoaUserOrgs.add(oaUserOrg);
+			}
+		}
+		Finder f3 = Finder.getDeleteFinder(OaUserOrg.class);
+		super.update(f3);
+		super.save(listoaUserOrgs);
+
+	}
+
+	@Override
+	public void saveOaUserForsyn() throws Exception {
+		Finder f = Finder.getSelectFinder(OaUser.class);
+		List<OaUser> listoa = super.queryForList(f, OaUser.class);
+		if (CollectionUtils.isEmpty(listoa)) {
+			return;
+		}
+		//查找user
+		Finder finder = new Finder();
+		finder.append(" select * from " + Finder.getTableName(User.class)
+				+ " where oauserId =:oauserId");
+		Finder fuserinfo = new Finder();
+		//判断userinfo是否存在
+		fuserinfo.append("select * from " + Finder.getTableName(UserInfo.class)
+				+ " where userId=:userId");
+		
+		//save user表userInfo表
+		List<User> listnewUser = new ArrayList<User>();
+		List<UserInfo> lisUserInfoNew = new ArrayList<UserInfo>();
+		//更新 user表userInfo表
+		List<User> listOldUser = new ArrayList<User>();
+		List<UserInfo> lisUserInfoOld = new ArrayList<UserInfo>();
+		for (OaUser oaUser : listoa) {
+			String oaUserId = oaUser.getId();
+			String uuid = SecUtils.getUUID();
+			finder.setParam("oauserId", oaUserId);
+			User user = super.queryForObject(finder, User.class);
+			if(user==null){
+				user = new User();
+			}
+			user = judge(user,oaUser);//账号不重复 是否离职 admin
+			user.setPassword(oaUser.getPassword());
+			user.setName(oaUser.getName());
+			user.setOauserId(oaUserId);
+			
+			if (StringUtils.isEmpty(user.getId())) {
+				user.setId(uuid);
+				listnewUser.add(user);//新数据list
+			}else{
+				listOldUser.add(user);
+			}
+			//查询userinfo
+			fuserinfo.setParam("userId", user.getId());
+			UserInfo userInfo = super.queryForObject(fuserinfo, UserInfo.class);
+			if(userInfo==null){
+				userInfo = new UserInfo();
+			}
+			userInfo.setEmail(oaUser.getEmail());
+			userInfo.setMobile1(oaUser.getMobile());
+			userInfo.setSex(oaUser.getSex());
+			userInfo.setTelephone(oaUser.getPhone());
+			userInfo.setWorkno(oaUser.getWorkno());
+			if(StringUtils.isNotEmpty(oaUser.getCardno())){
+				userInfo.setIdCard(oaUser.getCardno());
+				String birthday = null;
+				if(oaUser.getCardno().length() == 18){
+					birthday = oaUser.getCardno().substring(6,14);
+				}
+				Date birthDay = DateUtils.convertString2Date("yyyyMMdd",birthday);
+				userInfo.setBirthday(birthDay);
+			}
+			userInfo.setAge(oaUser.getAge());
+			userInfo.setFireName(oaUser.getFireName());
+			userInfo.setFirePhone(oaUser.getFamilyPhone());
+			userInfo.setGrade(oaUser.getGradeId());
+			if (StringUtils.isEmpty(userInfo.getId())) {
+				userInfo.setId(uuid);
+				userInfo.setUserId(uuid);
+				lisUserInfoNew.add(userInfo);//新数据list
+			}else{
+				lisUserInfoOld.add(userInfo);
+			}
+		}
+		
+		List<UserRole> list = new ArrayList<UserRole>();
+		if(CollectionUtils.isNotEmpty(listnewUser)){
+			for(User user :listnewUser){
+				UserRole userRole = new UserRole();
+				userRole.setUserId(user.getId());
+				userRole.setRoleId(ErpStateEnum.chuShiRoleEnum.初始角色.getValue());
+				list.add(userRole);
+			}
+		}
+		
+		super.save(listnewUser);
+		super.save(lisUserInfoNew);
+		super.update(listOldUser);
+		super.update(lisUserInfoOld);
+		super.save(list);
+		
+	}
+
+	private User judge(User user,OaUser oaUser)throws Exception{
+		String account = oaUser.getAccount();
+		Finder finder = new Finder();
+		finder.append(" select * from "+Finder.getTableName(User.class)+" where account=:account and oauserId is null").setParam("account", account);
+		User user1 = super.queryForObject(finder, User.class);
+		if(user1!=null){
+			account+=System.currentTimeMillis();
+		}
+		user.setAccount(account);
+		if("admin".equals(account)){
+			user.setUserType(0);
+		}else{
+			user.setUserType(1);
+		}
+		//是否离职
+		if("是".equals(oaUser.getState())){
+			user.setActive(ErpStateEnum.userActiveEnum.在职.getValue());
+		}else{
+			user.setActive(ErpStateEnum.userActiveEnum.离职.getValue());
+		}
+		return user;
+	}
+	
+}

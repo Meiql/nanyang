@@ -1,0 +1,67 @@
+package org.springrain.erp.tc.service;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+import org.springrain.erp.tc.entity.TongchouZengjian;
+import org.springrain.frame.util.Page;
+import org.springrain.system.service.IBaseSpringrainService;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-03 17:42:56
+ * @see org.springrain.erp.tc.service.TongchouZengjian
+ */
+public interface ITongchouZengjianService extends IBaseSpringrainService {
+	
+	/**
+	 * 根据ID查找
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	TongchouZengjian findTongchouZengjianById(Object id) throws Exception;
+	
+	/**
+	 * 
+	 * @param list
+	 * @throws Exception
+	 */
+	void saveOrUpdateForList(List<TongchouZengjian> list) throws Exception;
+	
+	/**
+	 * 查询
+	 */
+	List<TongchouZengjian> finderInfoForList(Page page,TongchouZengjian tongchouZengjian)throws Exception;
+	
+	/**
+	 * 删除 状态变更
+	 * @param id
+	 * @throws Exception
+	 */
+	void deletetongchouInfo(String id)throws Exception;
+	
+	/**
+	 * 查询接口工资生成时使用
+	 * @param userId 
+	 * @param month 格式 2017-06-01
+	 * @return
+	 * @throws Exception
+	 */
+	List<TongchouZengjian> finderTczjxForList(String userId,Date month,List<String> listStr)throws Exception;
+	
+	/**
+	 * 查询统筹增减项个人缴纳总和
+	 * @param userId
+	 * @param month
+	 * @return
+	 * @throws Exception
+	 */
+	BigDecimal findzengjianToal(String userId,Date month)throws Exception;
+ 	
+	List<TongchouZengjian> finderTczjxForFenzuList(String userId,Date month)throws Exception;
+	
+	
+}

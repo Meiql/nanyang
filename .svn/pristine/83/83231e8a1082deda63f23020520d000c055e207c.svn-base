@@ -1,0 +1,36 @@
+package org.springrain.erp.hr.service;
+
+import java.util.List;
+
+import org.springrain.erp.hr.entity.OaOrg;
+import org.springrain.system.service.IBaseSpringrainService;
+/**
+ * TODO 在此加入类描述
+ * @copyright {@link weicms.net}
+ * @author springrain<Auto generate>
+ * @version  2017-07-31 10:02:48
+ * @see org.springrain.erp.gz.service.OaOrg
+ */
+public interface IOaOrgService extends IBaseSpringrainService {
+	
+	/**	
+	 * 根据ID查找
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	OaOrg findOaOrgById(Object id) throws Exception;
+	/**
+	 * 同步oa部门
+	 * @throws Exception
+	 */
+	void updateSynOaOrg() throws Exception;
+	/**
+	 * 查询oa部门树
+	 * @return
+	 * @throws Exception
+	 */
+	List<OaOrg> findTreeOaOrg()throws Exception;
+	
+	
+}

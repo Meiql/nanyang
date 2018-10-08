@@ -1,0 +1,153 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+		<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		            <li class="layui-this">
+		            </li>
+		             <li style="float:right;">
+				        <button type="button" onclick="history.go(-1)" class="layui-btn layui-btn-small" style="margin-top:8px;"><i class="layui-icon layui-icon-specil">&#xe603;</i>返回</button>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview" class="layui-my-form">
+						          				<header class="larry-personal-tit">
+													<span>添加TongchouKkze</span>
+												</header>
+												<div class="larry-personal-body clearfix changepwd">
+													<form id="validForm" class="layui-form <!--  -->"  method="post" action="${ctx}/tongchoukkze/update">
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">公司编号*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.company)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">userId*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.userId)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">userName*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.userName)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">统筹缴纳地*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.tcjiaonadi)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">部门*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.department)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">公司部分*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.insuranceCompany)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">个人部分*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.insurancePersonal)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">companyCe*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.companyCe)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">createUser*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.createUser)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">createTime*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${((returnDatas.data.createTime)?string('yyyy-MM-dd'))!'' }
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">insuranceType*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.insuranceType)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<!--日期型-->
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">month*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${((returnDatas.data.month)?string('yyyy-MM-dd'))!'' }
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">bak1*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.bak1)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">bak2*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.bak2)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">bak3*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.bak3)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+																	<div class="layui-form-item col-lg-6">
+																		<label class="layui-form-label">bak4*</label>
+																		<div class="layui-inline col-lg-5">  
+																			${(returnDatas.data.bak4)!''}
+																		</div>
+																		<div class="layui-inline valid-info"></div>
+																	</div>
+													</form>
+												</div>
+								  </div>
+							</div>
+					</div>
+			</div>
+		</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>

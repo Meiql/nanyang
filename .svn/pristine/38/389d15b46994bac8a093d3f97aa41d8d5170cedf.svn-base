@@ -1,0 +1,267 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<#import "/system/dicdata/dataMacro.html" as dic />
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script src="${ctx}/js/custom/common/form.js"></script>
+<script type="text/javascript" src="${ctx}/js/ajaxfileupload/ajaxfileupload.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+
+<script>
+	var _state;
+	jQuery(function(){ 
+		_state="${(returnDatas.queryBean.active)!''}";
+		jQuery("#active").val(_state);
+		/*
+		全选、反选
+		*/
+		jQuery("#checkAll").bind('click',function(){
+			var _is_check=jQuery(this).get(0).checked;
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				jQuery(_o).get(0).checked=_is_check;
+			});
+		});
+		$("#salaryTypeId").find("option[value='${(returnDatas.queryBean.salaryTypeId)!''}']").prop("selected","true");
+	});
+	function del(_id){
+		springrain.mydelete(_id,"${ctx}/salaryinfo/delete");
+	}
+	
+	function opendialog(){
+		var html_content='<ul style="text-align:center;margin-top:20px;" ><li><input type="file" name="uploadfile"  id="uploadfile"/></li><br><li><button onclick="doimport();" class="layui-btn layui-btn-warm">导入</button> &nbsp;&nbsp;&nbsp;&nbsp;<button onclick="downloadmoban();" class="layui-btn">下载模板</button></li> </ul>';
+		//页面层
+		layer.open({
+		  type: 1,
+		  skin: 'layui-layer-rim', //加上边框
+		  area: ['300px', '150px'], //宽高
+		  content: html_content
+		});
+	}
+	
+	function downloadmoban(){
+		location.href="${ctx}/salaryinfo/ajax/downMoban";
+	}
+	
+	function doimport(){
+		var myfile=jQuery("#uploadfile").val();
+		if ( myfile== null|| myfile == '') {
+			layer.alert("导入的excel文件不能为空");
+			return false;
+		}
+		// 验证是否是excel文件
+		var s = /(.*?)\.xls$/;
+		if (s.test(myfile) == false) {
+			layer.alert("文件格式不正确,请上传Excel文件且扩展名为.xls.");
+			return false;
+		}
+		var confirm = layer.confirm('确认导入?', {icon: 3, title:'提示'}, function(idex){
+				var index = layer.load();
+				var _url="${ctx}/salaryinfo/import"
+				jQuery.ajaxFileUpload({
+			        url: _url, //用于文件上传的服务器端请求地址
+			        secureuri: false, //是否需要安全协议，一般设置为false
+			        fileElementId: "uploadfile", //文件上传域的ID
+			        dataType: 'json', //返回值类型 一般设置为json
+			        success: function (data, status)  //服务器成功响应处理函数
+			        {
+						layer.close(index);     
+						if(data.status=="success"){
+							layer.closeAll(); 
+							layer.alert(data.message, {
+								  closeBtn: 0
+								}, function(){
+									location.href="${ctx}/salaryinfo/list";
+								});
+						}else{
+							layer.alert(data.message); 
+						}
+			        },
+			        error: function (data, status, e)//服务器响应失败处理函数
+			        {
+			       	 alert(JSON.stringify(data)); 
+			        }
+			    });
+		});
+	}
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+
+		             </li>
+					 <li style="float:right;">
+<!-- 		             	<@shiro.hasPermission name="/salaryinfo/update" >
+		             		<button type="button"   class="layui-btn layui-btn-small" data-action="${ctx}/salaryinfo/update/pre"><i class="layui-icon layui-icon-specil">&#xe61f;</i>新增</button>
+		             	</@shiro.hasPermission> -->
+		             	<@shiro.hasPermission name="/salaryinfo/list/export" >
+				        	<button type="button"   class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		                
+		             <@shiro.hasPermission name="/salaryinfo/import" >
+		                <button type="button" onclick="opendialog();"  class="layui-btn layui-btn-warm layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe601;</i>导入工资增减项</button>
+				</@shiro.hasPermission>
+				
+		                <@shiro.hasPermission name="/salaryinfo/delete" >
+		          <!--      		 <button type="button"  class="layui-btn layui-btn-danger layui-btn-small"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
+		                </@shiro.hasPermission>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/salaryinfo/list" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">工资增减项搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">员工姓名</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="userName" value="${(returnDatas.queryBean.userName)!''}" placeholder="请输入名称 " class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">归属月份</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text"  id="monthStr" name="monthStr" onfocus="WdatePicker({dateFmt:'yyyy-MM'})"  value="${(returnDatas.queryBean.monthStr)!''}" placeholder="归属月份 " class="layui-input">
+									                    </div>
+							                		</div>
+							                		
+							                		<div class="layui-inline">
+									                    <label class="layui-form-label">工资增减项类型</label>
+									                    <div class="layui-input-inline">
+									                           <select name="salaryTypeId" id="salaryTypeId">
+									                           <option value=""></option>
+									                           <@dic.dataList typekey="gzzjxlx"/>
+									                           </select>
+									                    </div>
+							                		</div>
+
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even>
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												<tr>
+													<th colspan="9">工资增减项列表<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												<tr>
+												  <!--first_start_no_export-->
+<!-- 												  <th class="center">
+															<input id="checkAll"  type="checkbox">
+												  </th> -->
+												  <th width="80px;">操作</th>
+												  <!--first_end_no_export-->
+														<th id="th_inDate" >归属月份</th>
+														<th id="th_userName" >员工</th>
+														<th id="th_userAccount">账号</th>
+														<th id="th_salaryType" >增减类型</th>
+														<th id="th_amount" >金额</th>
+														<th id="th_remarker" >备注</th>
+														<th id="th_createUser" >创建人</th>
+														<th id="th_createTime" >创建时间</th>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+<!-- 														<td class="center">
+																<input name="check_li" value="${_data.id}"  type="checkbox">
+														</td> -->
+														<td>
+<!-- 															<@shiro.hasPermission name="/salaryinfo/update" >
+								                           		 <a href="#" data-action="${ctx}/salaryinfo/update/pre?id=${(_data.id)!''}" class="layui-btn layui-btn-normal layui-btn-mini">编辑</a>
+								                            </@shiro.hasPermission> -->
+								                            
+								                            <@shiro.hasPermission name="/salaryinfo/delete" >
+								                                <#if _data?? && _data.salaryId??>
+								                                   <font style="color: red;">已计入工资</font>
+								                                <#else>
+								                            	   <a href="javascript:del('${(_data.id)!''}')" class="layui-btn layui-btn-danger layui-btn-mini ajax-delete">删除</a>
+								                                </#if>
+								                            </@shiro.hasPermission>
+														</td>
+														<!--end_no_export-->
+														<td >
+															${((_data.inDate)?string('yyyy-MM'))!''}
+														</td>
+	
+														<td >
+															${(_data.userName)!''}
+														</td>
+														<td >
+															${(_data.userAccount)!''}
+														</td>
+														<td >
+															${(_data.salaryType)!''}
+														</td>
+														<td >
+															${(_data.amount)!0}
+														</td>
+														<td >
+															${(_data.remarker)!''}
+														</td>
+														<td >
+															${(_data.createUser)!''}
+														</td>
+														<td >
+															${(_data.createTime)!''}
+														</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

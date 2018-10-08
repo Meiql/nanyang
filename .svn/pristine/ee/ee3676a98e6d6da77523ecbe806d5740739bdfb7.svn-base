@@ -1,0 +1,186 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/custom/common/form.js"></script>
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var _retype;
+	jQuery(function(){ 
+		_retype="${(returnDatas.queryBean.retype)!''}";
+		jQuery("#retype").val(_retype);
+	});
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+
+		             </li>
+					 <li style="float:right;">
+		             	<@shiro.hasPermission name="/zichanrecord/list/${(zichanRecord.isAdmin)!''}/export" >
+				        	<button type="button"  onclick="myexport('searchForm','${ctx}/zichanrecord/list/${(zichanRecord.isAdmin)!''}/export')"    class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/zichanrecord/list/${(zichanRecord.isAdmin)!''}" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<th colspan="2">资产领用记录表搜索</th>
+							          		</tr>
+							          		<tr>
+							          			<td>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">资产编号</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="zccode" value="${(returnDatas.queryBean.zccode)!''}"  class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">资产名称</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="zcname" value="${(returnDatas.queryBean.zcname)!''}"  class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">发生人</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="reuser" value="${(returnDatas.queryBean.reuser)!''}"  class="layui-input">
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">发生类型</label>
+									                    <div class="layui-input-inline">
+									                    		<select name="retype" class="layui-input" id="retype">
+									                    			<option value="">请选择</option>
+									                    			<option value="领用">领用</option>
+									                    			<option value="归还">归还</option>
+									                    			<option value="报损">报损</option>
+									                    			<option value="出售">出售</option>
+									                    		</select>
+									                    </div>
+							                		</div>
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">发生时间</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="sdate" value="${(returnDatas.queryBean.sdate)!''}"  class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+									                    </div>
+									                    -
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="edate" value="${(returnDatas.queryBean.edate)!''}"  class="layui-input" readonly="readonly"  onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})">
+									                    </div>
+							                		</div>
+									                 
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even>
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												  <!--first_start_no_export-->
+												<tr>
+													<th colspan="9">资产领用记录表列表<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												  <!--first_end_no_export-->
+												<tr>
+														<th>资产编号</th>
+														<th>资产名称</th>
+														<th>发生类型</th>
+														<th>发生人</th>
+														<th>发生部门</th>
+														<th>发生日期</th>
+														<th>影响数量</th>
+														<th>影响金额</th>
+														<th>备注</th>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										    <#if (returnDatas.data??)&&(returnDatas.data?size>0)> 
+										    	<#list	returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+														<!--end_no_export-->
+														<td >
+															${(_data.zccode)!''}&#160;
+														</td>
+														<td >
+															${(_data.zcname)!''}&#160;
+														</td>
+														<td >
+															${(_data.retype)!''}&#160;
+														</td>
+														<td >
+															${(_data.reuser)!''}&#160;
+														</td>
+														<td >
+															${(_data.reunit)!''}&#160;
+														</td>
+														<td >
+															<!--日期型-->
+														${((_data.redate)?string('yyyy-MM-dd'))!''}
+														</td>
+														<td >
+															${(_data.renum)!0}&#160;
+														</td>
+														<td >
+															${(_data.remoney)!0}&#160;
+														</td>
+														<td >
+															${(_data.remark)!''}&#160;
+														</td>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+										<!--end_export-->
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+

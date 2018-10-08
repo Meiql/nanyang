@@ -1,0 +1,256 @@
+<#ftl output_format="HTML" auto_esc=true>
+<@h.commonHead title="后台管理系统" keywords="开源,永久免费" description="springrain开源系统管理后台"/>
+<script src="${ctx}/js/validform/validform.min.js"></script>
+<link rel="stylesheet" href="${ctx}/js/validform/validform.css" media="all">
+<link href="${ctx}/js/select2/css/select2.min.css" rel="stylesheet"/> 
+<link rel="stylesheet" href="${ctx}/js/My97DatePicker/skin/default/datepicker.css" />
+<script type="text/javascript" src="${ctx}/js/select2/js/select2.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${ctx}/js/tc/add.js"></script>
+<script type="text/javascript" src="${ctx}/js/My97DatePicker/WdatePicker.js"></script>
+<script>
+	var _state;
+	jQuery(function(){ 
+		_state="${(returnDatas.queryBean.active)!''}";
+		jQuery("#active").val(_state);
+		/*
+		全选、反选
+		*/
+		jQuery("#checkAll").bind('click',function(){
+			var _is_check=jQuery(this).get(0).checked;
+			jQuery("input[name='check_li']").each(function(_i,_o){
+				jQuery(_o).get(0).checked=_is_check;
+			});
+		});
+	});
+	function del(_id){
+		springrain.mydelete(_id,"${ctx}/tongchouinfo/delete");
+	}
+	jQuery(document).ready(function(){
+		$("#userName").select2({width:'320px',height:'26px'});
+		$("#userName").val('${(returnDatas.queryBean.userName)!''}').trigger("change");
+		$("#company option[value='${(returnDatas.queryBean.company)!''}']").prop("selected",true);
+		$("#state option[value='${(returnDatas.queryBean.state)!''}']").prop("selected",true);
+	});
+	function huifu(userid) {
+		 $.ajax({
+			url :"${ctx}/tongchouinfo/tingbao/more", 
+		    type :"post",
+		    data:{userId:userid},
+			dataType : "json",
+			success:function(ret){
+				if(ret.status=="success"){
+					layer.alert(ret.message, {icon: 1},function(){
+							layer.closeAll();
+							window.location.href="${ctx}/tongchouinfo/list?springraintoken="+springraintoken});
+					
+				}else{
+					layer.alert(ret.message,{icon: 5});
+				}
+			},
+			error:function(){
+				layer.closeAll('loading')
+				layer.alert('sorry,遇到问题添加失败了 ...',{icon: 5});
+			}
+		});  
+} 
+</script>
+
+</head>
+<body>
+	<div class="layui-layout layui-layout-admin">
+		<@h.naviHeader /><@h.leftMenu />
+			<!-- 主体内容开始 -->
+			<div class="layui-tab layui-tab-brief">
+				<ul class="layui-tab-title site-demo-title">
+		             <li class="layui-this">
+		             </li>
+					 <li style="float:right;">
+		             	<@shiro.hasPermission name="/tongchouinfo/update" >
+		             		<button type="button"   class="layui-btn layui-btn-small" data-action="${ctx}/tongchouinfo/update/pre"><i class="layui-icon layui-icon-specil">&#xe61f;</i>新增</button>
+		             	</@shiro.hasPermission>
+		             	<@shiro.hasPermission name="/tongchouinfo/list/export" >
+				        	<button type="button"   class="layui-btn layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe609;</i>导出</button>
+				        </@shiro.hasPermission>
+<!-- 		                <button type="button"  class="layui-btn layui-btn-warm layui-btn-small"><i class="layui-icon layui-icon-specil">&#xe601;</i>导入</button> -->
+<!-- 		                <@shiro.hasPermission name="/tongchouinfo/delete" > -->
+<!-- 		               		 <button type="button"  class="layui-btn layui-btn-danger layui-btn-small"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
+<!-- 		                </@shiro.hasPermission> -->
+		             </li>
+	       		</ul>
+				
+				<div class="layui-body layui-tab-content site-demo-body">
+					<div class="layui-tab-item layui-show">
+							<div class="layui-main">
+						          <div id="LAY_preview">
+						          <!-- 查询  开始 -->
+							          <form class="layui-form layui-form-pane" id="searchForm" action="${ctx}/tongchouinfo/list" method="post">
+							          <input type="hidden" name="pageIndex" id="pageIndex" value="${(returnDatas.page.pageIndex)!'1'}" /> 
+							          <input type="hidden" name="sort" id="page_sort" value="${(returnDatas.page.sort)!'desc'}" />
+							          <input type="hidden" name="order" id="page_order" value="${(returnDatas.page.order)!'id'}" />
+									  <table class="layui-table search-wrap">
+									  	<colgroup>
+										    <col width="">
+										    <col width="150">
+										</colgroup>
+							          	<tbody>
+							          		<tr>
+							          			<td>
+							          			<div class="layui-inline">
+									                    <label class="layui-form-label">开始时间：</label>
+									                    <div class="layui-input-inline">
+									                           <input type="text" name="startDate" id="startDate"  class="layui-input" readonly value= "${(returnDatas.queryBean.startDate)!''}"  onFocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"/>
+									                    </div>
+									                    -
+							                		</div>
+							                		<div class="layui-inline">
+							                		 <label class="layui-form-label">结束时间：</label>
+									                     <div class="layui-input-inline">
+									                           <input type="text" name="endDate" id="endDate"  class="layui-input" readonly value= "${(returnDatas.queryBean.endDate)!''}"  onFocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"/>
+									                    </div>
+									                   </div> 
+							          				<div class="layui-inline">
+									                    <label class="layui-form-label">用户名称</label>
+									                    <div class="layui-input-inline">
+																	 <select id="userName" name="userName"  class="nolayer" style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+																		<option value="">请选择</option>
+																		<#if listUser ??>
+																			<#list listUser as user>
+																				<option value="${(user.name)!''}" >${(user.name)!''}</option>	
+																			</#list>
+																		</#if>	
+																</select>
+									                    </div>
+							                		</div>
+									                 <div class="layui-inline">
+									                    <label class="layui-form-label">公司名称</label>
+									                    <div class="layui-input-inline">
+									                        	<select id="company" name="company"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+																		<option value="">请选择</option>
+																		<#if gsList ??>
+																			<#list gsList as unit>
+																				<option value="${(unit.id)!''}" >${(unit.name)!''}</option>	
+																			</#list>
+																		</#if>	
+																</select>
+									                    </div>
+									                </div>
+									                  <div class="layui-inline">
+									                    <label class="layui-form-label">状态</label>
+									                    <div class="layui-input-inline">
+									                        	<select id="state" name="state"  style="width:320px; height: 40px;border: 1px solid #e6e6e6;"  >
+																		<option value="">请选择</option>
+																		<option value="0">停保</option>
+																		<option value="1">正常</option>	
+																</select>
+									                    </div>
+									                </div>
+							          			</td>
+							          			<td>
+							          			   <div class="layui-inline">
+									                    <button class="layui-btn" type="button" onclick="springrain.commonSubmit('searchForm');"><i class="layui-icon" style="top:4px;right:5px;">&#xe615;</i>搜索</button>
+									                </div>
+							          			</td>
+							          		</tr>
+							          	</tbody>
+							          </table>
+									  <!-- 查询  结束 -->
+									</form>
+									<!--start_export-->
+									<table class="layui-table" lay-even>
+										  <colgroup>
+										    <col width="40">
+										    <col width="120">
+										    <col>
+										  </colgroup>
+										  <!--end_no_export-->
+										  <!--first_start_export-->
+											<thead>
+												<tr>
+													<th colspan="20">员工统筹公积金<font id='recordsView' class='recorsView'>共<span></span>页,共 <span></span>条记录</font></th>
+												</tr>
+												<tr>
+												  <!--first_start_no_export-->
+												  <!--first_end_no_export-->
+														<th >操作</th>
+														<th>状态</th>
+														<th>姓名</th>
+														<th>身份证号</th>
+														<th>公司</th>
+														<th>缴纳地</th>
+														<th>工号</th>
+														<th>岗位</th>
+														<th>添加时间</th>
+														<th>停保月份</th>
+														<#if listshow??>
+															<#list listshow as showTitle>
+																<th>${showTitle.dicdataName}${showTitle.deskShowName}</th>
+															</#list>
+														</#if>
+												</tr> 
+											</thead>
+										  <!--first_end_export-->
+										  <!--start_export-->
+										   <tbody>
+										   <#if (returnDatas.data??)&&(returnDatas.data?size>0)>
+					 								<#list returnDatas.data as _data>
+										    		<!--start_no_export-->
+													<tr class="">
+														<td style="width:130px">
+															<@shiro.hasPermission name="/tongchouinfo/update" >
+																	<#if (_data.state)?? && (_data.state=='1')>
+										                           		 <a href="#" data-action="${ctx}/tongchouinfo/update/pre?userId=${(_data.userId)!''}" class="layui-btn layui-btn-normal layui-btn-mini">编辑</a>
+																	</#if>
+								                            </@shiro.hasPermission>
+								                            
+															<#if (_data.state)?? && (_data.state=='1')>
+										                           		 <a href="#" data-action="${ctx}/tongchouinfo/tingbao/pre?userId=${(_data.userId)!''}" class="layui-btn layui-btn-normal layui-btn-mini">停保</a>
+															<#else>
+															<a href="#"  onclick="huifu('${(_data.userId)!''}')"  class="layui-btn layui-btn-normal layui-btn-mini">恢复</a>
+															</#if>
+															
+								                             <@shiro.hasPermission name="/tongchouinfo/delete" >
+<!-- 								                            	<a href="javascript:del('${(_data.userId)!''}')" class="layui-btn layui-btn-danger layui-btn-mini ajax-delete">删除</a> -->
+								                            </@shiro.hasPermission>
+														</td>
+														<!--end_no_export-->
+															<td>
+															<#if (_data.state)?? && (_data.state=='1')>
+																正常
+															<#else>
+																	已停保		
+															</#if>
+														</td>
+														<td>${(_data.username)!''}</td>
+														<td >${(_data.cardId)!''}</td>
+														<td >${(_data.inCompany)!''}</td>
+														<td >${(_data.tcjiaonadi)!''}</td>
+														<td >${(_data.jobNumber)!''}</td>
+														<td >${(_data.dutyTypeName)!''}</td>
+														<td >${(_data.creatDateStr)!''}</td>
+														<td >${((_data.stopProtectMonth)?string('yyyy-MM-dd'))!''}</td>
+														<#if _data.showList??>
+															<#list _data.showList as show>
+																<td >${(show.propertyValue)!''}</td>
+															</#list>
+														</#if>
+													</tr>
+												</#list>
+											 </#if>
+											</tbody>
+										</table>
+									<#if returnDatas.page??> 
+										<div id='laypageDiv'></div>
+										<@h.layPage page=returnDatas.page /> 
+									</#if>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		<!-- 主体内容结束 -->
+		<@h.footer />
+	</div>
+</body>
+</html>
+
