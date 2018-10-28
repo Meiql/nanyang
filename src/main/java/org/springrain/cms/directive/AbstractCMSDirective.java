@@ -22,7 +22,7 @@ import freemarker.template.TemplateModel;
  */
 public abstract class AbstractCMSDirective implements
 		TemplateDirectiveModel {
-//xuqiangceshi	
+//xuqiangceshi	cihang
 	/**
 	 * 输入参数，内容ID
 	 */
